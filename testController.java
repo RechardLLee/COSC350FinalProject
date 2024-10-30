@@ -19,7 +19,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class testController {
+// import Bingo.edu.augie.finalProgram.Weckman.StandardBingo;
+
+
+public class TestController {
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -44,6 +47,32 @@ public class testController {
 
     @FXML // fx:id="signInButton"
     private Button signInButton; // Value injected by FXMLLoader
+
+    @FXML // fx:id="reviewMenu"
+    private MenuItem reviewMenu; // Value injected by FXMLLoader
+
+    @FXML // fx:id="bingoPlayButton"
+    private Button bingoPlayButton; // Value injected by FXMLLoader
+
+    @FXML // fx:id="developerLoginButton"
+    private Button developerLoginButton; // Value injected by FXMLLoader
+
+    @FXML
+    void bingoPlayAction(ActionEvent event) {
+        // try {
+        //    Stage stage = new Stage();
+        //    Parent root = 
+        //      FXMLLoader.load(getClass().getResource("Bingo/Bingo.fxml")); //Change the .fxml file
+
+        //   Scene scene = new Scene(root); // attach scene graph to scene
+        //   stage.setTitle(""); // Change the Title Bar
+        //   stage.setScene(scene); // attach scene to stage
+        //   stage.show(); // display the stage;
+        // }
+        // catch(IOException e) {
+        //   e.printStackTrace();
+        // }
+    }
 
     @FXML
     void createAccountAction(ActionEvent event) {
@@ -81,6 +110,40 @@ public class testController {
         usernameDisplayTextField.setText(text);
     }
 
+    @FXML
+    void reviewAction(ActionEvent event) {
+        try {
+           Stage stage = new Stage();
+           Parent root = 
+             FXMLLoader.load(getClass().getResource("Review.fxml")); //Change the .fxml file
+
+          Scene scene = new Scene(root); // attach scene graph to scene
+          stage.setTitle(""); // Change the Title Bar
+          stage.setScene(scene); // attach scene to stage
+          stage.show(); // display the stage;
+        }
+        catch(IOException e) {
+          e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void developerLoginAction(ActionEvent event) {
+        try {
+           Stage stage = new Stage();
+           Parent root = 
+             FXMLLoader.load(getClass().getResource("developerLogin.fxml")); //Change the .fxml file
+
+          Scene scene = new Scene(root); // attach scene graph to scene
+          stage.setTitle(""); // Change the Title Bar
+          stage.setScene(scene); // attach scene to stage
+          stage.show(); // display the stage;
+        }
+        catch(IOException e) {
+          e.printStackTrace();
+        }
+    }
+
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         assert usernameTextField != null : "fx:id=\"usernameTextField\" was not injected: check your FXML file 'test.fxml'.";
@@ -88,6 +151,10 @@ public class testController {
         assert createAccountButton != null : "fx:id=\"createAccountButton\" was not injected: check your FXML file 'test.fxml'.";
         assert signInButton != null : "fx:id=\"signInButton\" was not injected: check your FXML file 'test.fxml'.";
         assert reportBugMenu != null : "fx:id=\"reportBugMenu\" was not injected: check your FXML file 'test.fxml'.";
+        assert reviewMenu != null : "fx:id=\"reviewMenu\" was not injected: check your FXML file 'test.fxml'.";
         assert usernameDisplayTextField != null : "fx:id=\"usernameDisplayTextField\" was not injected: check your FXML file 'test.fxml'.";
+        assert developerLoginButton != null : "fx:id=\"developerLoginButton\" was not injected: check your FXML file 'test.fxml'.";
+        assert bingoPlayButton != null : "fx:id=\"bingoPlayButton\" was not injected: check your FXML file 'test.fxml'.";
+
     }
 }
