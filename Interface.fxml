@@ -90,7 +90,7 @@
             <Font size="18.0" />
           </font>
         </Label>
-            <Button layoutX="294.0" layoutY="288.0" mnemonicParsing="false" text="Button" />
+            <Button fx:id="button" layoutX="294.0" layoutY="288.0" mnemonicParsing="false" text="Button" />
       </children>
     </AnchorPane>
   </children>
