@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ReviewController">
+   <children>
+      <Label focusTraversable="false" layoutX="250.0" layoutY="25.0" prefHeight="25.0" prefWidth="100.0" text="Reviews:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Slider fx:id="ratingSlider" blockIncrement="1.0" layoutX="175.0" layoutY="125.0" majorTickUnit="1.0" max="5.0" minorTickCount="1" prefHeight="50.0" prefWidth="250.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0" />
+      <Label focusTraversable="false" layoutX="150.0" layoutY="75.0" prefHeight="50.0" prefWidth="350.0" text="From 1 (poor) to 5 (great), how would you rate our product?" />
+      <TextArea fx:id="reviewTextField" layoutX="100.0" layoutY="200.0" prefHeight="150.0" prefWidth="400.0" />
+      <Button fx:id="submitButton" layoutX="275.0" layoutY="360.0" mnemonicParsing="false" onAction="#submitAction" text="Submit" />
+   </children>
+</Pane>

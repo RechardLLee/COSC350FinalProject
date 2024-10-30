@@ -9,10 +9,11 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.RadialGradient?>
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="testController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TestController">
    <top>
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
@@ -41,7 +42,7 @@
               <items>
                 <MenuItem mnemonicParsing="false" text="Sign Out" />
                 <MenuItem fx:id="reportBugMenu" mnemonicParsing="false" onAction="#reportBugAction" text="Report a Bug" />
-                  <MenuItem mnemonicParsing="false" text="Write a Review" />
+                  <MenuItem fx:id="reviewMenu" mnemonicParsing="false" onAction="#reviewAction" text="Write a Review" />
                   <MenuItem mnemonicParsing="false" text="Change Username" />
               </items>
             </MenuButton>
@@ -74,7 +75,7 @@
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <TextField alignment="TOP_LEFT" layoutX="15.0" layoutY="14.0" prefHeight="150.0" prefWidth="1000.0" text="General information, not able to be interacted with but visible to user. Possibly creators, date published/updated, etc." />
-            <Button layoutX="1700.0" layoutY="100.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="150.0" text="Developer Login" />
+            <Button fx:id="developerLoginButton" layoutX="1700.0" layoutY="100.0" mnemonicParsing="false" onAction="#developerLoginAction" prefHeight="20.0" prefWidth="150.0" text="Developer Login" />
          </children>
       </Pane>
    </bottom>
@@ -82,6 +83,20 @@
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <Label layoutX="71.0" layoutY="36.0" text="Games" />
+            <Label layoutX="49.0" layoutY="73.0" text="BINGO">
+               <font>
+                  <Font name="System Bold Italic" size="72.0" />
+               </font>
+               <textFill>
+                  <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
+                     <stops>
+                        <Stop color="#c31414" />
+                        <Stop color="WHITE" offset="1.0" />
+                     </stops>
+                  </RadialGradient>
+               </textFill>
+            </Label>
+            <Button fx:id="bingoPlayButton" layoutX="144.0" layoutY="178.0" mnemonicParsing="false" onAction="#bingoPlayAction" text="PLAY" />
          </children>
       </Pane>
    </center>
