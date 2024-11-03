@@ -19,10 +19,17 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-// import Bingo.edu.augie.finalProgram.Weckman.StandardBingo;
+import java.math.BigDecimal;
+
 
 
 public class TestController {
+
+    private String userName;
+
+    private BigDecimal balance;
+
+    
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
