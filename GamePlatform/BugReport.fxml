@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="30" prefWidth="700" prefHeight="600"
+    style="-fx-background-color: #f5f5f5;"
+    xmlns:fx="http://javafx.com/fxml" fx:controller="BugReportController">
+    
+    <padding>
+        <Insets top="40" right="50" bottom="40" left="50"/>
+    </padding>
+    
+    <Label fx:id="titleLabel" text="Bug Report" 
+        style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+    
+    <VBox spacing="20" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+        <padding>
+            <Insets top="30" right="30" bottom="30" left="30"/>
+        </padding>
+        
+        <Label text="Description" style="-fx-text-fill: #666;"/>
+        <TextArea fx:id="bugDescriptionArea" prefHeight="200" wrapText="true"
+            style="-fx-background-color: #f8f9fa; -fx-border-color: transparent; -fx-background-radius: 5;"/>
+        
+        <HBox spacing="15" alignment="CENTER">
+            <Button fx:id="uploadButton" text="Upload Screenshot"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20;"
+                onAction="#handleUploadScreenshot"/>
+            <Button fx:id="submitButton" text="Submit Report"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20;"
+                onAction="#handleSubmitReport"/>
+        </HBox>
+    </VBox>
+</VBox> 
