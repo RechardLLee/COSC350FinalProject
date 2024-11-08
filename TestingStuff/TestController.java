@@ -81,6 +81,14 @@ public class TestController {
         // }
     }
 
+    @FXML // fx:id="gofishPlayButton"
+    private Button gofishPlayButton; // Value injected by FXMLLoader
+
+    @FXML
+    void gofishPlayAction(ActionEvent event) {
+
+    }
+
     @FXML
     void createAccountAction(ActionEvent event) {
         int account = 1;
@@ -153,15 +161,16 @@ public class TestController {
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        assert usernameTextField != null : "fx:id=\"usernameTextField\" was not injected: check your FXML file 'test.fxml'.";
-        assert passwordField != null : "fx:id=\"passwordField\" was not injected: check your FXML file 'test.fxml'.";
+        assert bingoPlayButton != null : "fx:id=\"bingoPlayButton\" was not injected: check your FXML file 'test.fxml'.";
         assert createAccountButton != null : "fx:id=\"createAccountButton\" was not injected: check your FXML file 'test.fxml'.";
-        assert signInButton != null : "fx:id=\"signInButton\" was not injected: check your FXML file 'test.fxml'.";
+        assert developerLoginButton != null : "fx:id=\"developerLoginButton\" was not injected: check your FXML file 'test.fxml'.";
+        assert gofishPlayButton != null : "fx:id=\"gofishPlayButton\" was not injected: check your FXML file 'test.fxml'.";
+        assert passwordField != null : "fx:id=\"passwordField\" was not injected: check your FXML file 'test.fxml'.";
         assert reportBugMenu != null : "fx:id=\"reportBugMenu\" was not injected: check your FXML file 'test.fxml'.";
         assert reviewMenu != null : "fx:id=\"reviewMenu\" was not injected: check your FXML file 'test.fxml'.";
+        assert signInButton != null : "fx:id=\"signInButton\" was not injected: check your FXML file 'test.fxml'.";
         assert usernameDisplayTextField != null : "fx:id=\"usernameDisplayTextField\" was not injected: check your FXML file 'test.fxml'.";
-        assert developerLoginButton != null : "fx:id=\"developerLoginButton\" was not injected: check your FXML file 'test.fxml'.";
-        assert bingoPlayButton != null : "fx:id=\"bingoPlayButton\" was not injected: check your FXML file 'test.fxml'.";
+        assert usernameTextField != null : "fx:id=\"usernameTextField\" was not injected: check your FXML file 'test.fxml'.";
 
     }
 }

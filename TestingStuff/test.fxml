@@ -13,7 +13,7 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TestController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TestController">
    <top>
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
@@ -97,6 +97,12 @@
                </textFill>
             </Label>
             <Button fx:id="bingoPlayButton" layoutX="144.0" layoutY="178.0" mnemonicParsing="false" onAction="#bingoPlayAction" text="PLAY" />
+            <Label layoutX="449.0" layoutY="53.0" text="Go Fish" textFill="#e39dc2">
+               <font>
+                  <Font name="Curlz MT" size="72.0" />
+               </font>
+            </Label>
+            <Button fx:id="gofishPlayButton" layoutX="529.0" layoutY="178.0" mnemonicParsing="false" onAction="#gofishPlayAction" text="PLAY" />
          </children>
       </Pane>
    </center>
