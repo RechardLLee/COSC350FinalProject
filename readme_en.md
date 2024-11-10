@@ -67,4 +67,4 @@ A multilingual game platform system developed with JavaFX, supporting both Engli
 
 ### Launch Methods
 1. Double-click `run.bat` in Windows environment
-2. Or via command line: 
+2. Or via command line:
