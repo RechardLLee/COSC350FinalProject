@@ -38,11 +38,35 @@ public class GameViewController {
     
     @FXML
     private void handleDownload() {
-        // 实现下载逻辑
+        String gameName = getGameFileName(titleLabel.getText());
+        GameLauncher.downloadGame(gameName);
     }
     
     @FXML
     private void handleStartGame() {
-        // 实现启动游戏逻辑
+        String gameName = getGameFileName(titleLabel.getText());
+        GameLauncher.launchGame(gameName);
+    }
+    
+    private String getGameFileName(String gameTitle) {
+        // 将游戏标题转换为对应的文件名
+        switch(gameTitle.toLowerCase()) {
+            case "snake":
+            case "贪吃蛇":
+                return "snake_game";
+            case "hanoi tower":
+            case "汉诺塔":
+                return "hanoi_tower_game";
+            case "guess number":
+            case "猜数字":
+                return "guess_number_game";
+            default:
+                return gameTitle.toLowerCase().replace(" ", "_");
+        }
+    }
+    
+    public void setGameInfo(String title, String description) {
+        titleLabel.setText(title);
+        gameDescription.setText(description);
     }
 } 

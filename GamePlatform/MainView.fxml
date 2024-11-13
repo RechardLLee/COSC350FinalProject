@@ -55,6 +55,10 @@
                     prefWidth="200" prefHeight="200"
                     style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);"
                     onAction="#handleGameSelect" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                <Button fx:id="addGameButton" text="+" 
+                    prefWidth="200" prefHeight="200"
+                    style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);"
+                    onAction="#handleAddGame" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
             </GridPane>
         </VBox>
     </center>
