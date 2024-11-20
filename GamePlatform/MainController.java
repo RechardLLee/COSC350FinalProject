@@ -12,83 +12,64 @@ import java.io.IOException;
 import javafx.event.ActionEvent;
 import java.util.prefs.Preferences;
 import java.util.*;
+import javafx.scene.layout.FlowPane;
 
 public class MainController {
     
-    @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField;
-    @FXML private Button loginButton;
-    @FXML private Button signupButton;
+    @FXML private Label titleLabel;
     @FXML private Button languageButton;
     @FXML private Button snakeButton;
     @FXML private Button game2Button;
     @FXML private Button game3Button;
-    @FXML private Button game4Button;
+    @FXML private Button addGameButton;
     @FXML private Button bugReportButton;
     @FXML private Button reviewButton;
     @FXML private Button developerButton;
-    @FXML private Button addGameButton;
+    @FXML private FlowPane gamePane;
     
-    private boolean isEnglish = true;
     private Preferences prefs = Preferences.userNodeForPackage(MainController.class);
     private static final String CUSTOM_GAMES_KEY = "customGames";
     
     @FXML
     private void initialize() {
-        setLanguage(true);
-        LanguageUtil.setEnglish(true);
+        setLanguage(LanguageUtil.isEnglish());
         loadCustomGames();
-    }
-    
-    @FXML
-    private void handleLanguageToggle() {
-        isEnglish = !isEnglish;
-        LanguageUtil.setEnglish(isEnglish);
-        setLanguage(isEnglish);
+        
+        // 设置FlowPane的响应式布局
+        gamePane.prefWrapLengthProperty().bind(
+            gamePane.widthProperty()
+        );
     }
     
     private void setLanguage(boolean english) {
         if (english) {
+            titleLabel.setText("Game Center");
             languageButton.setText("中文");
-            usernameField.setPromptText("Username");
-            passwordField.setPromptText("Password");
-            loginButton.setText("Login");
-            signupButton.setText("Sign Up");
             snakeButton.setText("Snake");
             game2Button.setText("Hanoi Tower");
             game3Button.setText("Guess Number");
-            game4Button.setText("Coming Soon");
+            addGameButton.setText("+\nAdd Game");
             bugReportButton.setText("Bug Report");
             reviewButton.setText("Review");
             developerButton.setText("Developer Login");
-            addGameButton.setText("+\nAdd Game");
         } else {
+            titleLabel.setText("游戏中心");
             languageButton.setText("English");
-            usernameField.setPromptText("用户名");
-            passwordField.setPromptText("密码");
-            loginButton.setText("登录");
-            signupButton.setText("注册");
             snakeButton.setText("贪吃蛇");
             game2Button.setText("汉诺塔");
             game3Button.setText("猜数字");
-            game4Button.setText("即将推出");
+            addGameButton.setText("+\n添加游戏");
             bugReportButton.setText("问题反馈");
             reviewButton.setText("评价");
             developerButton.setText("开发者登录");
-            addGameButton.setText("+\n添加游戏");
         }
     }
     
     @FXML
-    private void handleLogin() {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-        // Implement login logic
-    }
-    
-    @FXML
-    private void handleSignup() {
-        openNewWindow("SignUp.fxml", isEnglish ? "Sign Up" : "注册");
+    private void handleLanguageToggle() {
+        boolean isEnglish = !LanguageUtil.isEnglish();
+        LanguageUtil.setEnglish(isEnglish);
+        setLanguage(isEnglish);
     }
     
     @FXML
@@ -104,7 +85,7 @@ public class MainController {
             GameViewController controller = loader.getController();
             
             // 设置游戏标题和描述
-            if (isEnglish) {
+            if (LanguageUtil.isEnglish()) {
                 switch(gameName.toLowerCase()) {
                     case "snake":
                         controller.setGameInfo("Snake", 
@@ -181,7 +162,7 @@ public class MainController {
                             "- 可视化反馈\n" +
                             "- 搜索算法可视化\n" +
                             "- 二分查找学习工具\n\n" +
-                            "挑战自己，用最��的次数找到目标数字！");
+                            "挑战自己，用最的次数找到目标数字！");
                         break;
                 }
             }
@@ -197,26 +178,26 @@ public class MainController {
     
     @FXML
     private void handleBugReport() {
-        openNewWindow("BugReport.fxml", isEnglish ? "Bug Report" : "问题反馈");
+        openNewWindow("BugReport.fxml", LanguageUtil.isEnglish() ? "Bug Report" : "问题反馈");
     }
     
     @FXML
     private void handleReview() {
-        openNewWindow("Review.fxml", isEnglish ? "Review" : "评价");
+        openNewWindow("Review.fxml", LanguageUtil.isEnglish() ? "Review" : "评价");
     }
     
     @FXML
     private void handleDeveloperLogin() {
-        openNewWindow("DeveloperLogin.fxml", isEnglish ? "Developer Login" : "开发者登录");
+        openNewWindow("DeveloperLogin.fxml", LanguageUtil.isEnglish() ? "Developer Login" : "开发者登录");
     }
     
     @FXML
     private void handleAddGame() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(isEnglish ? "Select Game Executable" : "选择游戏可执行文件");
+        fileChooser.setTitle(LanguageUtil.isEnglish() ? "Select Game Executable" : "选择游戏可执行文件");
         fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter(
-                isEnglish ? "Executable Files" : "可执行文件", 
+                LanguageUtil.isEnglish() ? "Executable Files" : "可执行文件", 
                 "*.exe"
             )
         );
@@ -232,9 +213,9 @@ public class MainController {
     
     private String showGameNameDialog() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle(isEnglish ? "Game Name" : "游戏名称");
+        dialog.setTitle(LanguageUtil.isEnglish() ? "Game Name" : "游戏名称");
         dialog.setHeaderText(null);
-        dialog.setContentText(isEnglish ? "Enter game name:" : "请输入游戏名称：");
+        dialog.setContentText(LanguageUtil.isEnglish() ? "Enter game name:" : "请输入游戏名称：");
         
         Optional<String> result = dialog.showAndWait();
         return result.orElse(null);
@@ -263,8 +244,8 @@ public class MainController {
             
         } catch (Exception e) {
             showError(
-                isEnglish ? "Error" : "错误",
-                isEnglish ? "Failed to add game" : "添加游戏失败"
+                LanguageUtil.isEnglish() ? "Error" : "错误",
+                LanguageUtil.isEnglish() ? "Failed to add game" : "添加游戏失败"
             );
             e.printStackTrace();
         }
@@ -281,7 +262,7 @@ public class MainController {
         
         // 添加右键菜单用于删除
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem deleteItem = new MenuItem(isEnglish ? "Delete" : "删除");
+        MenuItem deleteItem = new MenuItem(LanguageUtil.isEnglish() ? "Delete" : "删除");
         deleteItem.setOnAction(event -> removeCustomGame(gameName, button));
         contextMenu.getItems().add(deleteItem);
         button.setContextMenu(contextMenu);
@@ -295,8 +276,8 @@ public class MainController {
             pb.start();
         } catch (IOException e) {
             showError(
-                isEnglish ? "Launch Failed" : "启动失败",
-                isEnglish ? "Failed to launch game" : "启动游戏失败"
+                LanguageUtil.isEnglish() ? "Launch Failed" : "启动失败",
+                LanguageUtil.isEnglish() ? "Failed to launch game" : "启动游戏失败"
             );
             e.printStackTrace();
         }

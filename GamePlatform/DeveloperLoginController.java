@@ -1,5 +1,10 @@
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import java.io.IOException;
 
 public class DeveloperLoginController {
     @FXML private Label titleLabel;
@@ -43,6 +48,51 @@ public class DeveloperLoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
         String security = securityField.getText();
-        // Implement developer login logic
+        
+        if (DatabaseService.validateDeveloper(username, password, security)) {
+            try {
+                // 加载开发者管理界面
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("DeveloperManageView.fxml"));
+                Parent root = loader.load();
+                
+                Stage stage = new Stage();
+                stage.setTitle(LanguageUtil.isEnglish() ? "Developer Management" : "开发者管理");
+                stage.setScene(new Scene(root));
+                
+                // 关闭登录窗口
+                usernameField.getScene().getWindow().hide();
+                
+                // 显示管理界面
+                stage.show();
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+                showError(
+                    LanguageUtil.isEnglish() ? "Error" : "错误",
+                    LanguageUtil.isEnglish() ? "Failed to load management interface" : "加载管理界面失败"
+                );
+            }
+        } else {
+            showError(
+                LanguageUtil.isEnglish() ? "Login Error" : "登录错误",
+                LanguageUtil.isEnglish() ? "Invalid credentials" : "登录信息无效"
+            );
+        }
+    }
+    
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+    
+    private void showInfo(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 } 

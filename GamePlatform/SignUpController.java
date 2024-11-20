@@ -1,5 +1,6 @@
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 
 public class SignUpController {
     @FXML private Label usernameLabel;
@@ -47,6 +48,45 @@ public class SignUpController {
         String email = emailField.getText();
         String password = passwordField.getText();
         String code = codeField.getText();
-        // Implement signup logic
+        
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            showError(
+                LanguageUtil.isEnglish() ? "Registration Error" : "注册错误",
+                LanguageUtil.isEnglish() ? "Please fill in all fields" : "请填写所有字段"
+            );
+            return;
+        }
+        
+        if (DatabaseService.registerUser(username, email, password)) {
+            showInfo(
+                LanguageUtil.isEnglish() ? "Registration Success" : "注册成功",
+                LanguageUtil.isEnglish() ? "Account created successfully" : "账号创建成功"
+            );
+            // 关闭注册窗口
+            usernameField.getScene().getWindow().hide();
+        } else {
+            showError(
+                LanguageUtil.isEnglish() ? "Registration Error" : "注册错误",
+                LanguageUtil.isEnglish() ? "Failed to create account" : "创建账号失败"
+            );
+        }
+    }
+    
+    // 添加显示错误消息的方法
+    private void showError(String title, String content) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+    
+    // 添加显示信息的方法
+    private void showInfo(String title, String content) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 } 

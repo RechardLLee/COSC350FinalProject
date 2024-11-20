@@ -21,6 +21,12 @@
         </padding>
         
         <VBox spacing="10">
+            <Label fx:id="gameLabel" text="Select Game" 
+                style="-fx-text-fill: #666;"/>
+            <ComboBox fx:id="gameComboBox" maxWidth="Infinity"/>
+        </VBox>
+        
+        <VBox spacing="10">
             <Label fx:id="ratingLabel" text="Rating" 
                 style="-fx-text-fill: #666;"/>
             <HBox spacing="15" alignment="CENTER">
