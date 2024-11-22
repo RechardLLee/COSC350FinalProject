@@ -80,7 +80,7 @@ public class DeveloperManageController {
             ObservableList<UserData> users = FXCollections.observableArrayList();
             while (rs.next()) {
                 users.add(new UserData(
-                    rs.getInt("display_id"),
+                    rs.getInt("id"),
                     rs.getString("username"),
                     rs.getString("email"),
                     rs.getTimestamp("created_date")
@@ -89,7 +89,12 @@ public class DeveloperManageController {
             userTable.setItems(users);
             
         } catch (SQLException e) {
-            showError("Database Error", "Failed to load users: " + e.getMessage());
+            showError(
+                LanguageUtil.isEnglish() ? "Database Error" : "数据库错误",
+                LanguageUtil.isEnglish() ? 
+                    "Failed to load users: " + e.getMessage() :
+                    "加载用户失败：" + e.getMessage()
+            );
         }
     }
     

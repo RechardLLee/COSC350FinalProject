@@ -11,14 +11,16 @@ if not exist "bin\GamePlatform\Main\Interfaces" mkdir "bin\GamePlatform\Main\Int
 if not exist "bin\GamePlatform\User\Management" mkdir "bin\GamePlatform\User\Management"
 if not exist "bin\GamePlatform\Utility" mkdir "bin\GamePlatform\Utility"
 
-:: please change this part
-:: Set CLASSPATH with SQL Server JDBC driver
-set JDBC_PATH="D:\Code\Environment\SQL\sqljdbc_12.8.1.0_enu\sqljdbc_12.8\enu\jars\mssql-jdbc-12.8.1.jre8.jar"
+:: Create lib directory if it doesn't exist
+if not exist "lib" mkdir "lib"
+
+:: Set CLASSPATH with SQLite JDBC driver
+set JDBC_PATH="lib\sqlite-jdbc-3.47.0.0.jar"
 
 :: Check if JDBC driver exists
 if not exist %JDBC_PATH% (
-    echo SQL Server JDBC driver not found at %JDBC_PATH%
-    echo Please ensure the JDBC driver is installed
+    echo SQLite JDBC driver not found at %JDBC_PATH%
+    echo Please download it from https://github.com/xerial/sqlite-jdbc/releases
     pause
     exit /b 1
 )
@@ -63,7 +65,6 @@ javac -encoding UTF-8 -d bin -cp "%CLASSPATH%" ^
 :: Run the program if compilation succeeds
 if %errorlevel% == 0 (
     echo Compilation successful, starting program...
-    :: Include JDBC driver in runtime classpath
     java -cp "%CLASSPATH%" GamePlatform.Main.Interfaces.GamePlatformApp
 ) else (
     echo Compilation failed, check error messages
