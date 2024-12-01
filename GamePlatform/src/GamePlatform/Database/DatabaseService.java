@@ -4,7 +4,7 @@ public class DatabaseService {
     private static final String DRIVER = "org.sqlite.JDBC";
     private static final String URL = "jdbc:sqlite:gameplatform.db";
     
-    // 开发者登录凭证 - 修改为更容易记住的值
+    // developer username password security answer
     private static final String DEV_USERNAME = "admin";
     private static final String DEV_PASSWORD = "admin";
     private static final String DEV_SECURITY_ANSWER = "admin";
