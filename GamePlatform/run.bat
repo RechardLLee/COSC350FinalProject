@@ -11,22 +11,11 @@ if not exist "bin\GamePlatform\Main\Interfaces" mkdir "bin\GamePlatform\Main\Int
 if not exist "bin\GamePlatform\User\Management" mkdir "bin\GamePlatform\User\Management"
 if not exist "bin\GamePlatform\Utility" mkdir "bin\GamePlatform\Utility"
 
-:: Create lib directory if it doesn't exist
-if not exist "lib" mkdir "lib"
-
-:: Set CLASSPATH with SQLite JDBC driver
-set JDBC_PATH="lib\sqlite-jdbc-3.47.0.0.jar"
-
-:: Check if JDBC driver exists
-if not exist %JDBC_PATH% (
-    echo SQLite JDBC driver not found at %JDBC_PATH%
-    echo Please download it from https://github.com/xerial/sqlite-jdbc/releases
-    pause
-    exit /b 1
-)
-
-:: Set CLASSPATH
-set CLASSPATH=.;bin;%JDBC_PATH%
+:: Set CLASSPATH with all required JAR files
+set CLASSPATH=.;bin;^
+lib\sqlite-jdbc-3.42.0.0.jar;^
+lib\javax.mail.jar;^
+lib\activation.jar
 
 :: Create source directories if they don't exist
 if not exist "src\GamePlatform\Database" mkdir "src\GamePlatform\Database"

@@ -14,6 +14,7 @@ public class DatabaseService {
             Class.forName(DRIVER);
             initializeDatabase();
         } catch (ClassNotFoundException e) {
+            System.err.println("Error loading SQLite JDBC driver:");
             e.printStackTrace();
         }
     }

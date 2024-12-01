@@ -4,56 +4,28 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="30" prefWidth="500" prefHeight="600"
-    style="-fx-background-color: #f5f5f5;"
+<VBox alignment="CENTER" spacing="20" prefWidth="400" prefHeight="500"
     xmlns:fx="http://javafx.com/fxml" fx:controller="SignUpController">
     
     <padding>
-        <Insets top="40" right="50" bottom="40" left="50"/>
+        <Insets top="20" right="40" bottom="20" left="40"/>
     </padding>
     
-    <Label text="Create Account" 
-        style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+    <Label fx:id="titleLabel" text="Sign Up" 
+        style="-fx-font-size: 24; -fx-font-weight: bold;"/>
     
-    <VBox spacing="20" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
-        <padding>
-            <Insets top="30" right="30" bottom="30" left="30"/>
-        </padding>
-        
-        <VBox spacing="5">
-            <Label fx:id="usernameLabel" text="Username"
-                style="-fx-text-fill: #666;"/>
-            <TextField fx:id="usernameField" 
-                style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 8;"/>
-        </VBox>
-        
-        <VBox spacing="5">
-            <Label fx:id="emailLabel" text="Email"
-                style="-fx-text-fill: #666;"/>
-            <TextField fx:id="emailField"
-                style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 8;"/>
-        </VBox>
-        
-        <VBox spacing="5">
-            <Label fx:id="passwordLabel" text="Password"
-                style="-fx-text-fill: #666;"/>
-            <PasswordField fx:id="passwordField"
-                style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 8;"/>
-        </VBox>
-        
-        <VBox spacing="5">
-            <Label fx:id="codeLabel" text="Verification Code"
-                style="-fx-text-fill: #666;"/>
-            <HBox spacing="10">
-                <TextField fx:id="codeField" HBox.hgrow="ALWAYS"
-                    style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 8;"/>
-                <Button text="Get Code"
-                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 5;"/>
-            </HBox>
-        </VBox>
-        
-        <Button fx:id="createButton" text="Create Account" 
-            style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 12 0; -fx-font-size: 14;"
-            maxWidth="Infinity" onAction="#handleSignUp"/>
-    </VBox>
+    <TextField fx:id="usernameField" promptText="Username"/>
+    <TextField fx:id="emailField" promptText="Email"/>
+    
+    <HBox spacing="10">
+        <TextField fx:id="verificationCodeField" promptText="Verification Code" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="sendCodeButton" text="Send Code" onAction="#handleSendCode"/>
+    </HBox>
+    
+    <PasswordField fx:id="passwordField" promptText="Password"/>
+    <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password"/>
+    
+    <Button fx:id="signUpButton" text="Sign Up" 
+        style="-fx-background-color: #4CAF50; -fx-text-fill: white;"
+        onAction="#handleSignUp"/>
 </VBox> 
