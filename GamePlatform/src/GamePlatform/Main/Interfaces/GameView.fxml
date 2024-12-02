@@ -17,11 +17,16 @@
     <Label fx:id="titleLabel" text="Game Title" 
         style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #333;"/>
     
-    <HBox spacing="30" alignment="CENTER">
-        <ImageView fx:id="gameIcon" fitWidth="200" fitHeight="200"
-            style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);"/>
+    <HBox spacing="30">
+        <StackPane minWidth="200" minHeight="200" 
+            style="-fx-background-color: #ffffff; -fx-background-radius: 10; 
+                   -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);">
+            <ImageView fx:id="gameIcon" 
+                fitWidth="180" fitHeight="180"
+                preserveRatio="true"/>
+        </StackPane>
         
-        <VBox spacing="20" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+        <VBox spacing="20" HBox.hgrow="ALWAYS">
             <TextArea fx:id="gameDescription" wrapText="true" editable="false"
                 prefRowCount="8" style="-fx-background-color: transparent;"/>
                 
@@ -42,7 +47,6 @@
                         <TableColumn fx:id="playerColumn" text="Player"/>
                         <TableColumn fx:id="scoreColumn" text="Score"/>
                         <TableColumn fx:id="dateColumn" text="Date"/>
-                        <TableColumn fx:id="balanceColumn" text="Balance"/>
                     </columns>
                 </TableView>
             </TitledPane>

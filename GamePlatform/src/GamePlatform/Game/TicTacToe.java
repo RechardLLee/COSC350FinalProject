@@ -3,129 +3,281 @@ package GamePlatform.Game;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Scanner;
 
-public class TicTacToe extends JFrame {
-    private char[][] board = new char[3][3];
-    private char currentPlayer;
-    private int playerXScore = 0;
-    private int playerOScore = 0;
-    private boolean isEnglish = true;  // 默认英文
+public class TicTacToe extends BaseGame {
+    private static final int CELL_SIZE = 100;
+    private static final int GRID_SIZE = 3;
+    private static final int GAME_SIZE = CELL_SIZE * GRID_SIZE;
+    private static final int WINDOW_HEIGHT = GAME_SIZE + 100;
     
-    private JButton[][] buttons = new JButton[3][3];
+    private char[][] board;
+    private char currentPlayer;
+    private boolean gameEnded;
+    private String difficulty;
+    private int moves;
+    private JButton[][] buttons;
     private JLabel statusLabel;
-    private JLabel scoreLabel;
+    private JComboBox<String> difficultyCombo;
+    private JButton restartButton;
     
     public TicTacToe() {
-        setTitle("Tic Tac Toe");
-        setSize(400, 500);
+        super("Tic Tac Toe");
+        setTitle("Tic Tac Toe - Player: " + username);
+        setSize(GAME_SIZE + 16, WINDOW_HEIGHT);
+        setResizable(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        getContentPane().setBackground(new Color(44, 62, 80));
         setLayout(new BorderLayout());
         
-        createComponents();
         initializeGame();
+        createComponents();
         
         setLocationRelativeTo(null);
     }
     
-    private void createComponents() {
-        // Status panel
-        JPanel statusPanel = new JPanel();
-        statusLabel = new JLabel("Player X's turn");
-        scoreLabel = new JLabel("X: 0  O: 0");
-        statusPanel.add(statusLabel);
-        statusPanel.add(scoreLabel);
-        add(statusPanel, BorderLayout.NORTH);
+    private void initializeGame() {
+        board = new char[GRID_SIZE][GRID_SIZE];
+        currentPlayer = 'X';  // 玩家使用X
+        gameEnded = false;
+        difficulty = "Medium";
+        moves = 0;
         
-        // Game board
-        JPanel boardPanel = new JPanel(new GridLayout(3, 3));
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+        // 初始化棋盘
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                board[i][j] = ' ';
+            }
+        }
+    }
+    
+    private void createComponents() {
+        // 游戏标题
+        JLabel titleLabel = new JLabel("Tic Tac Toe", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        add(titleLabel, BorderLayout.NORTH);
+        
+        // 游戏面板
+        JPanel gamePanel = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
+        buttons = new JButton[GRID_SIZE][GRID_SIZE];
+        
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
                 buttons[i][j] = new JButton("");
                 buttons[i][j].setFont(new Font("Arial", Font.BOLD, 60));
+                buttons[i][j].setFocusPainted(false);
                 final int row = i;
                 final int col = j;
                 buttons[i][j].addActionListener(e -> handleMove(row, col));
-                boardPanel.add(buttons[i][j]);
+                gamePanel.add(buttons[i][j]);
             }
         }
-        add(boardPanel, BorderLayout.CENTER);
+        add(gamePanel, BorderLayout.CENTER);
         
-        // Control panel
-        JPanel controlPanel = new JPanel();
-        JButton newGameButton = new JButton("New Game");
-        newGameButton.addActionListener(e -> initializeGame());
-        controlPanel.add(newGameButton);
+        // 控制面板
+        JPanel controlPanel = new JPanel(new FlowLayout());
+        controlPanel.setBackground(new Color(44, 62, 80));
+        
+        // 难度选择
+        String[] difficulties = {"Easy", "Medium", "Hard"};
+        difficultyCombo = new JComboBox<>(difficulties);
+        difficultyCombo.setSelectedItem("Medium");
+        difficultyCombo.addActionListener(e -> difficulty = (String)difficultyCombo.getSelectedItem());
+        controlPanel.add(difficultyCombo);
+        
+        // 重新开始按钮
+        restartButton = new JButton("New Game");
+        restartButton.addActionListener(e -> restartGame());
+        controlPanel.add(restartButton);
+        
+        // 状态标签
+        statusLabel = new JLabel("Your turn (X)", SwingConstants.CENTER);
+        statusLabel.setForeground(Color.WHITE);
+        controlPanel.add(statusLabel);
+        
         add(controlPanel, BorderLayout.SOUTH);
     }
     
-    private void initializeGame() {
-        // Initialize board
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                board[i][j] = ' ';
-                buttons[i][j].setText("");
-                buttons[i][j].setEnabled(true);
-            }
-        }
-        currentPlayer = 'X';
-        updateStatus();
-    }
-    
     private void handleMove(int row, int col) {
-        if (board[row][col] == ' ') {
-            board[row][col] = currentPlayer;
-            buttons[row][col].setText(String.valueOf(currentPlayer));
-            
-            if (checkWin()) {
-                gameOver(currentPlayer + " wins!");
-                updateScore();
-            } else if (checkTie()) {
-                gameOver("It's a tie!");
-            } else {
-                currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
-                updateStatus();
+        if (gameEnded || board[row][col] != ' ') return;
+        
+        // 玩家移动
+        board[row][col] = currentPlayer;
+        buttons[row][col].setText(String.valueOf(currentPlayer));
+        moves++;
+        
+        if (checkWin(currentPlayer)) {
+            gameEnded = true;
+            statusLabel.setText("You win!");
+            // 计算分数：首次获胜10000分，之后根据移动次数递减
+            int score = Math.max(10000 - (moves - GRID_SIZE * 2) * 1000, 1000);
+            saveScore(score);
+            return;
+        }
+        
+        if (moves == GRID_SIZE * GRID_SIZE) {
+            gameEnded = true;
+            statusLabel.setText("Draw!");
+            saveScore(5000);  // 平局得5000分
+            return;
+        }
+        
+        // 电脑移动
+        currentPlayer = 'O';
+        statusLabel.setText("Computer's turn (O)");
+        Timer timer = new Timer(500, e -> {
+            makeComputerMove();
+            if (!gameEnded) {
+                currentPlayer = 'X';
+                statusLabel.setText("Your turn (X)");
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+    
+    private void makeComputerMove() {
+        int[] move = getBestMove();
+        board[move[0]][move[1]] = 'O';
+        buttons[move[0]][move[1]].setText("O");
+        moves++;
+        
+        if (checkWin('O')) {
+            gameEnded = true;
+            statusLabel.setText("Computer wins!");
+            saveScore(0);  // 失败得0分
+            return;
+        }
+        
+        if (moves == GRID_SIZE * GRID_SIZE) {
+            gameEnded = true;
+            statusLabel.setText("Draw!");
+            saveScore(5000);  // 平局得5000分
+        }
+    }
+    
+    private int[] getBestMove() {
+        switch (difficulty) {
+            case "Hard":
+                return getHardMove();
+            case "Medium":
+                return Math.random() < 0.5 ? getHardMove() : getEasyMove();
+            default:
+                return getEasyMove();
+        }
+    }
+    
+    private int[] getEasyMove() {
+        // 随机选择空位
+        while (true) {
+            int row = (int)(Math.random() * GRID_SIZE);
+            int col = (int)(Math.random() * GRID_SIZE);
+            if (board[row][col] == ' ') {
+                return new int[]{row, col};
             }
         }
     }
     
-    private boolean checkWin() {
-        // Check rows, columns and diagonals
-        for (int i = 0; i < 3; i++) {
-            if (board[i][0] != ' ' && board[i][0] == board[i][1] && board[i][1] == board[i][2]) return true;
-            if (board[0][i] != ' ' && board[0][i] == board[1][i] && board[1][i] == board[2][i]) return true;
+    private int[] getHardMove() {
+        // 使用极小化极大算法
+        int bestScore = Integer.MIN_VALUE;
+        int[] bestMove = new int[2];
+        
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                if (board[i][j] == ' ') {
+                    board[i][j] = 'O';
+                    int score = minimax(board, 0, false);
+                    board[i][j] = ' ';
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove[0] = i;
+                        bestMove[1] = j;
+                    }
+                }
+            }
         }
-        if (board[0][0] != ' ' && board[0][0] == board[1][1] && board[1][1] == board[2][2]) return true;
-        if (board[0][2] != ' ' && board[0][2] == board[1][1] && board[1][1] == board[2][0]) return true;
+        return bestMove;
+    }
+    
+    private int minimax(char[][] board, int depth, boolean isMaximizing) {
+        if (checkWin('O')) return 1;
+        if (checkWin('X')) return -1;
+        if (isBoardFull()) return 0;
+        
+        if (isMaximizing) {
+            int bestScore = Integer.MIN_VALUE;
+            for (int i = 0; i < GRID_SIZE; i++) {
+                for (int j = 0; j < GRID_SIZE; j++) {
+                    if (board[i][j] == ' ') {
+                        board[i][j] = 'O';
+                        int score = minimax(board, depth + 1, false);
+                        board[i][j] = ' ';
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+            }
+            return bestScore;
+        } else {
+            int bestScore = Integer.MAX_VALUE;
+            for (int i = 0; i < GRID_SIZE; i++) {
+                for (int j = 0; j < GRID_SIZE; j++) {
+                    if (board[i][j] == ' ') {
+                        board[i][j] = 'X';
+                        int score = minimax(board, depth + 1, true);
+                        board[i][j] = ' ';
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+            }
+            return bestScore;
+        }
+    }
+    
+    private boolean checkWin(char player) {
+        // 检查行
+        for (int i = 0; i < GRID_SIZE; i++) {
+            if (board[i][0] == player && board[i][1] == player && board[i][2] == player) {
+                return true;
+            }
+        }
+        
+        // 检查列
+        for (int j = 0; j < GRID_SIZE; j++) {
+            if (board[0][j] == player && board[1][j] == player && board[2][j] == player) {
+                return true;
+            }
+        }
+        
+        // 检查对角线
+        if (board[0][0] == player && board[1][1] == player && board[2][2] == player) {
+            return true;
+        }
+        if (board[0][2] == player && board[1][1] == player && board[2][0] == player) {
+            return true;
+        }
+        
         return false;
     }
     
-    private boolean checkTie() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+    private boolean isBoardFull() {
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
                 if (board[i][j] == ' ') return false;
             }
         }
         return true;
     }
     
-    private void updateScore() {
-        if (currentPlayer == 'X') playerXScore++;
-        else playerOScore++;
-        scoreLabel.setText("X: " + playerXScore + "  O: " + playerOScore);
-    }
-    
-    private void updateStatus() {
-        statusLabel.setText("Player " + currentPlayer + "'s turn");
-    }
-    
-    private void gameOver(String message) {
-        statusLabel.setText(message);
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                buttons[i][j].setEnabled(false);
+    private void restartGame() {
+        initializeGame();
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                buttons[i][j].setText("");
             }
         }
+        statusLabel.setText("Your turn (X)");
     }
     
     public static void main(String[] args) {

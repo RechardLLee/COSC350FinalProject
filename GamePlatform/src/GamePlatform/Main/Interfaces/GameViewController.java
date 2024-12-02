@@ -23,6 +23,7 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 import GamePlatform.Game.GameRecord;
 import GamePlatform.Game.GameRecordManager;
+import javafx.scene.image.Image;
 
 public class GameViewController {
     @FXML private Label titleLabel;
@@ -153,6 +154,52 @@ public class GameViewController {
         titleLabel.setText(title);
         gameDescription.setText(description);
         gamePath = path;
+        
+        // 重置ImageView的可见性
+        gameIcon.setVisible(true);
+        
+        // 加载游戏图片
+        try {
+            String imagePath = null;
+            switch(title) {
+                case "Snake":
+                    imagePath = "/images/SnakeGame.png";
+                    break;
+                case "Hanoi Tower":
+                    imagePath = "/images/HanoiTowerGame.png";
+                    break;
+                case "Guess Number":
+                    imagePath = "/images/GuessNumberGame.png";
+                    break;
+                case "Tic Tac Toe":
+                    imagePath = "/images/TicTacToeGame.png";
+                    break;
+            }
+            
+            if (imagePath != null) {
+                InputStream imageStream = getClass().getResourceAsStream(imagePath);
+                if (imageStream != null) {
+                    Image image = new Image(imageStream);
+                    gameIcon.setImage(image);
+                    System.out.println("Successfully loaded image: " + imagePath);
+                } else {
+                    System.out.println("Cannot find image: " + imagePath);
+                    gameIcon.setStyle(
+                        "-fx-background-color: #f0f0f0;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);"
+                    );
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error loading image for game: " + title);
+            e.printStackTrace();
+            gameIcon.setStyle(
+                "-fx-background-color: #f0f0f0;" +
+                "-fx-background-radius: 10;" +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);"
+            );
+        }
         
         // 设置开始按钮文本
         startButton.setText(LanguageUtil.isEnglish() ? "Start Game" : "开始游戏");

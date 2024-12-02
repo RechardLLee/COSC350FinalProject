@@ -42,14 +42,11 @@ public class MainController {
         // 设置FlowPane的响应式布局
         gamePane.prefWrapLengthProperty().bind(gamePane.widthProperty());
         
-        // 添加固定游戏列表，使用正确的类名
+        // 添加所有游戏
         addGameButton("Snake", "SnakeGame");
         addGameButton("Hanoi Tower", "HanoiTowerGame");
         addGameButton("Guess Number", "GuessNumberGame");
-        // 暂时注释掉未实现的游戏
-        // addGameButton("Tic Tac Toe", "TicTacToeGame");
-        // addGameButton("Slot Machine", "SlotMachine");
-        // addGameButton("Roulette", "RouletteGame");
+        addGameButton("Tic Tac Toe", "TicTacToe");  // 添加井字棋
     }
     
     private void setLanguage(boolean english) {
@@ -150,6 +147,13 @@ public class MainController {
                         "- Think carefully before each guess\n" +
                         "- Fewer attempts = Higher score",
                         "guess_number");
+                    break;
+                    
+                case "Tic Tac Toe":
+                case "井字棋":
+                    controller.setGameInfo("Tic Tac Toe", 
+                        getGameDescription("Tic Tac Toe"),
+                        "TicTacToe");
                     break;
             }
             
@@ -488,25 +492,21 @@ public class MainController {
                        "- Fewer attempts = Higher score";
                        
             case "Tic Tac Toe":
-                return "Tic Tac Toe Game (100 coins)\n\n" +
-                       "Classic Tic Tac Toe game.\n\n" +
-                       "Rules:\n" +
-                       "- The board is a 3x3 grid\n" +
-                       "- Players take turns placing their marks in empty squares\n" +
-                       "- The first player to get 3 of their marks in a row, column, or diagonal wins\n\n" +
+                return "Classic Tic Tac Toe Game\n\n" +
+                       "Play against computer AI with different difficulty levels.\n\n" +
                        "Features:\n" +
-                       "- Multiple difficulty levels\n" +
-                       "- Score tracking\n" +
-                       "- Perfect score (10000) for first try\n" +
-                       "- Score decreases with more attempts\n" +
-                       "- Zero score for failure\n\n" +
+                       "- Three difficulty levels (Easy/Medium/Hard)\n" +
+                       "- Smart AI opponent\n" +
+                       "- Score system based on moves\n" +
+                       "- Perfect score (10000) for quick win\n\n" +
+                       "Rules:\n" +
+                       "- Get three X's in a row to win\n" +
+                       "- Block computer's O's to prevent losing\n" +
+                       "- Draw game gives 5000 points\n\n" +
                        "Controls:\n" +
-                       "Mouse - Place mark\n" +
-                       "R - Restart game\n" +
-                       "Game Over:\n" +
-                       "- Hitting walls\n" +
-                       "- Hitting obstacles\n" +
-                       "- Hitting yourself";
+                       "- Click empty cell to place X\n" +
+                       "- New Game button to restart\n" +
+                       "- Choose difficulty level anytime";
                        
             default:
                 return "Game description not available.";
