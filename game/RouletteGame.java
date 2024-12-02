@@ -1,3 +1,5 @@
+package GamePlatform.Game;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -16,18 +18,16 @@ public class RouletteGame extends JFrame {
     private Random random;
 
     public RouletteGame() {
-        // Initialize game
+        setTitle("Roulette Game");
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout(10, 10));
+        setLocationRelativeTo(null);
+        
         balance = INITIAL_BALANCE;
         random = new Random();
         
-        // Set up window
-        setTitle("Roulette Game");
-        setSize(500, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(10, 10));
-        
         createComponents();
-        setLocationRelativeTo(null);
     }
 
     private void createComponents() {

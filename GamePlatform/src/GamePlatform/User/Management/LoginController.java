@@ -8,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.io.IOException;
 import GamePlatform.Database.DatabaseService;
-import GamePlatform.User.Management.UserSession;
 import GamePlatform.Utility.LanguageUtil;
 
 public class LoginController {
@@ -59,13 +58,20 @@ public class LoginController {
             UserSession.setCurrentUser(username);
             try {
                 // 加载主界面
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("/GamePlatform/Main/Interfaces/MainView.fxml"));
                 Parent root = loader.load();
                 
                 // 创建新窗口
                 Stage mainStage = new Stage();
                 mainStage.setTitle(LanguageUtil.isEnglish() ? "Game Platform" : "游戏平台");
                 mainStage.setScene(new Scene(root));
+                
+                // 设置窗口大小
+                mainStage.setMinWidth(800);
+                mainStage.setMinHeight(600);
+                mainStage.setWidth(1280);
+                mainStage.setHeight(720);
                 
                 // 关闭登录窗口
                 ((Stage) loginButton.getScene().getWindow()).close();
@@ -91,7 +97,9 @@ public class LoginController {
     @FXML
     private void handleSignup() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GamePlatform/User/Management/SignUp.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/GamePlatform/User/Management/SignUp.fxml")
+            );
             Parent root = loader.load();
             
             Stage signupStage = new Stage();

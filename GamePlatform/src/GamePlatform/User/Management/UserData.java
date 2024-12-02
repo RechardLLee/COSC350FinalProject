@@ -1,3 +1,5 @@
+package GamePlatform.User.Management;
+
 import java.util.Date;
 
 public class UserData {

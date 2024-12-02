@@ -1,3 +1,5 @@
+package GamePlatform.Developer;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.fxml.FXMLLoader;
@@ -5,6 +7,8 @@ import javafx.scene.Parent;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import java.io.IOException;
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.Utility.LanguageUtil;
 
 public class DeveloperLoginController {
     @FXML private Label titleLabel;

@@ -1,3 +1,5 @@
+package GamePlatform.Game;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -18,7 +20,8 @@ public class HanoiTowerGame extends JFrame {
     public HanoiTowerGame() {
         setTitle("Hanoi Tower Game");
         setSize(800, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
         
         difficulties = new HashMap<>();
         difficulties.put("Easy", 3);

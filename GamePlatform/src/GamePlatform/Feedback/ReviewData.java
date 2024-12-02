@@ -1,3 +1,5 @@
+package GamePlatform.Feedback;
+
 import java.util.Date;
 
 public class ReviewData {

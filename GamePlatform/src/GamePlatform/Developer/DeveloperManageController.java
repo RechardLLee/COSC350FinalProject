@@ -1,3 +1,5 @@
+package GamePlatform.Developer;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -7,6 +9,11 @@ import javafx.beans.property.SimpleStringProperty;
 import java.sql.*;
 import java.util.Date;
 import java.util.Optional;
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.Utility.LanguageUtil;
+import GamePlatform.User.Management.UserData;
+import GamePlatform.Feedback.ReviewData;
+import GamePlatform.Feedback.BugData;
 
 public class DeveloperManageController {
     @FXML private Label titleLabel;

@@ -1,7 +1,13 @@
+package GamePlatform.Feedback;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.User.Management.UserSession;
+import GamePlatform.Utility.LanguageUtil;
 
 public class ReviewController {
     @FXML private Label titleLabel;

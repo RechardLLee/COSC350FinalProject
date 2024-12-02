@@ -1,3 +1,5 @@
+package GamePlatform.User.Management;
+
 public class UserSession {
     private static String currentUsername = null;
     

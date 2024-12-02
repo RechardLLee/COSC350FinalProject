@@ -1,3 +1,5 @@
+package GamePlatform.Database;
+
 import java.sql.*;
 
 public class DatabaseService {

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="30" prefWidth="800" prefHeight="600"
+    style="-fx-background-color: #f5f5f5;"
+    xmlns:fx="http://javafx.com/fxml" 
+    fx:controller="GamePlatform.Main.Interfaces.GameViewController">
+    
+    <padding>
+        <Insets top="40" right="50" bottom="40" left="50"/>
+    </padding>
+    
+    <Label fx:id="titleLabel" text="Game Title" 
+        style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+    
+    <HBox spacing="30" alignment="CENTER">
+        <ImageView fx:id="gameIcon" fitWidth="200" fitHeight="200"
+            style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);"/>
+        
+        <VBox spacing="20" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <TextArea fx:id="gameDescription" wrapText="true" editable="false"
+                prefRowCount="8" style="-fx-background-color: transparent;"/>
+            
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="buyButton" text="Buy Game"
+                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20;"
+                    onAction="#handleBuyGame"/>
+                <Button fx:id="startButton" text="Start Game"
+                    style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20;"
+                    onAction="#handleStartGame"/>
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox> 

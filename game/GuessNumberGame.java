@@ -1,8 +1,9 @@
+package GamePlatform.Game;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import javax.swing.border.*;
 
 public class GuessNumberGame extends JFrame {
     private Map<String, Map<String, Integer>> difficulties;
@@ -40,8 +41,9 @@ public class GuessNumberGame extends JFrame {
         // Set up window
         setTitle("Guess the Number Game");
         setSize(400, 350);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
+        setLocationRelativeTo(null);
         
         createWidgets();
         startNewGame();

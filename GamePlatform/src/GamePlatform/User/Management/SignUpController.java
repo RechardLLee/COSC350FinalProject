@@ -1,3 +1,5 @@
+package GamePlatform.User.Management;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -5,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.Utility.LanguageUtil;
+import GamePlatform.Utility.EmailUtil;
 
 public class SignUpController {
     @FXML private TextField usernameField;

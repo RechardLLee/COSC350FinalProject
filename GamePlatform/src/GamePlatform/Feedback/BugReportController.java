@@ -1,8 +1,13 @@
+package GamePlatform.Feedback;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 import java.io.File;
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.User.Management.UserSession;
+import GamePlatform.Utility.LanguageUtil;
 
 public class BugReportController {
     @FXML private Label titleLabel;

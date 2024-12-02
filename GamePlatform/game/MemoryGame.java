@@ -1,3 +1,5 @@
+package GamePlatform.Game;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MemoryGame {
+public class MemoryGame extends JFrame implements ActionListener {
 
     private JButton[] buttons = new JButton[16]; // 16 cards (buttons) for a 4x4 grid
     private String[] cardValues = new String[16]; // Stores the values of each card
@@ -20,12 +22,17 @@ public class MemoryGame {
         setTitle("Memory Game");
         setSize(400, 400);
         setLayout(new GridLayout(4, 4)); // 4x4 grid layout
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         // Generate pairs of cards ( "A", "A", "B", "B", etc.)
         generateCardValues();
 
         // Initialize buttons
+        initializeButtons();
+    }
+
+    private void initializeButtons() {
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new JButton();
             buttons[i].setFont(new Font("Arial", Font.BOLD, 20));
@@ -33,9 +40,6 @@ public class MemoryGame {
             buttons[i].addActionListener(this);
             add(buttons[i]);
         }
-
-        // Set window visible
-        setVisible(true);
     }
 
     // Generate random pairs of card values

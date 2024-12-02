@@ -1,3 +1,5 @@
+package GamePlatform.Utility;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.util.Properties;
@@ -12,9 +14,9 @@ public class EmailUtil {
         
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.ssl.enable", "true");  // 使用SSL
+        props.put("mail.smtp.ssl.enable", "true");
         props.put("mail.smtp.host", "smtp.qq.com");
-        props.put("mail.smtp.port", "465");         // SSL端口
+        props.put("mail.smtp.port", "465");
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         
         Session session = Session.getInstance(props, new Authenticator() {
