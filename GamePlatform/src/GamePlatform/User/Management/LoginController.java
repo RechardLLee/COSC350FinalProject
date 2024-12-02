@@ -97,11 +97,14 @@ public class LoginController {
     @FXML
     private void handleSignup() {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/GamePlatform/User/Management/SignUp.fxml")
-            );
-            Parent root = loader.load();
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/GamePlatform/User/Management/SignUp.fxml"));
             
+            if (loader.getLocation() == null) {
+                throw new IOException("Cannot find SignUp.fxml");
+            }
+            
+            Parent root = loader.load();
             Stage signupStage = new Stage();
             signupStage.setTitle(LanguageUtil.isEnglish() ? "Sign Up" : "注册");
             signupStage.setScene(new Scene(root));

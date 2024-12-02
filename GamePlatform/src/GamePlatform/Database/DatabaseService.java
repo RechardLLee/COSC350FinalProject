@@ -164,15 +164,22 @@ public class DatabaseService {
     
     // 注册新用户
     public static boolean registerUser(String username, String email, String password) {
-        String sql = "INSERT INTO Users (username, email, password) VALUES (?, ?, ?)";
+        if (isEmailRegistered(email)) {
+            return false;
+        }
+
+        String sql = "INSERT INTO Users(username, email, password, created_date) VALUES(?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, username);
             pstmt.setString(2, email);
             pstmt.setString(3, password);
+            pstmt.setDate(4, new java.sql.Date(System.currentTimeMillis()));
             
-            return pstmt.executeUpdate() > 0;
+            pstmt.executeUpdate();
+            return true;
+            
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -205,6 +212,53 @@ public class DatabaseService {
             
             pstmt.setString(1, username);
             pstmt.setString(2, description);
+            
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean isEmailRegistered(String email) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public static boolean updateUserPassword(String email, String newPassword) {
+        String sql = "UPDATE Users SET password = ? WHERE email = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, email);
+            
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean updateUsername(String email, String newUsername) {
+        String sql = "UPDATE Users SET username = ? WHERE email = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, newUsername);
+            pstmt.setString(2, email);
             
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
