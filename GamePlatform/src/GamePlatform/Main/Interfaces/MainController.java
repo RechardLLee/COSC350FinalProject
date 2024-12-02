@@ -104,18 +104,23 @@ public class MainController {
                         "- Multiple difficulty levels\n" +
                         "- Score tracking\n" +
                         "- Obstacle mode\n" +
-                        "- Power-ups\n\n" +
+                        "- Power-ups (costs 10 coins)\n\n" +
                         "Controls:\n" +
                         "WASD - Move snake\n" +
                         "P - Pause game\n" +
-                        "R - Restart game",
+                        "R - Restart game\n" +
+                        "B - Buy power-up\n\n" +
+                        "Game Over:\n" +
+                        "- Hitting walls\n" +
+                        "- Hitting obstacles\n" +
+                        "- Hitting yourself",
                         "snake");
                     break;
                     
                 case "Hanoi Tower":
                 case "汉诺塔":
                     controller.setGameInfo("Hanoi Tower", 
-                        "Classic Tower of Hanoi puzzle game.\n\n" +
+                        "Classic Tower of Hanoi puzzle game\n\n" +
                         "Move all disks from the leftmost peg to the rightmost peg.\n\n" +
                         "Rules:\n" +
                         "- Only one disk can be moved at a time\n" +
@@ -123,21 +128,23 @@ public class MainController {
                         "Features:\n" +
                         "- Multiple difficulty levels\n" +
                         "- Move counter\n" +
-                        "- Auto-solve demonstration",
+                        "- Auto-solve demonstration (costs 5 coins)\n" +
+                        "- Hint system (costs 2 coins per hint)",
                         "hanoi_tower");
                     break;
                     
                 case "Guess Number":
                 case "猜数字":
                     controller.setGameInfo("Guess Number", 
-                        "Number guessing game.\n\n" +
+                        "Number Guessing Game\n\n" +
                         "Try to guess the secret number within the given attempts.\n\n" +
                         "Features:\n" +
                         "- Multiple difficulty levels\n" +
                         "- Score based on attempts left\n" +
                         "- Perfect score (10000) for first try\n" +
                         "- Score decreases with more attempts\n" +
-                        "- Zero score for failure\n\n" +
+                        "- Zero score for failure\n" +
+                        "- Hint system (costs 3 coins per hint)\n\n" +
                         "Strategy:\n" +
                         "- Use binary search\n" +
                         "- Think carefully before each guess\n" +
@@ -368,10 +375,10 @@ public class MainController {
     
     private void updateBalance() {
         String username = UserSession.getCurrentUser();
-        int balance = DatabaseService.getUserBalance(username);
+        int money = DatabaseService.getUserMoney(username);
         balanceLabel.setText(String.format(
-            LanguageUtil.isEnglish() ? "Balance: $%d" : "余额: ￥%d",
-            balance
+            LanguageUtil.isEnglish() ? "Money: $%d" : "金币: %d",
+            money
         ));
     }
     
@@ -379,7 +386,7 @@ public class MainController {
         String username = UserSession.getCurrentUser();
         Map<String, String> userGames = DatabaseService.getUserGames(username);
         
-        // 清除现有游戏按钮��保留添加按钮）
+        // 清除现有游戏按钮保留添加按钮）
         gamePane.getChildren().clear();
         gamePane.getChildren().add(addGameButton);
         
@@ -440,19 +447,21 @@ public class MainController {
                        "Control the snake to eat food and grow longer.\n\n" +
                        "Features:\n" +
                        "- Multiple difficulty levels\n" +
-                       "- Score tracking (10 points per food)\n" +
-                       "- Obstacle mode\n\n" +
+                       "- Score tracking\n" +
+                       "- Obstacle mode\n" +
+                       "- Power-ups (costs 10 coins)\n\n" +
                        "Controls:\n" +
                        "WASD - Move snake\n" +
                        "P - Pause game\n" +
-                       "R - Restart game\n\n" +
+                       "R - Restart game\n" +
+                       "B - Buy power-up\n\n" +
                        "Game Over:\n" +
                        "- Hitting walls\n" +
                        "- Hitting obstacles\n" +
                        "- Hitting yourself";
                        
             case "Hanoi Tower":
-                return "Classic Tower of Hanoi puzzle game.\n\n" +
+                return "Classic Tower of Hanoi puzzle game\n\n" +
                        "Move all disks from the leftmost peg to the rightmost peg.\n\n" +
                        "Rules:\n" +
                        "- Only one disk can be moved at a time\n" +
@@ -460,24 +469,44 @@ public class MainController {
                        "Features:\n" +
                        "- Multiple difficulty levels\n" +
                        "- Move counter\n" +
-                       "- Auto-solve demonstration";
+                       "- Auto-solve demonstration (costs 5 coins)\n" +
+                       "- Hint system (costs 2 coins per hint)";
                        
             case "Guess Number":
                 return "Number Guessing Game\n\n" +
                        "Try to guess the secret number within the given attempts.\n\n" +
                        "Features:\n" +
-                       "- Multiple difficulty levels:\n" +
-                       "  Easy: 1-50, 10 attempts\n" +
-                       "  Medium: 1-100, 7 attempts\n" +
-                       "  Hard: 1-200, 5 attempts\n\n" +
-                       "Scoring System:\n" +
+                       "- Multiple difficulty levels\n" +
+                       "- Score based on attempts left\n" +
                        "- Perfect score (10000) for first try\n" +
                        "- Score decreases with more attempts\n" +
-                       "- Zero score if failed to guess\n\n" +
-                       "Tips:\n" +
-                       "- Use binary search strategy\n" +
-                       "- Pay attention to the hints\n" +
-                       "- Think carefully before each guess";
+                       "- Zero score for failure\n" +
+                       "- Hint system (costs 3 coins per hint)\n\n" +
+                       "Strategy:\n" +
+                       "- Use binary search\n" +
+                       "- Think carefully before each guess\n" +
+                       "- Fewer attempts = Higher score";
+                       
+            case "Tic Tac Toe":
+                return "Tic Tac Toe Game (100 coins)\n\n" +
+                       "Classic Tic Tac Toe game.\n\n" +
+                       "Rules:\n" +
+                       "- The board is a 3x3 grid\n" +
+                       "- Players take turns placing their marks in empty squares\n" +
+                       "- The first player to get 3 of their marks in a row, column, or diagonal wins\n\n" +
+                       "Features:\n" +
+                       "- Multiple difficulty levels\n" +
+                       "- Score tracking\n" +
+                       "- Perfect score (10000) for first try\n" +
+                       "- Score decreases with more attempts\n" +
+                       "- Zero score for failure\n\n" +
+                       "Controls:\n" +
+                       "Mouse - Place mark\n" +
+                       "R - Restart game\n" +
+                       "Game Over:\n" +
+                       "- Hitting walls\n" +
+                       "- Hitting obstacles\n" +
+                       "- Hitting yourself";
                        
             default:
                 return "Game description not available.";

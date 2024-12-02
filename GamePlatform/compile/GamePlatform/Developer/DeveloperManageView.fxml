@@ -28,8 +28,8 @@
                         <TableColumn fx:id="createdDateColumn" text="Created Date"/>
                     </columns>
                 </TableView>
-                <HBox spacing="10">
-                    <Button text="Delete User" onAction="#handleDeleteUser"/>
+                <HBox spacing="10" alignment="CENTER">
+                    <TextField fx:id="balanceField" promptText="Enter amount"/>
                     <Button text="Add Balance" onAction="#handleAddBalance"/>
                 </HBox>
             </VBox>

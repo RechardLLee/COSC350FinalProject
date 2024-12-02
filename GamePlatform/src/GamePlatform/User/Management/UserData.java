@@ -3,10 +3,10 @@ package GamePlatform.User.Management;
 import java.util.Date;
 
 public class UserData {
-    private int id;
-    private String username;
-    private String email;
-    private Date createdDate;
+    private final int id;
+    private final String username;
+    private final String email;
+    private final Date createdDate;
     
     public UserData(int id, String username, String email, Date createdDate) {
         this.id = id;

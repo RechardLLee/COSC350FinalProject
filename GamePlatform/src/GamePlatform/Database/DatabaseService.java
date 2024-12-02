@@ -1,9 +1,12 @@
 package GamePlatform.Database;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import GamePlatform.Game.GameStats;
+import GamePlatform.User.Management.UserData;
 
 public class DatabaseService {
     private static final String DRIVER = "org.sqlite.JDBC";
@@ -45,7 +48,7 @@ public class DatabaseService {
                 "    username TEXT UNIQUE NOT NULL," +
                 "    email TEXT UNIQUE NOT NULL," +
                 "    password TEXT NOT NULL," +
-                "    balance INTEGER DEFAULT 1000," +
+                "    money INTEGER DEFAULT 1000," +
                 "    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                 ")"
             );
@@ -114,12 +117,12 @@ public class DatabaseService {
             );
             
             // 创建一个默认的管理员账户
-            String sql = "INSERT OR IGNORE INTO Users (username, email, password, balance) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT OR IGNORE INTO Users (username, email, password, money) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, "admin");
                 pstmt.setString(2, "admin@admin.com");
                 pstmt.setString(3, "admin");
-                pstmt.setInt(4, 9999);
+                pstmt.setInt(4, 1000);
                 pstmt.executeUpdate();
             }
             
@@ -194,7 +197,7 @@ public class DatabaseService {
             stmt.executeUpdate("DROP TABLE IF EXISTS BugReports");
             stmt.executeUpdate("DROP TABLE IF EXISTS Users");
             
-            // 重新创建表
+            // 重创建表
             initializeDatabase();
             return true;
         } catch (SQLException e) {
@@ -326,8 +329,8 @@ public class DatabaseService {
     }
     
     // 获取用户余额
-    public static int getUserBalance(String username) {
-        String sql = "SELECT balance FROM Users WHERE username = ?";
+    public static int getUserMoney(String username) {
+        String sql = "SELECT money FROM Users WHERE username = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
@@ -335,7 +338,7 @@ public class DatabaseService {
             ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
-                return rs.getInt("balance");
+                return rs.getInt("money");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -344,12 +347,12 @@ public class DatabaseService {
     }
     
     // 更新用户余额
-    public static boolean updateUserBalance(String username, int newBalance) {
-        String sql = "UPDATE Users SET balance = ? WHERE username = ?";
+    public static boolean updateUserMoney(String username, int newMoney) {
+        String sql = "UPDATE Users SET money = ? WHERE username = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
-            pstmt.setInt(1, newBalance);
+            pstmt.setInt(1, newMoney);
             pstmt.setString(2, username);
             
             return pstmt.executeUpdate() > 0;
@@ -408,7 +411,13 @@ public class DatabaseService {
             pstmt.setString(2, gameName);
             pstmt.setInt(3, score);
             
-            return pstmt.executeUpdate() > 0;
+            int result = pstmt.executeUpdate();
+            
+            // 调试输出
+            System.out.println(String.format("Score saved to DB - User: %s, Game: %s, Score: %d", 
+                username, gameName, score));
+                
+            return result > 0;
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -460,5 +469,28 @@ public class DatabaseService {
         }
         
         return stats;
+    }
+    
+    public static List<UserData> getAllUsers() {
+        List<UserData> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users ORDER BY id";
+        
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                users.add(new UserData(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getTimestamp("created_date")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return users;
     }
 } 

@@ -42,6 +42,7 @@
                         <TableColumn fx:id="playerColumn" text="Player"/>
                         <TableColumn fx:id="scoreColumn" text="Score"/>
                         <TableColumn fx:id="dateColumn" text="Date"/>
+                        <TableColumn fx:id="balanceColumn" text="Balance"/>
                     </columns>
                 </TableView>
             </TitledPane>

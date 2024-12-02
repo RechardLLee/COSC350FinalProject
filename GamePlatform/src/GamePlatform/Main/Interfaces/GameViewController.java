@@ -22,6 +22,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import GamePlatform.Game.GameRecord;
+import GamePlatform.Game.GameRecordManager;
 
 public class GameViewController {
     @FXML private Label titleLabel;
@@ -74,6 +75,9 @@ public class GameViewController {
         if (titleLabel != null && titleLabel.getText() != null) {
             String title = titleLabel.getText();
             
+            // 同步文件记录到数据库
+            GameRecordManager.syncRecordsToDatabase(title);
+            
             // 刷新游戏统计信息
             GameStats stats = DatabaseService.getGameStats(title);
             
@@ -116,68 +120,17 @@ public class GameViewController {
                 scoreColumn.setText(LanguageUtil.isEnglish() ? "Score" : "分数");
             }
             
-            // 刷新历史记录
-            try {
-                Path scoreFile = Paths.get("game_records", title + ".txt");
-                System.out.println("Looking for score file: " + scoreFile);
-                
-                if (Files.exists(scoreFile)) {
-                    List<String> lines = Files.readAllLines(scoreFile);
-                    ObservableList<GameRecord> records = FXCollections.observableArrayList();
-                    
-                    for (String line : lines) {
-                        if (!line.trim().isEmpty()) {
-                            try {
-                                String[] parts = line.split(",");
-                                if (parts.length >= 2) {
-                                    String player = parts[0].trim();
-                                    int score = Integer.parseInt(parts[1].trim());
-                                    String dateStr = parts[2].trim();
-                                    Date date = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
-                                        .parse(dateStr);
-                                    
-                                    // 添加游戏记录
-                                    GameRecord record = new GameRecord(player, score, date);
-                                    records.add(record);
-                                }
-                            } catch (Exception e) {
-                                System.err.println("Error parsing line: " + line);
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    
-                    // 按分数降序排序
-                    records.sort((r1, r2) -> Integer.compare(r2.getScore(), r1.getScore()));
-                    
-                    historyTable.setItems(records);
-                    
-                    // 如果有记录，更新统计信息
-                    if (!records.isEmpty()) {
-                        GameRecord topRecord = records.get(0);
-                        if (stats.getHighScore() < topRecord.getScore()) {
-                            // 更新最高分显示
-                            if (title.equals("Hanoi Tower")) {
-                                highScoreLabel.setText(String.format("%d (by %s, 最优解)", 
-                                    topRecord.getScore(), topRecord.getPlayer()));
-                            } else {
-                                highScoreLabel.setText(String.format("%d (by %s)", 
-                                    topRecord.getScore(), topRecord.getPlayer()));
-                            }
-                            topPlayerLabel.setText(topRecord.getPlayer());
-                        }
-                    }
-                } else {
-                    System.out.println("Score file not found: " + scoreFile);
-                    historyTable.setItems(FXCollections.observableArrayList());
-                    
-                    // 清空统计信息
-                    highScoreLabel.setText("No records yet");
-                    topPlayerLabel.setText("No top player yet");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // 从文件加载最新记录
+            List<GameRecord> records = GameRecordManager.loadGameRecords(title);
+            
+            // 按分数降序排序
+            records.sort((r1, r2) -> Integer.compare(r2.getScore(), r1.getScore()));
+            
+            // 更新表格
+            historyTable.setItems(FXCollections.observableArrayList(records));
+            
+            // 立即刷新表格显示
+            historyTable.refresh();
         }
     }
     
@@ -192,7 +145,6 @@ public class GameViewController {
     private void handleStartGame() {
         if (gamePath != null) {
             GameLauncher.launchGame(gamePath);
-            // 启动游戏后立即开始刷新
             refreshTimeline.play();
         }
     }
@@ -202,6 +154,9 @@ public class GameViewController {
         gameDescription.setText(description);
         gamePath = path;
         
+        // 设置开始按钮文本
+        startButton.setText(LanguageUtil.isEnglish() ? "Start Game" : "开始游戏");
+        
         // 加载游戏统计信息
         GameStats stats = DatabaseService.getGameStats(title);
         totalPlayersLabel.setText(String.valueOf(stats.getTotalPlayers()));
@@ -210,13 +165,5 @@ public class GameViewController {
         
         // 立即刷新历史记录
         refreshGameInfo();
-    }
-    
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 } 

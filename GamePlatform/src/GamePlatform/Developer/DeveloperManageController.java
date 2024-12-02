@@ -15,6 +15,8 @@ import GamePlatform.User.Management.UserData;
 import GamePlatform.Feedback.ReviewData;
 import GamePlatform.Feedback.BugData;
 import GamePlatform.Game.GameData;
+import java.util.List;
+import java.util.ArrayList;
 
 public class DeveloperManageController {
     @FXML private Label titleLabel;
@@ -51,6 +53,8 @@ public class DeveloperManageController {
     @FXML private TableColumn<GameData, String> ownerColumn;
     @FXML private TableColumn<GameData, Date> purchaseDateColumn;
     @FXML private TableColumn<GameData, Integer> playTimeColumn;
+    
+    @FXML private TextField balanceField;
     
     @FXML
     private void initialize() {
@@ -96,26 +100,15 @@ public class DeveloperManageController {
     }
     
     private void loadUsers() {
-        try (Connection conn = DatabaseService.getConnection();
-             ResultSet rs = DatabaseService.getUsers()) {
-            
-            ObservableList<UserData> users = FXCollections.observableArrayList();
-            while (rs.next()) {
-                users.add(new UserData(
-                    rs.getInt("id"),
-                    rs.getString("username"),
-                    rs.getString("email"),
-                    rs.getTimestamp("created_date")
-                ));
-            }
-            userTable.setItems(users);
-            
-        } catch (SQLException e) {
+        List<UserData> users = DatabaseService.getAllUsers();
+        if (users != null) {
+            userTable.setItems(FXCollections.observableArrayList(users));
+        } else {
             showError(
                 LanguageUtil.isEnglish() ? "Database Error" : "数据库错误",
                 LanguageUtil.isEnglish() ? 
-                    "Failed to load users: " + e.getMessage() :
-                    "加载用户失败：" + e.getMessage()
+                    "Failed to load users" :
+                    "加载用户失败"
             );
         }
     }
@@ -354,43 +347,32 @@ public class DeveloperManageController {
     @FXML
     private void handleAddBalance() {
         UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
-        if (selectedUser == null) {
-            showError(
-                LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Please select a user" : "请选择用户"
-            );
-            return;
-        }
-        
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle(LanguageUtil.isEnglish() ? "Add Balance" : "添加余额");
-        dialog.setHeaderText(null);
-        dialog.setContentText(LanguageUtil.isEnglish() ? "Enter amount:" : "输入金额：");
-        
-        dialog.showAndWait().ifPresent(amount -> {
+        if (selectedUser != null) {
             try {
-                int value = Integer.parseInt(amount);
-                if (value <= 0) throw new NumberFormatException();
-                
-                int currentBalance = DatabaseService.getUserBalance(selectedUser.getUsername());
-                if (DatabaseService.updateUserBalance(selectedUser.getUsername(), currentBalance + value)) {
-                    loadAllData();  // Refresh data
-                    showInfo(
-                        LanguageUtil.isEnglish() ? "Success" : "成功",
-                        LanguageUtil.isEnglish() ? 
-                            "Balance updated successfully" :
-                            "余额更新成功"
-                    );
+                int value = Integer.parseInt(balanceField.getText());
+                if (value > 0) {
+                    // 获取当前金币数
+                    int currentMoney = DatabaseService.getUserMoney(selectedUser.getUsername());
+                    // 更新金币
+                    if (DatabaseService.updateUserMoney(selectedUser.getUsername(), currentMoney + value)) {
+                        showInfo(
+                            LanguageUtil.isEnglish() ? "Success" : "成功",
+                            LanguageUtil.isEnglish() ? 
+                                "Added " + value + " money to user " + selectedUser.getUsername() :
+                                "已为用户 " + selectedUser.getUsername() + " 添加 " + value + " 金币"
+                        );
+                        refreshUserList();  // 刷新用户列表
+                    }
                 }
             } catch (NumberFormatException e) {
                 showError(
                     LanguageUtil.isEnglish() ? "Error" : "错误",
                     LanguageUtil.isEnglish() ? 
-                        "Please enter a valid positive number" :
-                        "请输入有效的正数"
+                        "Please enter a valid number" :
+                        "请输入有效数字"
                 );
             }
-        });
+        }
     }
     
     @FXML
@@ -524,5 +506,11 @@ public class DeveloperManageController {
                 );
             }
         }
+    }
+    
+    private void refreshUserList() {
+        // 重新加载用户列表
+        List<UserData> users = DatabaseService.getAllUsers();
+        userTable.setItems(FXCollections.observableArrayList(users));
     }
 } 

@@ -39,19 +39,8 @@ public abstract class BaseGame extends JFrame {
     }
     
     protected void saveScore(int score) {
-        // 保存到数据库
-        DatabaseService.saveGameScore(username, gameName, score);
-        
-        // 保存到本地文件
-        try {
-            Path scoreFile = Paths.get(SCORES_DIR, gameName + ".txt");
-            String scoreRecord = String.format("%s,%d,%s%n", 
-                username, score, new Date());
-            Files.write(scoreFile, scoreRecord.getBytes(), 
-                StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // 使用GameRecordManager保存记录
+        GameRecordManager.saveGameRecord(username, gameName, score);
     }
     
     protected GameStats getGameStats() {

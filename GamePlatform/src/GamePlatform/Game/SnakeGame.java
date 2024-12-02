@@ -14,6 +14,7 @@ public class SnakeGame extends BaseGame {
     private static final int GAME_WIDTH = GRID_WIDTH * CELL_SIZE;
     private static final int GAME_HEIGHT = GRID_HEIGHT * CELL_SIZE;
     private static final int WINDOW_HEIGHT = GAME_HEIGHT + 100;
+    private static final int POWERUP_COST = 10;  // 道具价格
     
     private ArrayList<Point> snake;
     private Point food;

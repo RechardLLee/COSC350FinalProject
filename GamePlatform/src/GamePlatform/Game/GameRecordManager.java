@@ -1,88 +1,79 @@
 package GamePlatform.Game;
 
-import java.io.*;
-import java.util.*;
 import java.nio.file.*;
+import java.util.*;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import GamePlatform.Database.DatabaseService;
 
 public class GameRecordManager {
     private static final String RECORDS_DIR = "game_records";
     
+    // 保存游戏记录到文件和数据库
     public static void saveGameRecord(String username, String gameName, int score) {
+        // 保存到本地文件
         try {
             // 确保目录存在
             Files.createDirectories(Paths.get(RECORDS_DIR));
             
-            // 游戏记录文件路径
-            Path recordFile = Paths.get(RECORDS_DIR, gameName + ".txt");
-            
-            // 读取现有记录
-            List<String> records = new ArrayList<>();
-            if (Files.exists(recordFile)) {
-                records = Files.readAllLines(recordFile);
-            }
-            
-            // 添加新记录
-            records.add(String.format("%s,%d,%s", username, score, 
-                new java.util.Date().toString()));
-            
-            // 写入文件
-            Files.write(recordFile, records);
-            
+            Path scoreFile = Paths.get(RECORDS_DIR, gameName + ".txt");
+            String scoreRecord = String.format("%s,%d,%s%n", 
+                username,           // 用户名
+                score,             // 分数
+                new Date()         // 时间
+            );
+            Files.write(scoreFile, scoreRecord.getBytes(), 
+                StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                
+            System.out.println("Score saved to file: " + scoreRecord);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        // 保存到数据库
+        DatabaseService.saveGameScore(username, gameName, score);
     }
     
-    public static GameStats getGameStats(String gameName) {
-        GameStats stats = new GameStats();
-        Path recordFile = Paths.get(RECORDS_DIR, gameName + ".txt");
+    // 从文件加载游戏记录
+    public static List<GameRecord> loadGameRecords(String gameName) {
+        List<GameRecord> records = new ArrayList<>();
+        Path scoreFile = Paths.get(RECORDS_DIR, gameName + ".txt");
         
-        if (Files.exists(recordFile)) {
-            try {
-                List<String> records = Files.readAllLines(recordFile);
-                Set<String> players = new HashSet<>();
-                int maxScore = Integer.MIN_VALUE;
-                String topPlayer = "";
-                
-                for (String record : records) {
-                    String[] parts = record.split(",");
-                    String player = parts[0];
-                    int score = Integer.parseInt(parts[1]);
-                    
-                    players.add(player);
-                    if (score > maxScore) {
-                        maxScore = score;
-                        topPlayer = player;
+        try {
+            if (Files.exists(scoreFile)) {
+                List<String> lines = Files.readAllLines(scoreFile);
+                for (String line : lines) {
+                    if (!line.trim().isEmpty()) {
+                        try {
+                            String[] parts = line.split(",");
+                            if (parts.length >= 3) {
+                                String player = parts[0].trim();
+                                int score = Integer.parseInt(parts[1].trim());
+                                Date date = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
+                                    .parse(parts[2].trim());
+                                
+                                records.add(new GameRecord(player, score, date));
+                                System.out.println("Loaded record: " + line);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Error parsing line: " + line);
+                            e.printStackTrace();
+                        }
                     }
                 }
-                
-                stats.setTotalPlayers(players.size());
-                stats.setTotalGames(records.size());
-                stats.setHighScore(maxScore);
-                stats.setTopPlayer(topPlayer);
-                
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         
-        return stats;
+        return records;
     }
     
-    public static class GameStats {
-        private int totalPlayers;
-        private int totalGames;
-        private int highScore;
-        private String topPlayer;
-        
-        // Getters and setters
-        public int getTotalPlayers() { return totalPlayers; }
-        public void setTotalPlayers(int totalPlayers) { this.totalPlayers = totalPlayers; }
-        public int getTotalGames() { return totalGames; }
-        public void setTotalGames(int totalGames) { this.totalGames = totalGames; }
-        public int getHighScore() { return highScore; }
-        public void setHighScore(int highScore) { this.highScore = highScore; }
-        public String getTopPlayer() { return topPlayer; }
-        public void setTopPlayer(String topPlayer) { this.topPlayer = topPlayer; }
+    // 同步文件记录到数据库
+    public static void syncRecordsToDatabase(String gameName) {
+        List<GameRecord> records = loadGameRecords(gameName);
+        for (GameRecord record : records) {
+            DatabaseService.saveGameScore(record.getPlayer(), gameName, record.getScore());
+        }
     }
 } 
