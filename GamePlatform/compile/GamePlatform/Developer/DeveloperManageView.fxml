@@ -18,53 +18,97 @@
     
     <TabPane VBox.vgrow="ALWAYS">
         <Tab text="Users" closable="false">
-            <TableView fx:id="userTable">
-                <columns>
-                    <TableColumn fx:id="idColumn" text="ID"/>
-                    <TableColumn fx:id="usernameColumn" text="Username"/>
-                    <TableColumn fx:id="emailColumn" text="Email"/>
-                    <TableColumn fx:id="createdDateColumn" text="Created Date"/>
-                </columns>
-            </TableView>
+            <VBox spacing="10">
+                <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="idColumn" text="ID"/>
+                        <TableColumn fx:id="usernameColumn" text="Username"/>
+                        <TableColumn fx:id="emailColumn" text="Email"/>
+                        <TableColumn fx:id="balanceColumn" text="Balance"/>
+                        <TableColumn fx:id="createdDateColumn" text="Created Date"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10">
+                    <Button text="Delete User" onAction="#handleDeleteUser"/>
+                    <Button text="Add Balance" onAction="#handleAddBalance"/>
+                </HBox>
+            </VBox>
+        </Tab>
+        
+        <Tab text="Games" closable="false">
+            <VBox spacing="10">
+                <TableView fx:id="gameTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="gameNameColumn" text="Game Name"/>
+                        <TableColumn fx:id="ownerColumn" text="Owner"/>
+                        <TableColumn fx:id="purchaseDateColumn" text="Purchase Date"/>
+                        <TableColumn fx:id="playTimeColumn" text="Play Time"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10">
+                    <Button text="Remove Game" onAction="#handleRemoveGame"/>
+                    <Button text="Game Statistics" onAction="#handleGameStats"/>
+                </HBox>
+            </VBox>
         </Tab>
         
         <Tab text="Reviews" closable="false">
-            <TableView fx:id="reviewTable">
-                <columns>
-                    <TableColumn fx:id="reviewIdColumn" text="ID"/>
-                    <TableColumn fx:id="reviewUserColumn" text="User"/>
-                    <TableColumn fx:id="gameNameColumn" text="Game"/>
-                    <TableColumn fx:id="ratingColumn" text="Rating"/>
-                    <TableColumn fx:id="reviewTextColumn" text="Review"/>
-                    <TableColumn fx:id="reviewDateColumn" text="Date"/>
-                </columns>
-            </TableView>
+            <VBox spacing="10">
+                <TableView fx:id="reviewTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="reviewIdColumn" text="ID"/>
+                        <TableColumn fx:id="reviewUserColumn" text="User"/>
+                        <TableColumn fx:id="reviewGameColumn" text="Game"/>
+                        <TableColumn fx:id="ratingColumn" text="Rating"/>
+                        <TableColumn fx:id="reviewTextColumn" text="Review"/>
+                        <TableColumn fx:id="reviewDateColumn" text="Date"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10">
+                    <Button text="Delete Review" onAction="#handleDeleteReview"/>
+                    <Button text="Review Analytics" onAction="#handleReviewAnalytics"/>
+                </HBox>
+            </VBox>
         </Tab>
         
         <Tab text="Bug Reports" closable="false">
-            <TableView fx:id="bugTable">
-                <columns>
-                    <TableColumn fx:id="bugIdColumn" text="ID"/>
-                    <TableColumn fx:id="bugUserColumn" text="User"/>
-                    <TableColumn fx:id="descriptionColumn" text="Description"/>
-                    <TableColumn fx:id="statusColumn" text="Status"/>
-                    <TableColumn fx:id="reportDateColumn" text="Date"/>
-                </columns>
-            </TableView>
+            <VBox spacing="10">
+                <TableView fx:id="bugTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="bugIdColumn" text="ID"/>
+                        <TableColumn fx:id="bugUserColumn" text="User"/>
+                        <TableColumn fx:id="descriptionColumn" text="Description"/>
+                        <TableColumn fx:id="statusColumn" text="Status"/>
+                        <TableColumn fx:id="reportDateColumn" text="Date"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10">
+                    <Button text="Update Status" onAction="#handleUpdateBugStatus"/>
+                    <Button text="Delete Report" onAction="#handleDeleteBugReport"/>
+                </HBox>
+            </VBox>
         </Tab>
         
         <Tab text="SQL Query" closable="false">
             <VBox spacing="10">
                 <TextArea fx:id="sqlQueryArea" prefHeight="200" wrapText="true"
                     promptText="Enter SQL query here..."/>
-                <Button text="Execute Query" onAction="#handleExecuteQuery"/>
+                <HBox spacing="10">
+                    <Button text="Execute Query" onAction="#handleExecuteQuery"/>
+                    <Button text="Save Query" onAction="#handleSaveQuery"/>
+                    <Button text="Load Query" onAction="#handleLoadQuery"/>
+                </HBox>
                 <TableView fx:id="queryResultTable" VBox.vgrow="ALWAYS"/>
             </VBox>
         </Tab>
+        
+        <Tab text="System" closable="false">
+            <VBox spacing="10">
+                <Button text="Reset Database" onAction="#handleResetDatabase"/>
+                <Button text="Backup Database" onAction="#handleBackupDatabase"/>
+                <Button text="Restore Database" onAction="#handleRestoreDatabase"/>
+                <Button text="View System Logs" onAction="#handleViewLogs"/>
+            </VBox>
+        </Tab>
     </TabPane>
-    
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Delete Selected User" onAction="#handleDeleteUser"/>
-        <Button text="Reset Database" onAction="#handleResetDatabase"/>
-    </HBox>
 </VBox> 

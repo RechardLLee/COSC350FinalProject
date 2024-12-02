@@ -4,8 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import GamePlatform.User.Management.UserSession;
+import GamePlatform.Utility.LanguageUtil;
 
-public class SnakeGame extends JFrame {
+public class SnakeGame extends BaseGame {
     private static final int CELL_SIZE = 20;
     private static final int GRID_WIDTH = 30;
     private static final int GRID_HEIGHT = 25;
@@ -30,9 +32,15 @@ public class SnakeGame extends JFrame {
     private JComboBox<String> difficultyCombo;
     private Random random = new Random();
     private javax.swing.Timer gameTimer;
+    private String currentPlayer;
     
     public SnakeGame() {
-        setTitle("Snake Game");
+        super("Snake");
+        
+        // 获取当前玩家
+        currentPlayer = UserSession.getCurrentUser();
+        
+        setTitle("Snake Game - Player: " + currentPlayer);
         setSize(GAME_WIDTH + 16, WINDOW_HEIGHT);
         setMinimumSize(new Dimension(GAME_WIDTH + 16, WINDOW_HEIGHT));
         setResizable(false);
@@ -154,7 +162,6 @@ public class SnakeGame extends JFrame {
             }
         }
         
-        // 如果没有可用位置，游戏结束
         if (availablePositions.isEmpty()) {
             gameOver();
             return;
@@ -162,8 +169,9 @@ public class SnakeGame extends JFrame {
         
         // 随机选择一个可用位置
         food = availablePositions.get(random.nextInt(availablePositions.size()));
+        System.out.println("New food generated at: " + food.x + "," + food.y); // 调试输出
         
-        // 强制重绘以显示新食物
+        // 强制重绘
         if (gamePanel != null) {
             gamePanel.repaint();
         }
@@ -174,7 +182,7 @@ public class SnakeGame extends JFrame {
         
         // 检查是否吃到食物
         if (head.equals(food)) {
-            score += 10;
+            score += 10;  // 每吃到一个食物加10分
             if (score > highScore) {
                 highScore = score;
             }
@@ -264,20 +272,27 @@ public class SnakeGame extends JFrame {
         Point head = snake.get(0);
         Point newHead = new Point(head.x, head.y);
         
-        // 更新蛇头位置
+        // 更新蛇头位置 - 修改这里，去掉循环边界
         switch (direction) {
             case "Right": 
-                newHead.x = (head.x + 1 + GRID_WIDTH) % GRID_WIDTH;
+                newHead.x = head.x + 1;
                 break;
             case "Left": 
-                newHead.x = (head.x - 1 + GRID_WIDTH) % GRID_WIDTH;
+                newHead.x = head.x - 1;
                 break;
             case "Up": 
-                newHead.y = (head.y - 1 + GRID_HEIGHT) % GRID_HEIGHT;
+                newHead.y = head.y - 1;
                 break;
             case "Down": 
-                newHead.y = (head.y + 1 + GRID_HEIGHT) % GRID_HEIGHT;
+                newHead.y = head.y + 1;
                 break;
+        }
+        
+        // 检查是否撞墙
+        if (newHead.x < 0 || newHead.x >= GRID_WIDTH || 
+            newHead.y < 0 || newHead.y >= GRID_HEIGHT) {
+            gameOver();
+            return;
         }
         
         // 检查是否撞到自己或障碍物
@@ -296,12 +311,7 @@ public class SnakeGame extends JFrame {
                 highScore = score;
             }
             updateScore();
-            
-            // 生成新食物（确保生成）
-            food = null;  // 清除旧食物
             generateFood();  // 生成新食物
-            
-            // 不移除尾部，让蛇变长
         } else {
             // 如果没吃到食物，移除尾部
             snake.remove(snake.size() - 1);
@@ -315,6 +325,9 @@ public class SnakeGame extends JFrame {
         gameRunning = false;
         gameTimer.stop();
         
+        // 保存游戏记录，使用当前分数
+        GameRecordManager.saveGameRecord(currentPlayer, "Snake", score);
+        
         // 更新最高分
         if (score > highScore) {
             highScore = score;
@@ -322,9 +335,14 @@ public class SnakeGame extends JFrame {
         }
         
         // 显示游戏结束对话框
+        String message = String.format(
+            "Game Over!\nScore: %d\nHigh Score: %d\nWould you like to play again?",
+            score, highScore
+        );
+        
         int option = JOptionPane.showConfirmDialog(
             this,
-            "Game Over!\nScore: " + score + "\nHigh Score: " + highScore + "\nWould you like to play again?",
+            message,
             "Game Over",
             JOptionPane.YES_NO_OPTION
         );
@@ -335,8 +353,7 @@ public class SnakeGame extends JFrame {
     }
     
     private void updateScore() {
-        scoreLabel.setText("Score: " + score);
-        highScoreLabel.setText("High Score: " + highScore);
+        scoreLabel.setText(String.format("Score: %d High Score: %d", score, highScore));
     }
     
     private void createObstacles() {
@@ -394,12 +411,19 @@ public class SnakeGame extends JFrame {
             
             // 绘制蛇
             if (snake != null) {
-                for (Point p : snake) {
-                    g.setColor(new Color(46, 204, 113));
+                // 绘制蛇身
+                g.setColor(new Color(46, 204, 113));
+                for (int i = 1; i < snake.size(); i++) {
+                    Point p = snake.get(i);
                     g.fillRect(p.x * CELL_SIZE + 1, p.y * CELL_SIZE + 1, 
                               CELL_SIZE - 2, CELL_SIZE - 2);
+                }
+                
+                // 绘制蛇头（使用不同颜色）
+                if (!snake.isEmpty()) {
+                    Point head = snake.get(0);
                     g.setColor(new Color(39, 174, 96));
-                    g.drawRect(p.x * CELL_SIZE + 1, p.y * CELL_SIZE + 1, 
+                    g.fillRect(head.x * CELL_SIZE + 1, head.y * CELL_SIZE + 1, 
                               CELL_SIZE - 2, CELL_SIZE - 2);
                 }
             }
@@ -416,12 +440,9 @@ public class SnakeGame extends JFrame {
             
             // 绘制障碍物
             if (obstacles != null) {
+                g.setColor(new Color(149, 165, 166));
                 for (Point p : obstacles) {
-                    g.setColor(new Color(149, 165, 166));
                     g.fillRect(p.x * CELL_SIZE + 1, p.y * CELL_SIZE + 1, 
-                              CELL_SIZE - 2, CELL_SIZE - 2);
-                    g.setColor(new Color(127, 140, 141));
-                    g.drawRect(p.x * CELL_SIZE + 1, p.y * CELL_SIZE + 1, 
                               CELL_SIZE - 2, CELL_SIZE - 2);
                 }
             }

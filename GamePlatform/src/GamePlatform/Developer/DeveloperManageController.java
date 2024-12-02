@@ -14,6 +14,7 @@ import GamePlatform.Utility.LanguageUtil;
 import GamePlatform.User.Management.UserData;
 import GamePlatform.Feedback.ReviewData;
 import GamePlatform.Feedback.BugData;
+import GamePlatform.Game.GameData;
 
 public class DeveloperManageController {
     @FXML private Label titleLabel;
@@ -28,11 +29,12 @@ public class DeveloperManageController {
     @FXML private TableColumn<UserData, String> usernameColumn;
     @FXML private TableColumn<UserData, String> emailColumn;
     @FXML private TableColumn<UserData, Date> createdDateColumn;
+    @FXML private TableColumn<UserData, Integer> balanceColumn;
     
     // 评论表列
     @FXML private TableColumn<ReviewData, Integer> reviewIdColumn;
     @FXML private TableColumn<ReviewData, String> reviewUserColumn;
-    @FXML private TableColumn<ReviewData, String> gameNameColumn;
+    @FXML private TableColumn<ReviewData, String> reviewGameColumn;
     @FXML private TableColumn<ReviewData, Integer> ratingColumn;
     @FXML private TableColumn<ReviewData, String> reviewTextColumn;
     @FXML private TableColumn<ReviewData, Date> reviewDateColumn;
@@ -43,6 +45,12 @@ public class DeveloperManageController {
     @FXML private TableColumn<BugData, String> descriptionColumn;
     @FXML private TableColumn<BugData, String> statusColumn;
     @FXML private TableColumn<BugData, Date> reportDateColumn;
+    
+    @FXML private TableView<GameData> gameTable;
+    @FXML private TableColumn<GameData, String> gameNameColumn;
+    @FXML private TableColumn<GameData, String> ownerColumn;
+    @FXML private TableColumn<GameData, Date> purchaseDateColumn;
+    @FXML private TableColumn<GameData, Integer> playTimeColumn;
     
     @FXML
     private void initialize() {
@@ -57,11 +65,12 @@ public class DeveloperManageController {
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         createdDateColumn.setCellValueFactory(new PropertyValueFactory<>("createdDate"));
+        balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
         
         // 初始化评论表列
         reviewIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         reviewUserColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        gameNameColumn.setCellValueFactory(new PropertyValueFactory<>("gameName"));
+        reviewGameColumn.setCellValueFactory(new PropertyValueFactory<>("gameName"));
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
         reviewTextColumn.setCellValueFactory(new PropertyValueFactory<>("review"));
         reviewDateColumn.setCellValueFactory(new PropertyValueFactory<>("reviewDate"));
@@ -72,6 +81,12 @@ public class DeveloperManageController {
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         reportDateColumn.setCellValueFactory(new PropertyValueFactory<>("reportDate"));
+        
+        // Initialize game table columns
+        gameNameColumn.setCellValueFactory(new PropertyValueFactory<>("gameName"));
+        ownerColumn.setCellValueFactory(new PropertyValueFactory<>("owner"));
+        purchaseDateColumn.setCellValueFactory(new PropertyValueFactory<>("purchaseDate"));
+        playTimeColumn.setCellValueFactory(new PropertyValueFactory<>("playTime"));
     }
     
     private void loadAllData() {
@@ -331,6 +346,181 @@ public class DeveloperManageController {
                     LanguageUtil.isEnglish() ? 
                     "Invalid confirmation code" :
                     "确认码错误"
+                );
+            }
+        }
+    }
+    
+    @FXML
+    private void handleAddBalance() {
+        UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
+        if (selectedUser == null) {
+            showError(
+                LanguageUtil.isEnglish() ? "Error" : "错误",
+                LanguageUtil.isEnglish() ? "Please select a user" : "请选择用户"
+            );
+            return;
+        }
+        
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle(LanguageUtil.isEnglish() ? "Add Balance" : "添加余额");
+        dialog.setHeaderText(null);
+        dialog.setContentText(LanguageUtil.isEnglish() ? "Enter amount:" : "输入金额：");
+        
+        dialog.showAndWait().ifPresent(amount -> {
+            try {
+                int value = Integer.parseInt(amount);
+                if (value <= 0) throw new NumberFormatException();
+                
+                int currentBalance = DatabaseService.getUserBalance(selectedUser.getUsername());
+                if (DatabaseService.updateUserBalance(selectedUser.getUsername(), currentBalance + value)) {
+                    loadAllData();  // Refresh data
+                    showInfo(
+                        LanguageUtil.isEnglish() ? "Success" : "成功",
+                        LanguageUtil.isEnglish() ? 
+                            "Balance updated successfully" :
+                            "余额更新成功"
+                    );
+                }
+            } catch (NumberFormatException e) {
+                showError(
+                    LanguageUtil.isEnglish() ? "Error" : "错误",
+                    LanguageUtil.isEnglish() ? 
+                        "Please enter a valid positive number" :
+                        "请输入有效的正数"
+                );
+            }
+        });
+    }
+    
+    @FXML
+    private void handleGameStats() {
+        // ... implement game statistics display ...
+    }
+    
+    @FXML
+    private void handleRemoveGame() {
+        // ... implement game removal ...
+    }
+    
+    @FXML
+    private void handleReviewAnalytics() {
+        // ... implement review analytics ...
+    }
+    
+    @FXML
+    private void handleUpdateBugStatus() {
+        // ... implement bug status update ...
+    }
+    
+    @FXML
+    private void handleBackupDatabase() {
+        // ... implement database backup ...
+    }
+    
+    @FXML
+    private void handleRestoreDatabase() {
+        // ... implement database restore ...
+    }
+    
+    @FXML
+    private void handleViewLogs() {
+        // ... implement log viewing ...
+    }
+    
+    @FXML
+    private void handleSaveQuery() {
+        // ... implement query saving ...
+    }
+    
+    @FXML
+    private void handleLoadQuery() {
+        // ... implement query loading ...
+    }
+    
+    @FXML
+    private void handleDeleteReview() {
+        ReviewData selectedReview = reviewTable.getSelectionModel().getSelectedItem();
+        if (selectedReview == null) {
+            showError(
+                LanguageUtil.isEnglish() ? "Error" : "错误",
+                LanguageUtil.isEnglish() ? "Please select a review to delete" : "请选择要删除的评论"
+            );
+            return;
+        }
+        
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(LanguageUtil.isEnglish() ? "Confirm Delete" : "确认删除");
+        alert.setHeaderText(null);
+        alert.setContentText(LanguageUtil.isEnglish() ? 
+            "Are you sure you want to delete this review?" :
+            "确定要删除这条评论吗？");
+        
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            try (Connection conn = DatabaseService.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(
+                     "DELETE FROM GameReviews WHERE id = ?"
+                 )) {
+                
+                pstmt.setInt(1, selectedReview.getId());
+                if (pstmt.executeUpdate() > 0) {
+                    loadReviews();  // 重新加载评论列表
+                    showInfo(
+                        LanguageUtil.isEnglish() ? "Success" : "成功",
+                        LanguageUtil.isEnglish() ? "Review deleted successfully" : "评论删除成功"
+                    );
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showError(
+                    LanguageUtil.isEnglish() ? "Error" : "错误",
+                    LanguageUtil.isEnglish() ? 
+                        "Failed to delete review: " + e.getMessage() :
+                        "删除评论失败：" + e.getMessage()
+                );
+            }
+        }
+    }
+    
+    @FXML
+    private void handleDeleteBugReport() {
+        BugData selectedBug = bugTable.getSelectionModel().getSelectedItem();
+        if (selectedBug == null) {
+            showError(
+                LanguageUtil.isEnglish() ? "Error" : "错误",
+                LanguageUtil.isEnglish() ? "Please select a bug report to delete" : "请选择要删除的问题报告"
+            );
+            return;
+        }
+        
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(LanguageUtil.isEnglish() ? "Confirm Delete" : "确认删除");
+        alert.setHeaderText(null);
+        alert.setContentText(LanguageUtil.isEnglish() ? 
+            "Are you sure you want to delete this bug report?" :
+            "确定要删除这条问题报告吗？");
+        
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            try (Connection conn = DatabaseService.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(
+                     "DELETE FROM BugReports WHERE id = ?"
+                 )) {
+                
+                pstmt.setInt(1, selectedBug.getId());
+                if (pstmt.executeUpdate() > 0) {
+                    loadBugReports();  // 重新加载问题报告列表
+                    showInfo(
+                        LanguageUtil.isEnglish() ? "Success" : "成功",
+                        LanguageUtil.isEnglish() ? "Bug report deleted successfully" : "问题报告删除成功"
+                    );
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showError(
+                    LanguageUtil.isEnglish() ? "Error" : "错误",
+                    LanguageUtil.isEnglish() ? 
+                        "Failed to delete bug report: " + e.getMessage() :
+                        "删除问题报告失败：" + e.getMessage()
                 );
             }
         }

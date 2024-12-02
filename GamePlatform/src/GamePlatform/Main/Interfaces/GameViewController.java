@@ -3,43 +3,220 @@ package GamePlatform.Main.Interfaces;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import java.util.*;
+import java.text.SimpleDateFormat;
 import GamePlatform.Utility.LanguageUtil;
 import GamePlatform.Game.GameLauncher;
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.User.Management.UserSession;
+import java.nio.file.*;
+import java.io.*;
+import GamePlatform.Game.GameStats;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+import GamePlatform.Game.GameRecord;
 
 public class GameViewController {
     @FXML private Label titleLabel;
     @FXML private ImageView gameIcon;
     @FXML private TextArea gameDescription;
-    @FXML private Button buyButton;
+    @FXML private Label totalPlayersLabel;
+    @FXML private Label highScoreLabel;
+    @FXML private Label topPlayerLabel;
     @FXML private Button startButton;
+    @FXML private TableView<GameRecord> historyTable;
+    @FXML private TableColumn<GameRecord, String> playerColumn;
+    @FXML private TableColumn<GameRecord, Integer> scoreColumn;
+    @FXML private TableColumn<GameRecord, Date> dateColumn;
+    
+    private String gamePath;
+    private Timeline refreshTimeline;
     
     @FXML
     private void initialize() {
-        setLanguage(LanguageUtil.isEnglish());
+        // 设置表格列
+        playerColumn.setCellValueFactory(new PropertyValueFactory<>("player"));
+        scoreColumn.setCellValueFactory(new PropertyValueFactory<>("score"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        
+        // 设置日期格式
+        dateColumn.setCellFactory(column -> new TableCell<GameRecord, Date>() {
+            private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            @Override
+            protected void updateItem(Date item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(format.format(item));
+                }
+            }
+        });
+        
+        // 设置开始按钮文本
+        startButton.setText(LanguageUtil.isEnglish() ? "Start Game" : "开始游戏");
+        
+        // 设置定时刷新
+        refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(5), e -> refreshGameInfo()));
+        refreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        refreshTimeline.play();
     }
     
-    private void setLanguage(boolean english) {
-        if (english) {
-            buyButton.setText("Buy Game");
-            startButton.setText("Start Game");
-        } else {
-            buyButton.setText("购买游戏");
-            startButton.setText("开始游戏");
+    private void refreshGameInfo() {
+        if (titleLabel != null && titleLabel.getText() != null) {
+            String title = titleLabel.getText();
+            
+            // 刷新游戏统计信息
+            GameStats stats = DatabaseService.getGameStats(title);
+            
+            // 更新统计标签
+            String totalPlayersText = stats.getTotalPlayers() > 0 ? 
+                String.valueOf(stats.getTotalPlayers()) : 
+                LanguageUtil.isEnglish() ? "No players yet" : "暂无玩家";
+            totalPlayersLabel.setText(totalPlayersText);
+            
+            // 处理高分和最佳玩家的显示
+            if (stats.getHighScore() > 0 && stats.getTopPlayer() != null) {
+                if (title.equals("Hanoi Tower")) {
+                    highScoreLabel.setText(String.format("%d (by %s, %s)", 
+                        stats.getHighScore(), 
+                        stats.getTopPlayer(),
+                        LanguageUtil.isEnglish() ? "Perfect Solution" : "最优解"));
+                } else {
+                    highScoreLabel.setText(String.format("%d (by %s)", 
+                        stats.getHighScore(), stats.getTopPlayer()));
+                }
+            } else {
+                highScoreLabel.setText(LanguageUtil.isEnglish() ? "No records yet" : "暂无记录");
+            }
+            
+            // 更新顶部玩家显示
+            if (stats.getTopPlayer() != null) {
+                topPlayerLabel.setText(stats.getTopPlayer());
+            } else {
+                topPlayerLabel.setText(LanguageUtil.isEnglish() ? "No top player yet" : "暂无最佳玩家");
+            }
+            
+            // 设置表格列标题
+            if (title.equals("Hanoi Tower")) {
+                scoreColumn.setText(LanguageUtil.isEnglish() ? 
+                    "Score (Perfect=10000)" : "分数 (最优解=10000)");
+            } else if (title.equals("Guess Number")) {
+                scoreColumn.setText(LanguageUtil.isEnglish() ? 
+                    "Score (First Try=10000)" : "分数 (首次猜中=10000)");
+            } else {
+                scoreColumn.setText(LanguageUtil.isEnglish() ? "Score" : "分数");
+            }
+            
+            // 刷新历史记录
+            try {
+                Path scoreFile = Paths.get("game_records", title + ".txt");
+                System.out.println("Looking for score file: " + scoreFile);
+                
+                if (Files.exists(scoreFile)) {
+                    List<String> lines = Files.readAllLines(scoreFile);
+                    ObservableList<GameRecord> records = FXCollections.observableArrayList();
+                    
+                    for (String line : lines) {
+                        if (!line.trim().isEmpty()) {
+                            try {
+                                String[] parts = line.split(",");
+                                if (parts.length >= 2) {
+                                    String player = parts[0].trim();
+                                    int score = Integer.parseInt(parts[1].trim());
+                                    String dateStr = parts[2].trim();
+                                    Date date = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
+                                        .parse(dateStr);
+                                    
+                                    // 添加游戏记录
+                                    GameRecord record = new GameRecord(player, score, date);
+                                    records.add(record);
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Error parsing line: " + line);
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    
+                    // 按分数降序排序
+                    records.sort((r1, r2) -> Integer.compare(r2.getScore(), r1.getScore()));
+                    
+                    historyTable.setItems(records);
+                    
+                    // 如果有记录，更新统计信息
+                    if (!records.isEmpty()) {
+                        GameRecord topRecord = records.get(0);
+                        if (stats.getHighScore() < topRecord.getScore()) {
+                            // 更新最高分显示
+                            if (title.equals("Hanoi Tower")) {
+                                highScoreLabel.setText(String.format("%d (by %s, 最优解)", 
+                                    topRecord.getScore(), topRecord.getPlayer()));
+                            } else {
+                                highScoreLabel.setText(String.format("%d (by %s)", 
+                                    topRecord.getScore(), topRecord.getPlayer()));
+                            }
+                            topPlayerLabel.setText(topRecord.getPlayer());
+                        }
+                    }
+                } else {
+                    System.out.println("Score file not found: " + scoreFile);
+                    historyTable.setItems(FXCollections.observableArrayList());
+                    
+                    // 清空统计信息
+                    highScoreLabel.setText("No records yet");
+                    topPlayerLabel.setText("No top player yet");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    // 在窗口关闭时停止刷新
+    public void cleanup() {
+        if (refreshTimeline != null) {
+            refreshTimeline.stop();
         }
     }
     
     @FXML
-    private void handleBuyGame() {
-        // 实现购买逻辑
-    }
-    
-    @FXML
     private void handleStartGame() {
-        GameLauncher.launchGame(titleLabel.getText());
+        if (gamePath != null) {
+            GameLauncher.launchGame(gamePath);
+            // 启动游戏后立即开始刷新
+            refreshTimeline.play();
+        }
     }
     
-    public void setGameInfo(String title, String description) {
+    public void setGameInfo(String title, String description, String path) {
         titleLabel.setText(title);
         gameDescription.setText(description);
+        gamePath = path;
+        
+        // 加载游戏统计信息
+        GameStats stats = DatabaseService.getGameStats(title);
+        totalPlayersLabel.setText(String.valueOf(stats.getTotalPlayers()));
+        highScoreLabel.setText(String.format("%d (by %s)", 
+            stats.getHighScore(), stats.getTopPlayer()));
+        
+        // 立即刷新历史记录
+        refreshGameInfo();
+    }
+    
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 } 

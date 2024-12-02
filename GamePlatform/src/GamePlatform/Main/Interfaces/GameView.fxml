@@ -24,15 +24,31 @@
         <VBox spacing="20" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
             <TextArea fx:id="gameDescription" wrapText="true" editable="false"
                 prefRowCount="8" style="-fx-background-color: transparent;"/>
+                
+            <GridPane hgap="10" vgap="5">
+                <Label text="Total Players:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Label fx:id="totalPlayersLabel" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                
+                <Label text="High Score:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Label fx:id="highScoreLabel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                
+                <Label text="Top Player:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <Label fx:id="topPlayerLabel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </GridPane>
             
-            <HBox spacing="15" alignment="CENTER">
-                <Button fx:id="buyButton" text="Buy Game"
-                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20;"
-                    onAction="#handleBuyGame"/>
-                <Button fx:id="startButton" text="Start Game"
-                    style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20;"
-                    onAction="#handleStartGame"/>
-            </HBox>
+            <TitledPane text="Game History" expanded="false">
+                <TableView fx:id="historyTable">
+                    <columns>
+                        <TableColumn fx:id="playerColumn" text="Player"/>
+                        <TableColumn fx:id="scoreColumn" text="Score"/>
+                        <TableColumn fx:id="dateColumn" text="Date"/>
+                    </columns>
+                </TableView>
+            </TitledPane>
+            
+            <Button fx:id="startButton" text="Start Game"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20;"
+                onAction="#handleStartGame"/>
         </VBox>
     </HBox>
 </VBox> 

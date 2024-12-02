@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.border.*;
+import GamePlatform.User.Management.UserSession;
 
 public class GuessNumberGame extends JFrame {
     private Map<String, Map<String, Integer>> difficulties;
@@ -12,6 +13,8 @@ public class GuessNumberGame extends JFrame {
     private int targetNumber;
     private ArrayList<Integer> guesses;
     private int attemptsLeft;
+    private int maxAttempts;
+    private String currentPlayer;
     
     private JLabel infoLabel;
     private JTextField inputField;
@@ -19,6 +22,8 @@ public class GuessNumberGame extends JFrame {
     private JComboBox<String> difficultyCombo;
     
     public GuessNumberGame() {
+        currentPlayer = UserSession.getCurrentUser();
+        
         // Initialize game settings
         difficulties = new HashMap<>();
         Map<String, Integer> easySettings = new HashMap<>();
@@ -40,9 +45,9 @@ public class GuessNumberGame extends JFrame {
         guesses = new ArrayList<>();
         
         // Set up window
-        setTitle("Guess the Number Game");
+        setTitle("Guess the Number Game - Player: " + currentPlayer);
         setSize(400, 350);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
         
         createWidgets();
@@ -97,6 +102,7 @@ public class GuessNumberGame extends JFrame {
         Map<String, Integer> difficultyInfo = difficulties.get(currentDifficulty);
         targetNumber = new Random().nextInt(difficultyInfo.get("range")) + 1;
         attemptsLeft = difficultyInfo.get("attempts");
+        maxAttempts = attemptsLeft;
         guesses.clear();
         updateInfoLabel();
         resultLabel.setText("");
@@ -119,11 +125,13 @@ public class GuessNumberGame extends JFrame {
             attemptsLeft--;
             
             if (guess == targetNumber) {
+                int score = (int)((attemptsLeft / (double)maxAttempts) * 10000);
+                
                 resultLabel.setText("Congratulations! You guessed the number!");
-                showGameResult(true);
+                showGameResult(true, score);
             } else if (attemptsLeft == 0) {
                 resultLabel.setText("Game over! The number was " + targetNumber);
-                showGameResult(false);
+                showGameResult(false, 0);
             } else if (guess < targetNumber) {
                 resultLabel.setText("Too low, try again");
             } else {
@@ -138,14 +146,18 @@ public class GuessNumberGame extends JFrame {
         }
     }
     
-    private void showGameResult(boolean won) {
+    private void showGameResult(boolean won, int score) {
+        GameRecordManager.saveGameRecord(currentPlayer, "Guess Number", score);
+        
         String message = won ? 
-            "Congratulations! You won!\nWould you like to play again?" :
-            "Game Over! The number was " + targetNumber + "\nWould you like to try again?";
+            String.format("Congratulations! You won!\nAttempts used: %d\nAttempts left: %d\nScore: %d", 
+                maxAttempts - attemptsLeft, attemptsLeft, score) :
+            String.format("Game Over! The number was %d\nScore: %d", 
+                targetNumber, score);
             
         int choice = JOptionPane.showConfirmDialog(
             this,
-            message,
+            message + "\nWould you like to play again?",
             won ? "Victory!" : "Game Over",
             JOptionPane.YES_NO_OPTION
         );

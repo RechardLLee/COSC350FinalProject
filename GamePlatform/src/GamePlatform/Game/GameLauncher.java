@@ -8,46 +8,38 @@ public class GameLauncher {
         SwingUtilities.invokeLater(() -> {
             try {
                 JFrame game = null;
-                switch(gameName.toLowerCase()) {
-                    case "snake":
-                    case "贪吃蛇":
-                        game = new SnakeGame();
-                        break;
-                        
-                    case "hanoi tower":
-                    case "汉诺塔":
-                        game = new HanoiTowerGame();
-                        break;
-                        
-                    case "guess number":
-                    case "猜数字":
-                        game = new GuessNumberGame();
-                        break;
-                        
-                    case "memory game":
-                        game = new MemoryGame();
-                        break;
-                        
-                    case "slot machine":
-                        game = new SlotMachine();
-                        break;
-                        
-                    case "roulette":
-                        game = new RouletteGame();
-                        break;
-                        
-                    case "tic tac toe":
-                        game = new TicTacToe();
-                        break;
-                        
-                    default:
-                        showErrorMessage(
-                            LanguageUtil.isEnglish() ? "Error" : "错误",
-                            LanguageUtil.isEnglish() ? 
-                                "Unknown game: " + gameName :
-                                "未知游戏：" + gameName
-                        );
-                        return;
+                
+                // 尝试通过类名加载游戏
+                try {
+                    Class<?> gameClass = Class.forName(gameName);
+                    game = (JFrame) gameClass.getDeclaredConstructor().newInstance();
+                } catch (ClassNotFoundException e) {
+                    // 如果找不到类,尝试使用内置游戏
+                    switch(gameName.toLowerCase()) {
+                        case "snake":
+                        case "贪吃蛇":
+                            game = new SnakeGame();
+                            break;
+                            
+                        case "hanoi tower":
+                        case "汉诺塔":
+                            game = new HanoiTowerGame();
+                            break;
+                            
+                        case "guess number":
+                        case "猜数字":
+                            game = new GuessNumberGame();
+                            break;
+                            
+                        default:
+                            showErrorMessage(
+                                LanguageUtil.isEnglish() ? "Error" : "错误",
+                                LanguageUtil.isEnglish() ? 
+                                    "Unknown game: " + gameName :
+                                    "未知游戏：" + gameName
+                            );
+                            return;
+                    }
                 }
                 
                 if (game != null) {

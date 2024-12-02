@@ -16,19 +16,20 @@ import java.util.*;
 import java.util.prefs.Preferences;
 import GamePlatform.Utility.LanguageUtil;
 import GamePlatform.Game.GameLauncher;
+import GamePlatform.User.Management.UserSession;
+import GamePlatform.Database.DatabaseService;
 
 public class MainController {
     
+    @FXML private Label balanceLabel;
     @FXML private Label titleLabel;
     @FXML private Button languageButton;
-    @FXML private Button snakeButton;
-    @FXML private Button game2Button;
-    @FXML private Button game3Button;
     @FXML private Button addGameButton;
     @FXML private Button bugReportButton;
     @FXML private Button reviewButton;
     @FXML private Button developerButton;
     @FXML private FlowPane gamePane;
+    @FXML private AnchorPane mainPane;
     
     private Preferences prefs = Preferences.userNodeForPackage(MainController.class);
     private static final String CUSTOM_GAMES_KEY = "customGames";
@@ -36,31 +37,32 @@ public class MainController {
     @FXML
     private void initialize() {
         setLanguage(LanguageUtil.isEnglish());
-        loadCustomGames();
+        updateBalance();
         
         // 设置FlowPane的响应式布局
-        gamePane.prefWrapLengthProperty().bind(
-            gamePane.widthProperty()
-        );
+        gamePane.prefWrapLengthProperty().bind(gamePane.widthProperty());
+        
+        // 添加固定游戏列表，使用正确的类名
+        addGameButton("Snake", "SnakeGame");
+        addGameButton("Hanoi Tower", "HanoiTowerGame");
+        addGameButton("Guess Number", "GuessNumberGame");
+        // 暂时注释掉未实现的游戏
+        // addGameButton("Tic Tac Toe", "TicTacToeGame");
+        // addGameButton("Slot Machine", "SlotMachine");
+        // addGameButton("Roulette", "RouletteGame");
     }
     
     private void setLanguage(boolean english) {
         if (english) {
-            titleLabel.setText("Game Center");
+            titleLabel.setText("My Games");
             languageButton.setText("中文");
-            snakeButton.setText("Snake");
-            game2Button.setText("Hanoi Tower");
-            game3Button.setText("Guess Number");
             addGameButton.setText("+\nAdd Game");
             bugReportButton.setText("Bug Report");
             reviewButton.setText("Review");
             developerButton.setText("Developer Login");
         } else {
-            titleLabel.setText("游戏中心");
+            titleLabel.setText("我的游戏");
             languageButton.setText("English");
-            snakeButton.setText("贪吃蛇");
-            game2Button.setText("汉诺塔");
-            game3Button.setText("猜数字");
             addGameButton.setText("+\n添加游戏");
             bugReportButton.setText("问题反馈");
             reviewButton.setText("评价");
@@ -106,7 +108,8 @@ public class MainController {
                         "Controls:\n" +
                         "WASD - Move snake\n" +
                         "P - Pause game\n" +
-                        "R - Restart game");
+                        "R - Restart game",
+                        "snake");
                     break;
                     
                 case "Hanoi Tower":
@@ -120,7 +123,8 @@ public class MainController {
                         "Features:\n" +
                         "- Multiple difficulty levels\n" +
                         "- Move counter\n" +
-                        "- Auto-solve demonstration");
+                        "- Auto-solve demonstration",
+                        "hanoi_tower");
                     break;
                     
                 case "Guess Number":
@@ -130,9 +134,15 @@ public class MainController {
                         "Try to guess the secret number within the given attempts.\n\n" +
                         "Features:\n" +
                         "- Multiple difficulty levels\n" +
-                        "- Hints after each guess\n" +
-                        "- Score tracking\n" +
-                        "- Customizable number range");
+                        "- Score based on attempts left\n" +
+                        "- Perfect score (10000) for first try\n" +
+                        "- Score decreases with more attempts\n" +
+                        "- Zero score for failure\n\n" +
+                        "Strategy:\n" +
+                        "- Use binary search\n" +
+                        "- Think carefully before each guess\n" +
+                        "- Fewer attempts = Higher score",
+                        "guess_number");
                     break;
             }
             
@@ -173,11 +183,11 @@ public class MainController {
     @FXML
     private void handleAddGame() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(LanguageUtil.isEnglish() ? "Select Game Executable" : "选择游戏可执行文件");
+        fileChooser.setTitle(LanguageUtil.isEnglish() ? "Select Game Class File" : "选择游戏类文件");
         fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter(
-                LanguageUtil.isEnglish() ? "Executable Files" : "可执行文件", 
-                "*.exe"
+                LanguageUtil.isEnglish() ? "Java Class Files" : "Java类文件", 
+                "*.class"
             )
         );
         
@@ -185,7 +195,11 @@ public class MainController {
         if (selectedFile != null) {
             String gameName = showGameNameDialog();
             if (gameName != null && !gameName.trim().isEmpty()) {
-                addCustomGame(gameName, selectedFile.getAbsolutePath());
+                // 获取类名(去掉.class后缀)
+                String className = selectedFile.getName().replace(".class", "");
+                // 保存完整的类名作为游戏路径
+                String classPath = "GamePlatform.Game." + className;
+                addCustomGame(gameName, classPath);
             }
         }
     }
@@ -210,16 +224,17 @@ public class MainController {
             // 创建新的游戏按钮
             Button gameButton = createGameButton(gameName, exePath);
             
-            // 将按钮添加到网格
-            GridPane gridPane = (GridPane) addGameButton.getParent();
-            int numGames = gridPane.getChildren().size() - 1; // 减去添加按钮
-            int row = numGames / 4;
-            int col = numGames % 4;
-            gridPane.add(gameButton, col, row);
+            // 将按钮添加到 FlowPane
+            FlowPane flowPane = (FlowPane) addGameButton.getParent();
             
-            // 如果需要，移动添加按钮到新的位置
-            GridPane.setColumnIndex(addGameButton, (numGames + 1) % 4);
-            GridPane.setRowIndex(addGameButton, (numGames + 1) / 4);
+            // 将新按钮添加到 addGameButton 之前
+            int addButtonIndex = flowPane.getChildren().indexOf(addGameButton);
+            if (addButtonIndex >= 0) {
+                flowPane.getChildren().add(addButtonIndex, gameButton);
+            } else {
+                // 如果找不到 addGameButton，就直接添加末尾
+                flowPane.getChildren().add(gameButton);
+            }
             
         } catch (Exception e) {
             showError(
@@ -232,8 +247,10 @@ public class MainController {
     
     private Button createGameButton(String gameName, String exePath) {
         Button button = new Button(gameName);
-        button.setPrefWidth(200);
-        button.setPrefHeight(200);
+        button.setMinWidth(180);
+        button.setMinHeight(180);
+        button.setMaxWidth(180);
+        button.setMaxHeight(180);
         button.setStyle("-fx-background-color: white; -fx-background-radius: 10; " +
                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);");
         
@@ -249,11 +266,11 @@ public class MainController {
         return button;
     }
     
-    private void launchCustomGame(String exePath) {
+    private void launchCustomGame(String classPath) {
         try {
-            ProcessBuilder pb = new ProcessBuilder(exePath);
-            pb.start();
-        } catch (IOException e) {
+            // 使用GameLauncher启动游戏
+            GameLauncher.launchGame(classPath);
+        } catch (Exception e) {
             showError(
                 LanguageUtil.isEnglish() ? "Launch Failed" : "启动失败",
                 LanguageUtil.isEnglish() ? "Failed to launch game" : "启动游戏失败"
@@ -267,24 +284,8 @@ public class MainController {
         customGames.remove(gameName);
         saveCustomGames(customGames);
         
-        GridPane gridPane = (GridPane) button.getParent();
-        gridPane.getChildren().remove(button);
-        reorganizeGrid(gridPane);
-    }
-    
-    private void reorganizeGrid(GridPane gridPane) {
-        List<Node> buttons = new ArrayList<>(gridPane.getChildren());
-        gridPane.getChildren().clear();
-        
-        int index = 0;
-        for (Node node : buttons) {
-            if (node != addGameButton) {
-                gridPane.add(node, index % 4, index / 4);
-                index++;
-            }
-        }
-        
-        gridPane.add(addGameButton, index % 4, index / 4);
+        FlowPane flowPane = (FlowPane) button.getParent();
+        flowPane.getChildren().remove(button);
     }
     
     private Map<String, String> loadCustomGamesMap() {
@@ -315,12 +316,19 @@ public class MainController {
     
     private void loadCustomGames() {
         Map<String, String> games = loadCustomGamesMap();
+        FlowPane flowPane = (FlowPane) addGameButton.getParent();
+        
         for (Map.Entry<String, String> entry : games.entrySet()) {
             Button gameButton = createGameButton(entry.getKey(), entry.getValue());
             
-            GridPane gridPane = (GridPane) addGameButton.getParent();
-            int numGames = gridPane.getChildren().size() - 1;
-            gridPane.add(gameButton, numGames % 4, numGames / 4);
+            // 将新按钮添加到 addGameButton 之前
+            int addButtonIndex = flowPane.getChildren().indexOf(addGameButton);
+            if (addButtonIndex >= 0) {
+                flowPane.getChildren().add(addButtonIndex, gameButton);
+            } else {
+                // 如果找不到 addGameButton，就直接添加到末尾
+                flowPane.getChildren().add(gameButton);
+            }
         }
     }
     
@@ -355,6 +363,124 @@ public class MainController {
                     "Failed to load interface: " + e.getMessage() :
                     "加载界面失败: " + e.getMessage()
             );
+        }
+    }
+    
+    private void updateBalance() {
+        String username = UserSession.getCurrentUser();
+        int balance = DatabaseService.getUserBalance(username);
+        balanceLabel.setText(String.format(
+            LanguageUtil.isEnglish() ? "Balance: $%d" : "余额: ￥%d",
+            balance
+        ));
+    }
+    
+    private void loadUserGames() {
+        String username = UserSession.getCurrentUser();
+        Map<String, String> userGames = DatabaseService.getUserGames(username);
+        
+        // 清除现有游戏按钮��保留添加按钮）
+        gamePane.getChildren().clear();
+        gamePane.getChildren().add(addGameButton);
+        
+        // 添加用户拥有的游戏
+        for (Map.Entry<String, String> entry : userGames.entrySet()) {
+            Button gameButton = createGameButton(entry.getKey(), entry.getValue());
+            // 将新按钮添加到添加按钮之前
+            int addButtonIndex = gamePane.getChildren().indexOf(addGameButton);
+            gamePane.getChildren().add(addButtonIndex, gameButton);
+        }
+    }
+    
+    private void addGameButton(String gameName, String gameId) {
+        Button gameButton = new Button(gameName);
+        gameButton.setMinWidth(180);
+        gameButton.setMinHeight(180);
+        gameButton.setMaxWidth(180);
+        gameButton.setMaxHeight(180);
+        gameButton.setStyle("-fx-background-color: white; -fx-background-radius: 10; " +
+                           "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);");
+        
+        gameButton.setOnAction(e -> showGameDetails(gameName, gameId));
+        gamePane.getChildren().add(gameButton);
+    }
+    
+    private void showGameDetails(String gameName, String gameId) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/GamePlatform/Main/Interfaces/GameView.fxml"));
+            Parent root = loader.load();
+            GameViewController controller = loader.getController();
+            
+            // 设置游戏信息
+            String description = getGameDescription(gameName);
+            controller.setGameInfo(gameName, description, "GamePlatform.Game." + gameId);
+            
+            Stage stage = new Stage();
+            stage.setTitle(gameName);
+            stage.setScene(new Scene(root));
+            stage.setOnCloseRequest(e -> controller.cleanup());
+            stage.show();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError(
+                LanguageUtil.isEnglish() ? "Error" : "错误",
+                LanguageUtil.isEnglish() ? 
+                    "Failed to load game details: " + e.getMessage() :
+                    "加载游戏详情失败：" + e.getMessage()
+            );
+        }
+    }
+    
+    private String getGameDescription(String gameName) {
+        switch(gameName) {
+            case "Snake":
+                return "Classic Snake Game\n\n" +
+                       "Control the snake to eat food and grow longer.\n\n" +
+                       "Features:\n" +
+                       "- Multiple difficulty levels\n" +
+                       "- Score tracking (10 points per food)\n" +
+                       "- Obstacle mode\n\n" +
+                       "Controls:\n" +
+                       "WASD - Move snake\n" +
+                       "P - Pause game\n" +
+                       "R - Restart game\n\n" +
+                       "Game Over:\n" +
+                       "- Hitting walls\n" +
+                       "- Hitting obstacles\n" +
+                       "- Hitting yourself";
+                       
+            case "Hanoi Tower":
+                return "Classic Tower of Hanoi puzzle game.\n\n" +
+                       "Move all disks from the leftmost peg to the rightmost peg.\n\n" +
+                       "Rules:\n" +
+                       "- Only one disk can be moved at a time\n" +
+                       "- A larger disk cannot be placed on top of a smaller disk\n\n" +
+                       "Features:\n" +
+                       "- Multiple difficulty levels\n" +
+                       "- Move counter\n" +
+                       "- Auto-solve demonstration";
+                       
+            case "Guess Number":
+                return "Number Guessing Game\n\n" +
+                       "Try to guess the secret number within the given attempts.\n\n" +
+                       "Features:\n" +
+                       "- Multiple difficulty levels:\n" +
+                       "  Easy: 1-50, 10 attempts\n" +
+                       "  Medium: 1-100, 7 attempts\n" +
+                       "  Hard: 1-200, 5 attempts\n\n" +
+                       "Scoring System:\n" +
+                       "- Perfect score (10000) for first try\n" +
+                       "- Score decreases with more attempts\n" +
+                       "- Zero score if failed to guess\n\n" +
+                       "Tips:\n" +
+                       "- Use binary search strategy\n" +
+                       "- Pay attention to the hints\n" +
+                       "- Think carefully before each guess";
+                       
+            default:
+                return "Game description not available.";
         }
     }
 } 

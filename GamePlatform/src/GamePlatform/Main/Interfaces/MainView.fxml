@@ -16,6 +16,8 @@
     <top>
         <HBox alignment="CENTER_RIGHT" spacing="15" 
             style="-fx-padding: 10 20; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 1);">
+            <Label fx:id="balanceLabel" text="Balance: $1000"
+                style="-fx-font-size: 16;"/>
             <Button fx:id="languageButton" text="中文"
                 style="-fx-background-color: transparent; -fx-text-fill: #666; -fx-background-radius: 20; -fx-padding: 8 15;"
                 onAction="#handleLanguageToggle"/>
@@ -30,23 +32,11 @@
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
                 
-                <Label fx:id="titleLabel" text="Game Center" 
+                <Label fx:id="titleLabel" text="My Games" 
                     style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #333;"/>
                 
                 <FlowPane fx:id="gamePane" alignment="CENTER" hgap="20" vgap="20"
                     style="-fx-padding: 20;">
-                    <Button fx:id="snakeButton" text="Snake" 
-                        minWidth="180" minHeight="180" maxWidth="180" maxHeight="180"
-                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);"
-                        onAction="#handleGameSelect"/>
-                    <Button fx:id="game2Button" text="Hanoi Tower"
-                        minWidth="180" minHeight="180" maxWidth="180" maxHeight="180"
-                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);"
-                        onAction="#handleGameSelect"/>
-                    <Button fx:id="game3Button" text="Guess Number"
-                        minWidth="180" minHeight="180" maxWidth="180" maxHeight="180"
-                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);"
-                        onAction="#handleGameSelect"/>
                     <Button fx:id="addGameButton" text="+" 
                         minWidth="180" minHeight="180" maxWidth="180" maxHeight="180"
                         style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);"

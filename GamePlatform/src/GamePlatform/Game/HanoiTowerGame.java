@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import GamePlatform.User.Management.UserSession;
 
 public class HanoiTowerGame extends JFrame {
     private JPanel canvas;
@@ -15,12 +16,16 @@ public class HanoiTowerGame extends JFrame {
     private ArrayList<Tower> towers;
     private Tower selectedTower;
     private int moves;
+    private int minMoves;
     private JLabel movesLabel;
+    private String currentPlayer;
     
     public HanoiTowerGame() {
-        setTitle("Hanoi Tower Game");
+        currentPlayer = UserSession.getCurrentUser();
+        
+        setTitle("Hanoi Tower - Player: " + currentPlayer);
         setSize(800, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         difficulties = new HashMap<>();
         difficulties.put("Easy", 3);
@@ -110,6 +115,7 @@ public class HanoiTowerGame extends JFrame {
         
         selectedTower = null;
         moves = 0;
+        minMoves = Integer.MAX_VALUE;
         movesLabel.setText("Moves: " + moves);
         
         // Place disks on the first tower
@@ -176,7 +182,26 @@ public class HanoiTowerGame extends JFrame {
     }
     
     private boolean checkWin() {
-        return towers.get(2).getDisks().size() == numDisks;
+        if (towers.get(2).getDisks().size() == numDisks) {
+            // 计算得分 - 使用反向分数
+            // 理论最少步数为 2^n - 1，其中n是盘子数量
+            int minMoves = (1 << numDisks) - 1;  // 2^n - 1
+            // 分数计算公式：10000 * (最少步数/实际步数)
+            // 这样最优解会得到10000分，步数越多分数越低
+            int score = (int)(10000.0 * minMoves / moves);
+            
+            // 保存游戏记录
+            GameRecordManager.saveGameRecord(currentPlayer, "Hanoi Tower", score);
+            
+            JOptionPane.showMessageDialog(this,
+                String.format("恭喜完成！\n移动次数: %d\n最少步数: %d\n得分: %d",
+                    moves, minMoves, score),
+                "胜利",
+                JOptionPane.INFORMATION_MESSAGE);
+            
+            return true;
+        }
+        return false;
     }
     
     private void autoSolve() {
