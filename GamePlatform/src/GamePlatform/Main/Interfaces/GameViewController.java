@@ -163,27 +163,37 @@ public class GameViewController {
             String imagePath = null;
             switch(title) {
                 case "Snake":
-                    imagePath = "/images/SnakeGame.png";
+                    imagePath = "/src/GamePlatform/Game/SnakeGame.png";
                     break;
                 case "Hanoi Tower":
-                    imagePath = "/images/HanoiTowerGame.png";
+                    imagePath = "/src/GamePlatform/Game/HanoiTowerGame.png";
                     break;
                 case "Guess Number":
-                    imagePath = "/images/GuessNumberGame.png";
+                    imagePath = "/src/GamePlatform/Game/GuessNumberGame.png";
                     break;
                 case "Tic Tac Toe":
-                    imagePath = "/images/TicTacToeGame.png";
+                    imagePath = "/src/GamePlatform/Game/TicTacToe.png";
                     break;
+                case "Slot Machine":
+                    imagePath = "/src/GamePlatform/Game/SlotMachine.png";
+                    break;
+                case "Memory Game":
+                    imagePath = "/src/GamePlatform/Game/MemoryGame.png";
+                    break;
+                case "Roulette":
+                    imagePath = "/src/GamePlatform/Game/RouletteGame.png";
+                    break;
+                    
             }
             
             if (imagePath != null) {
-                InputStream imageStream = getClass().getResourceAsStream(imagePath);
-                if (imageStream != null) {
-                    Image image = new Image(imageStream);
+                // 使用文件系统路径加载图片
+                File imageFile = new File(System.getProperty("user.dir") + imagePath);
+                if (imageFile.exists()) {
+                    Image image = new Image(imageFile.toURI().toString());
                     gameIcon.setImage(image);
-                    System.out.println("Successfully loaded image: " + imagePath);
                 } else {
-                    System.out.println("Cannot find image: " + imagePath);
+                    System.out.println("Cannot find image: " + imageFile.getAbsolutePath());
                     gameIcon.setStyle(
                         "-fx-background-color: #f0f0f0;" +
                         "-fx-background-radius: 10;" +

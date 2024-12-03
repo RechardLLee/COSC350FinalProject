@@ -18,6 +18,10 @@ import GamePlatform.Utility.LanguageUtil;
 import GamePlatform.Game.GameLauncher;
 import GamePlatform.User.Management.UserSession;
 import GamePlatform.Database.DatabaseService;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+import javafx.application.Platform;
 
 public class MainController {
     
@@ -33,9 +37,12 @@ public class MainController {
     
     private Preferences prefs = Preferences.userNodeForPackage(MainController.class);
     private static final String CUSTOM_GAMES_KEY = "customGames";
+    private Timeline balanceUpdateTimeline;
+    private static MainController instance;
     
     @FXML
     private void initialize() {
+        instance = this;
         setLanguage(LanguageUtil.isEnglish());
         updateBalance();
         
@@ -46,7 +53,15 @@ public class MainController {
         addGameButton("Snake", "SnakeGame");
         addGameButton("Hanoi Tower", "HanoiTowerGame");
         addGameButton("Guess Number", "GuessNumberGame");
-        addGameButton("Tic Tac Toe", "TicTacToe");  // 添加井字棋
+        addGameButton("Tic Tac Toe", "TicTacToe");
+        addGameButton("Slot Machine", "SlotMachine");
+        addGameButton("Roulette", "RouletteGame");
+        addGameButton("Memory Game", "MemoryGame");
+        
+        // 设置定时更新余额
+        balanceUpdateTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateBalance()));
+        balanceUpdateTimeline.setCycleCount(Timeline.INDEFINITE);
+        balanceUpdateTimeline.play();
     }
     
     private void setLanguage(boolean english) {
@@ -154,6 +169,24 @@ public class MainController {
                     controller.setGameInfo("Tic Tac Toe", 
                         getGameDescription("Tic Tac Toe"),
                         "TicTacToe");
+                    break;
+                    
+                case "Memory Game":
+                    controller.setGameInfo("Memory Game", 
+                        getGameDescription("Memory Game"),
+                        "MemoryGame");
+                    break;
+                    
+                case "Roulette":
+                    controller.setGameInfo("Roulette", 
+                        getGameDescription("Roulette"),
+                        "RouletteGame");
+                    break;
+                    
+                case "Slot Machine":
+                    controller.setGameInfo("Slot Machine", 
+                        getGameDescription("Slot Machine"),
+                        "SlotMachine");
                     break;
             }
             
@@ -377,13 +410,15 @@ public class MainController {
         }
     }
     
-    private void updateBalance() {
-        String username = UserSession.getCurrentUser();
-        int money = DatabaseService.getUserMoney(username);
-        balanceLabel.setText(String.format(
-            LanguageUtil.isEnglish() ? "Money: $%d" : "金币: %d",
-            money
-        ));
+    public void updateBalance() {
+        Platform.runLater(() -> {
+            String username = UserSession.getCurrentUser();
+            int money = DatabaseService.getUserMoney(username);
+            balanceLabel.setText(String.format(
+                LanguageUtil.isEnglish() ? "Money: $%d" : "金币: %d",
+                money
+            ));
+        });
     }
     
     private void loadUserGames() {
@@ -508,8 +543,70 @@ public class MainController {
                        "- New Game button to restart\n" +
                        "- Choose difficulty level anytime";
                        
+            case "Memory Game":
+                return "Classic Memory Card Game\n\n" +
+                       "Match pairs of cards to earn points.\n\n" +
+                       "Features:\n" +
+                       "- 4x4 grid of cards\n" +
+                       "- Score based on matches\n" +
+                       "- 100 points per match\n" +
+                       "- Memory training\n\n" +
+                       "Rules:\n" +
+                       "- Click cards to reveal them\n" +
+                       "- Find matching pairs\n" +
+                       "- Cards flip back if no match\n" +
+                       "- Game ends when all pairs found\n\n" +
+                       "Controls:\n" +
+                       "- Click to flip cards\n" +
+                       "- New Game to restart";
+                       
+            case "Roulette":
+                return "Classic Casino Roulette\n\n" +
+                       "Place bets and try your luck!\n\n" +
+                       "Features:\n" +
+                       "- Number bets (0-36)\n" +
+                       "- Color bets (Red/Black)\n" +
+                       "- Real money betting\n" +
+                       "- High payouts\n\n" +
+                       "Payouts:\n" +
+                       "- Number bet: 35x\n" +
+                       "- Color bet: 2x\n\n" +
+                       "Controls:\n" +
+                       "- Choose bet type\n" +
+                       "- Enter bet amount\n" +
+                       "- Click Spin to play\n" +
+                       "- New Game to reset";
+                       
+            case "Slot Machine":
+                return "Classic Casino Slot Machine\n\n" +
+                       "Try your luck with the slot machine!\n\n" +
+                       "Features:\n" +
+                       "- Real money betting\n" +
+                       "- Multiple winning combinations\n" +
+                       "- Animated spinning reels\n" +
+                       "- Net profit tracking\n\n" +
+                       "Payouts:\n" +
+                       "- Three of a kind: 10x bet\n" +
+                       "- Two of a kind: 2x bet\n\n" +
+                       "Controls:\n" +
+                       "- Enter bet amount\n" +
+                       "- Click SPIN! to play\n" +
+                       "- New Game to reset\n\n" +
+                       "Score shows net profit/loss";
+                       
             default:
                 return "Game description not available.";
         }
+    }
+    
+    // 在窗口关闭时停止更新
+    public void cleanup() {
+        if (balanceUpdateTimeline != null) {
+            balanceUpdateTimeline.stop();
+        }
+    }
+    
+    public static MainController getInstance() {
+        return instance;
     }
 } 

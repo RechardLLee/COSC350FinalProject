@@ -11,27 +11,29 @@ public class GameRecordManager {
     
     // 保存游戏记录到文件和数据库
     public static void saveGameRecord(String username, String gameName, int score) {
-        // 保存到本地文件
-        try {
-            // 确保目录存在
-            Files.createDirectories(Paths.get(RECORDS_DIR));
-            
-            Path scoreFile = Paths.get(RECORDS_DIR, gameName + ".txt");
-            String scoreRecord = String.format("%s,%d,%s%n", 
-                username,           // 用户名
-                score,             // 分数
-                new Date()         // 时间
-            );
-            Files.write(scoreFile, scoreRecord.getBytes(), 
-                StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        // 只保存大于0的分数
+        if (score > 0) {
+            try {
+                // 确保目录存在
+                Files.createDirectories(Paths.get(RECORDS_DIR));
                 
-            System.out.println("Score saved to file: " + scoreRecord);
-        } catch (IOException e) {
-            e.printStackTrace();
+                Path scoreFile = Paths.get(RECORDS_DIR, gameName + ".txt");
+                String scoreRecord = String.format("%s,%d,%s%n", 
+                    username,           // 用户名
+                    score,             // 分数
+                    new Date()         // 时间
+                );
+                Files.write(scoreFile, scoreRecord.getBytes(), 
+                    StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                    
+                System.out.println("Score saved: " + scoreRecord);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+            // 保存到数据库
+            DatabaseService.saveGameScore(username, gameName, score);
         }
-        
-        // 保存到数据库
-        DatabaseService.saveGameScore(username, gameName, score);
     }
     
     // 从文件加载游戏记录

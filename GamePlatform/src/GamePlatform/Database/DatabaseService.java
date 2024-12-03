@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import GamePlatform.Game.GameStats;
 import GamePlatform.User.Management.UserData;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class DatabaseService {
     private static final String DRIVER = "org.sqlite.JDBC";
@@ -17,10 +21,14 @@ public class DatabaseService {
     private static final String DEV_PASSWORD = "admin";
     private static final String DEV_SECURITY_ANSWER = "admin";
     
+    private static final String USER_DATA_FILE = "user_data.txt";
+    private static Map<String, Integer> userMoney = new HashMap<>();
+    
     static {
         try {
             Class.forName(DRIVER);
             initializeDatabase();
+            loadUserData();
         } catch (ClassNotFoundException e) {
             System.err.println("Error loading SQLite JDBC driver:");
             e.printStackTrace();
@@ -330,36 +338,13 @@ public class DatabaseService {
     
     // 获取用户余额
     public static int getUserMoney(String username) {
-        String sql = "SELECT money FROM Users WHERE username = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt("money");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
+        return userMoney.getOrDefault(username, 1000);  // 默认1000
     }
     
     // 更新用户余额
-    public static boolean updateUserMoney(String username, int newMoney) {
-        String sql = "UPDATE Users SET money = ? WHERE username = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, newMoney);
-            pstmt.setString(2, username);
-            
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public static void updateUserMoney(String username, int newAmount) {
+        userMoney.put(username, newAmount);
+        saveUserData();  // 立即保存到文件
     }
     
     // 添加用户游戏
@@ -492,5 +477,34 @@ public class DatabaseService {
         }
         
         return users;
+    }
+    
+    public static void loadUserData() {
+        try {
+            File file = new File(USER_DATA_FILE);
+            if (file.exists()) {
+                List<String> lines = Files.readAllLines(file.toPath());
+                for (String line : lines) {
+                    String[] parts = line.split(",");
+                    if (parts.length == 2) {
+                        userMoney.put(parts[0], Integer.parseInt(parts[1]));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void saveUserData() {
+        try {
+            List<String> lines = new ArrayList<>();
+            for (Map.Entry<String, Integer> entry : userMoney.entrySet()) {
+                lines.add(entry.getKey() + "," + entry.getValue());
+            }
+            Files.write(Paths.get(USER_DATA_FILE), lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 } 
