@@ -288,7 +288,7 @@ public class DeveloperManageController {
             "此操作将删除所有数据且无法撤销。您确定要继续吗？"
         );
         
-        // 添加自定义按钮
+        // 加自定义按钮
         ButtonType confirmButton = new ButtonType(
             LanguageUtil.isEnglish() ? "Yes, Reset Database" : "是的，重置数据库", 
             ButtonBar.ButtonData.OK_DONE
@@ -345,33 +345,99 @@ public class DeveloperManageController {
     }
     
     @FXML
-    private void handleAddBalance() {
+    private void handleAddMoney() {
         UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
-            try {
-                int value = Integer.parseInt(balanceField.getText());
-                if (value > 0) {
-                    // 获取当前金币数
-                    int currentMoney = DatabaseService.getUserMoney(selectedUser.getUsername());
-                    // 更新金币
-                    if (DatabaseService.updateUserMoney(selectedUser.getUsername(), currentMoney + value)) {
-                        showInfo(
-                            LanguageUtil.isEnglish() ? "Success" : "成功",
-                            LanguageUtil.isEnglish() ? 
-                                "Added " + value + " money to user " + selectedUser.getUsername() :
-                                "已为用户 " + selectedUser.getUsername() + " 添加 " + value + " 金币"
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Add Money");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Enter amount to add:");
+            
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                try {
+                    int value = Integer.parseInt(result.get());
+                    if (value <= 0) {
+                        showAlert(Alert.AlertType.ERROR, 
+                            "Error", 
+                            "Please enter a positive number"
                         );
-                        refreshUserList();  // 刷新用户列表
+                        return;
                     }
+                    
+                    int currentMoney = DatabaseService.getUserMoney(selectedUser.getUsername());
+                    DatabaseService.updateUserMoney(selectedUser.getUsername(), currentMoney + value);
+                    refreshUserTable();
+                    
+                    showAlert(Alert.AlertType.INFORMATION, 
+                        "Success", 
+                        String.format("Added $%d to user %s", value, selectedUser.getUsername())
+                    );
+                    
+                } catch (NumberFormatException e) {
+                    showAlert(Alert.AlertType.ERROR, 
+                        "Error", 
+                        "Please enter a valid number"
+                    );
                 }
-            } catch (NumberFormatException e) {
-                showError(
-                    LanguageUtil.isEnglish() ? "Error" : "错误",
-                    LanguageUtil.isEnglish() ? 
-                        "Please enter a valid number" :
-                        "请输入有效数字"
-                );
             }
+        } else {
+            showAlert(Alert.AlertType.WARNING, 
+                "Warning", 
+                "Please select a user first"
+            );
+        }
+    }
+    
+    @FXML
+    private void handleDeductMoney() {
+        UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
+        if (selectedUser != null) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Deduct Money");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Enter amount to deduct:");
+            
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                try {
+                    int value = Integer.parseInt(result.get());
+                    if (value <= 0) {
+                        showAlert(Alert.AlertType.ERROR, 
+                            "Error", 
+                            "Please enter a positive number"
+                        );
+                        return;
+                    }
+                    
+                    int currentMoney = DatabaseService.getUserMoney(selectedUser.getUsername());
+                    if (currentMoney >= value) {
+                        DatabaseService.updateUserMoney(selectedUser.getUsername(), currentMoney - value);
+                        refreshUserTable();
+                        
+                        showAlert(Alert.AlertType.INFORMATION, 
+                            "Success", 
+                            String.format("Deducted $%d from user %s", value, selectedUser.getUsername())
+                        );
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, 
+                            "Error", 
+                            "Insufficient balance"
+                        );
+                    }
+                    
+                } catch (NumberFormatException e) {
+                    showAlert(Alert.AlertType.ERROR, 
+                        "Error", 
+                        "Please enter a valid number"
+                    );
+                }
+            }
+        } else {
+            showAlert(Alert.AlertType.WARNING, 
+                "Warning", 
+                "Please select a user first"
+            );
         }
     }
     
@@ -509,6 +575,20 @@ public class DeveloperManageController {
     }
     
     private void refreshUserList() {
+        // 重新加载用户列表
+        List<UserData> users = DatabaseService.getAllUsers();
+        userTable.setItems(FXCollections.observableArrayList(users));
+    }
+    
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+    
+    private void refreshUserTable() {
         // 重新加载用户列表
         List<UserData> users = DatabaseService.getAllUsers();
         userTable.setItems(FXCollections.observableArrayList(users));

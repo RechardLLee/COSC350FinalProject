@@ -30,7 +30,7 @@
                 </TableView>
                 <HBox spacing="10" alignment="CENTER">
                     <TextField fx:id="balanceField" promptText="Enter amount"/>
-                    <Button text="Add Balance" onAction="#handleAddBalance"/>
+                    <Button text="Add Money" onAction="#handleAddMoney"/>
                 </HBox>
             </VBox>
         </Tab>

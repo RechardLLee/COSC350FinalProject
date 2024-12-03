@@ -90,11 +90,9 @@ public class GameViewController {
             
             // 处理高分和最佳玩家的显示
             if (stats.getHighScore() > 0 && stats.getTopPlayer() != null) {
-                if (title.equals("Hanoi Tower")) {
-                    highScoreLabel.setText(String.format("%d (by %s, %s)", 
-                        stats.getHighScore(), 
-                        stats.getTopPlayer(),
-                        LanguageUtil.isEnglish() ? "Perfect Solution" : "最优解"));
+                if (title.equals("Slot Machine") || title.equals("Roulette")) {
+                    highScoreLabel.setText(String.format("$%d (by %s)", 
+                        stats.getHighScore(), stats.getTopPlayer()));
                 } else {
                     highScoreLabel.setText(String.format("%d (by %s)", 
                         stats.getHighScore(), stats.getTopPlayer()));

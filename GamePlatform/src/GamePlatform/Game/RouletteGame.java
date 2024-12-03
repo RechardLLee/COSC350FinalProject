@@ -21,6 +21,9 @@ public class RouletteGame extends BaseGame {
     private JButton spinButton;
     private Random random = new Random();
     private JLabel balanceLabel;
+    private int totalBet = 0;    // 总下注金额
+    private int totalWin = 0;    // 总赢得金额
+    private int netProfit = 0;   // 净盈亏
 
     public RouletteGame() {
         super("Roulette");
@@ -110,10 +113,7 @@ public class RouletteGame extends BaseGame {
         // 添加New Game按钮
         JButton newGameButton = new JButton("New Game");
         newGameButton.addActionListener(e -> {
-            score = 0;  // 重置分数
-            scoreLabel.setText("Score: 0");
-            messageArea.setText("");
-            updateBalance();
+            resetGame();
         });
         
         JPanel buttonPanel = new JPanel();
@@ -194,16 +194,27 @@ public class RouletteGame extends BaseGame {
                 winnings = won ? betAmount * 2 : 0;
             }
 
+            // 更新总下注金额和净盈亏
+            totalBet += betAmount;
+            netProfit -= betAmount;
+            score = netProfit;  // 更新分数为净盈亏
+            scoreLabel.setText("Net Profit: $" + netProfit);
+
             // 更新分数和余额
             if (won) {
-                // 赢了获得奖金
-                DatabaseService.updateUserMoney(username, 
-                    DatabaseService.getUserMoney(username) + winnings);
-                score += winnings;
-                scoreLabel.setText("Score: " + score);
-                messageArea.append("You win! +$" + winnings + "\n");
+                totalWin += winnings;
+                netProfit += winnings;
+                score = netProfit;
+                scoreLabel.setText("Net Profit: $" + netProfit);
+                messageArea.append(String.format(
+                    "You win! +$%d (Total bet: $%d, Total win: $%d, Net profit: $%d)\n",
+                    winnings, totalBet, totalWin, netProfit
+                ));
             } else {
-                messageArea.append("Better luck next time! -$" + betAmount + "\n");
+                messageArea.append(String.format(
+                    "Better luck next time! -$%d (Total bet: $%d, Total win: $%d, Net profit: $%d)\n",
+                    betAmount, totalBet, totalWin, netProfit
+                ));
             }
             
             // 更新显示的余额
@@ -242,6 +253,16 @@ public class RouletteGame extends BaseGame {
     private void showMessage(String message) {
         messageArea.append(message + "\n\n");
         messageArea.setCaretPosition(messageArea.getDocument().getLength());
+    }
+
+    private void resetGame() {
+        totalBet = 0;
+        totalWin = 0;
+        netProfit = 0;
+        score = 0;
+        scoreLabel.setText("Net Profit: $0");
+        messageArea.setText("");
+        updateBalance();
     }
 
     public static void main(String[] args) {

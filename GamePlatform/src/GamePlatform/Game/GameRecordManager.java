@@ -11,8 +11,8 @@ public class GameRecordManager {
     
     // 保存游戏记录到文件和数据库
     public static void saveGameRecord(String username, String gameName, int score) {
-        // 只保存大于0的分数
-        if (score > 0) {
+        // 只保存非零分数
+        if (score != 0) {
             try {
                 // 确保目录存在
                 Files.createDirectories(Paths.get(RECORDS_DIR));
@@ -27,12 +27,12 @@ public class GameRecordManager {
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
                     
                 System.out.println("Score saved: " + scoreRecord);
+                
+                // 保存到数据库
+                DatabaseService.saveGameScore(username, gameName, score);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            
-            // 保存到数据库
-            DatabaseService.saveGameScore(username, gameName, score);
         }
     }
     
