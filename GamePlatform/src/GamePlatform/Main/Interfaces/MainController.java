@@ -609,4 +609,10 @@ public class MainController {
     public static MainController getInstance() {
         return instance;
     }
+    
+    @FXML
+    private void handleLogout() {
+        UserSession.clearCurrentUser();
+        // ... 其他登出代码 ...
+    }
 } 

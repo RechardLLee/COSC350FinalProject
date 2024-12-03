@@ -43,53 +43,50 @@ public class LoginController {
     
     @FXML
     private void handleLogin() {
-        String username = usernameField.getText();
+        String username = usernameField.getText().trim();
         String password = passwordField.getText();
         
+        // 验证输入
         if (username.isEmpty() || password.isEmpty()) {
             showError(
-                LanguageUtil.isEnglish() ? "Login Error" : "登录错误",
-                LanguageUtil.isEnglish() ? "Please enter username and password" : "请输入用户名和密码"
+                LanguageUtil.isEnglish() ? "Error" : "错误",
+                LanguageUtil.isEnglish() ? "Username and password are required" : "用户名和密码不能为空"
             );
             return;
         }
         
+        // 验证登录
         if (DatabaseService.validateUser(username, password)) {
+            // 登录成功
             UserSession.setCurrentUser(username);
+            
             try {
-                // 加载主界面
-                FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(getClass().getResource("/GamePlatform/Main/Interfaces/MainView.fxml"));
+                // 打开主界面
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/GamePlatform/Main/Interfaces/MainView.fxml"));
                 Parent root = loader.load();
-                
-                // 创建新窗口
-                Stage mainStage = new Stage();
-                mainStage.setTitle(LanguageUtil.isEnglish() ? "Game Platform" : "游戏平台");
-                mainStage.setScene(new Scene(root));
-                
-                // 设置窗口大小
-                mainStage.setMinWidth(800);
-                mainStage.setMinHeight(600);
-                mainStage.setWidth(1280);
-                mainStage.setHeight(720);
+                Stage stage = new Stage();
+                stage.setTitle(LanguageUtil.isEnglish() ? "Game Platform" : "游戏平台");
+                stage.setScene(new Scene(root));
+                stage.show();
                 
                 // 关闭登录窗口
-                ((Stage) loginButton.getScene().getWindow()).close();
-                
-                // 显示主界面
-                mainStage.show();
+                ((Stage) usernameField.getScene().getWindow()).close();
                 
             } catch (IOException e) {
                 e.printStackTrace();
                 showError(
                     LanguageUtil.isEnglish() ? "Error" : "错误",
-                    LanguageUtil.isEnglish() ? "Failed to load main interface" : "加载主界面失败"
+                    LanguageUtil.isEnglish() ? 
+                        "Failed to open main window: " + e.getMessage() :
+                        "打开主窗口失败：" + e.getMessage()
                 );
             }
         } else {
             showError(
-                LanguageUtil.isEnglish() ? "Login Error" : "登录错误",
-                LanguageUtil.isEnglish() ? "Invalid username or password" : "用户名或密码错误"
+                LanguageUtil.isEnglish() ? "Error" : "错误",
+                LanguageUtil.isEnglish() ? 
+                    "Invalid username or password" :
+                    "用户名或密码错误"
             );
         }
     }

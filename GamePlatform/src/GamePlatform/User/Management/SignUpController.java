@@ -11,6 +11,10 @@ import GamePlatform.Database.DatabaseService;
 import GamePlatform.Utility.LanguageUtil;
 import GamePlatform.Utility.EmailUtil;
 import java.util.Optional;
+import java.io.IOException;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 
 public class SignUpController {
     @FXML private Label titleLabel;
@@ -105,11 +109,12 @@ public class SignUpController {
         String confirmPassword = confirmPasswordField.getText();
         String verificationCode = verificationCodeField.getText().trim();
         
-        // 基本验证
-        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || verificationCode.isEmpty()) {
+        // 验证输入
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || 
+            confirmPassword.isEmpty() || verificationCode.isEmpty()) {
             showError(
                 LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Please fill in all fields" : "请填写所有字段"
+                LanguageUtil.isEnglish() ? "All fields are required" : "所有字段都必须填写"
             );
             return;
         }
@@ -124,10 +129,10 @@ public class SignUpController {
         }
         
         // 验证邮箱格式
-        if (!EmailUtil.isValidEmail(email)) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             showError(
                 LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Invalid email format" : "邮箱格式无效"
+                LanguageUtil.isEnglish() ? "Invalid email format" : "邮箱格式不正确"
             );
             return;
         }
@@ -137,90 +142,58 @@ public class SignUpController {
         if (savedCode == null || !savedCode.equals(verificationCode)) {
             showError(
                 LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Invalid or expired verification code" : "验证码无效或已过期"
+                LanguageUtil.isEnglish() ? 
+                    "Invalid or expired verification code" : 
+                    "验证码无效或已过期"
             );
             return;
         }
         
-        // 检查邮箱是否已注册
-        if (DatabaseService.isEmailRegistered(email)) {
-            // 如果邮箱已注册，提供重置密码和修改用户名的选项
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle(LanguageUtil.isEnglish() ? "Email Exists" : "邮箱已存在");
-            alert.setHeaderText(null);
-            alert.setContentText(LanguageUtil.isEnglish() ? 
-                "This email is already registered. Would you like to reset your password or update your username?" :
-                "该邮箱已注册。您是要重置密码还是更新用户名？");
-            
-            ButtonType resetPasswordButton = new ButtonType(
-                LanguageUtil.isEnglish() ? "Reset Password" : "重置密码"
-            );
-            ButtonType updateUsernameButton = new ButtonType(
-                LanguageUtil.isEnglish() ? "Update Username" : "更新用户名"
-            );
-            ButtonType cancelButton = new ButtonType(
-                LanguageUtil.isEnglish() ? "Cancel" : "取消", 
-                ButtonBar.ButtonData.CANCEL_CLOSE
-            );
-            
-            alert.getButtonTypes().setAll(resetPasswordButton, updateUsernameButton, cancelButton);
-            
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent()) {
-                if (result.get() == resetPasswordButton) {
-                    // 重置密码
-                    if (DatabaseService.updateUserPassword(email, password)) {
-                        showInfo(
-                            LanguageUtil.isEnglish() ? "Success" : "成功",
-                            LanguageUtil.isEnglish() ? 
-                                "Password has been reset successfully" :
-                                "密码重置成功"
-                        );
-                        ((Stage) signUpButton.getScene().getWindow()).close();
-                    } else {
-                        showError(
-                            LanguageUtil.isEnglish() ? "Error" : "错误",
-                            LanguageUtil.isEnglish() ? 
-                                "Failed to reset password" :
-                                "密码重置失败"
-                        );
-                    }
-                } else if (result.get() == updateUsernameButton) {
-                    // 更新用户名
-                    if (DatabaseService.updateUsername(email, username)) {
-                        showInfo(
-                            LanguageUtil.isEnglish() ? "Success" : "成功",
-                            LanguageUtil.isEnglish() ? 
-                                "Username has been updated successfully" :
-                                "用户名更新成功"
-                        );
-                        ((Stage) signUpButton.getScene().getWindow()).close();
-                    } else {
-                        showError(
-                            LanguageUtil.isEnglish() ? "Error" : "错误",
-                            LanguageUtil.isEnglish() ? 
-                                "Failed to update username" :
-                                "用户名更新失败"
-                        );
-                    }
-                }
-            }
-            return;
-        }
-        
-        // 新用户注册
+        // 注册用户
         if (DatabaseService.registerUser(username, email, password)) {
+            // 注册成功后清除验证码
+            verificationCodes.remove(email);
+            if (verificationTimers.containsKey(email)) {
+                verificationTimers.get(email).cancel();
+                verificationTimers.remove(email);
+            }
+            
+            // 注册成功，自动登录
+            UserSession.setCurrentUser(username);
+            
+            // 显示成功消息
             showInfo(
                 LanguageUtil.isEnglish() ? "Success" : "成功",
-                LanguageUtil.isEnglish() ? 
-                    "Registration successful! Please login." :
-                    "注册成功！请登录。"
+                LanguageUtil.isEnglish() ? "Registration successful!" : "注册成功！"
             );
-            ((Stage) signUpButton.getScene().getWindow()).close();
+            
+            // 关闭注册窗口，打开主界面
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/GamePlatform/Main/Interfaces/MainView.fxml"));
+                Parent root = loader.load();
+                Stage stage = new Stage();
+                stage.setTitle(LanguageUtil.isEnglish() ? "Game Platform" : "游戏平台");
+                stage.setScene(new Scene(root));
+                stage.show();
+                
+                // 关闭当前窗口
+                ((Stage) usernameField.getScene().getWindow()).close();
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+                showError(
+                    LanguageUtil.isEnglish() ? "Error" : "错误",
+                    LanguageUtil.isEnglish() ? 
+                        "Failed to open main window: " + e.getMessage() :
+                        "打开主窗口失败：" + e.getMessage()
+                );
+            }
         } else {
             showError(
                 LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Registration failed" : "注册失败"
+                LanguageUtil.isEnglish() ? 
+                    "Registration failed. Email may already be registered." :
+                    "注册失败。邮箱可能已被注册。"
             );
         }
     }

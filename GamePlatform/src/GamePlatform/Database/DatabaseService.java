@@ -43,13 +43,7 @@ public class DatabaseService {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             
-            // 先删除所有表（按照依赖关系的反序）
-            stmt.executeUpdate("DROP TABLE IF EXISTS GameReviews");
-            stmt.executeUpdate("DROP TABLE IF EXISTS BugReports");
-            stmt.executeUpdate("DROP TABLE IF EXISTS UserGames");
-            stmt.executeUpdate("DROP TABLE IF EXISTS Users");
-            
-            // 创建Users表（作为基础表）
+            // 只在表不存在时创建表
             stmt.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS Users (" +
                 "    id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -61,7 +55,6 @@ public class DatabaseService {
                 ")"
             );
             
-            // 创建UserGames表（依赖于Users表）
             stmt.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS UserGames (" +
                 "    id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -124,14 +117,19 @@ public class DatabaseService {
                 ")"
             );
             
-            // 创建一个默认的管理员账户
-            String sql = "INSERT OR IGNORE INTO Users (username, email, password, money) VALUES (?, ?, ?, ?)";
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, "admin");
-                pstmt.setString(2, "admin@admin.com");
-                pstmt.setString(3, "admin");
-                pstmt.setInt(4, 1000);
-                pstmt.executeUpdate();
+            // 只在admin用户不存在时创建
+            String checkAdmin = "SELECT COUNT(*) FROM Users WHERE username = 'admin'";
+            ResultSet rs = stmt.executeQuery(checkAdmin);
+            if (rs.next() && rs.getInt(1) == 0) {
+                String sql = "INSERT INTO Users (username, email, password, money) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setString(1, "admin");
+                    pstmt.setString(2, "admin@admin.com");
+                    pstmt.setString(3, "admin");
+                    pstmt.setInt(4, 1000);
+                    pstmt.executeUpdate();
+                    System.out.println("Created default admin account");
+                }
             }
             
         } catch (SQLException e) {
@@ -216,6 +214,8 @@ public class DatabaseService {
     
     // 验证用户登录
     public static boolean validateUser(String username, String password) {
+        System.out.println("Attempting to validate user: " + username);
+        
         String sql = "SELECT * FROM Users WHERE username = ? AND password = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -224,8 +224,21 @@ public class DatabaseService {
             pstmt.setString(2, password);
             
             ResultSet rs = pstmt.executeQuery();
-            return rs.next();
+            boolean isValid = rs.next();
+            
+            System.out.println("Login result: " + isValid);
+            
+            // 如果登录成功，确保用户在userMoney中有记录
+            if (isValid && !userMoney.containsKey(username)) {
+                int money = rs.getInt("money");
+                userMoney.put(username, money);
+                saveUserData();
+                System.out.println("Added user money record: " + username + " -> " + money);
+            }
+            
+            return isValid;
         } catch (SQLException e) {
+            System.err.println("Error validating user:");
             e.printStackTrace();
             return false;
         }
@@ -233,26 +246,37 @@ public class DatabaseService {
     
     // 注册新用户
     public static boolean registerUser(String username, String email, String password) {
+        System.out.println("Attempting to register user: " + username);
+        
         if (isEmailRegistered(email)) {
+            System.out.println("Email already registered: " + email);
             return false;
         }
 
-        String sql = "INSERT INTO Users(username, email, password, created_date) VALUES(?, ?, ?, ?)";
+        String sql = "INSERT INTO Users(username, email, password, money) VALUES(?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, username);
             pstmt.setString(2, email);
             pstmt.setString(3, password);
-            pstmt.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+            pstmt.setInt(4, 1000);
             
-            pstmt.executeUpdate();
-            return true;
+            int result = pstmt.executeUpdate();
+            System.out.println("Registration result: " + result);
+            
+            if (result > 0) {
+                userMoney.put(username, 1000);
+                saveUserData();
+                System.out.println("User registered successfully");
+                return true;
+            }
             
         } catch (SQLException e) {
+            System.err.println("Error registering user:");
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
     
     // 保存游戏评分
