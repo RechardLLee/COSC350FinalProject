@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import GamePlatform.User.Management.UserSession;
 
-public class HanoiTowerGame extends JFrame {
+public class HanoiTowerGame extends BaseGame {
     private JPanel canvas;
     private Map<String, Integer> difficulties;
     private String currentDifficulty;
@@ -21,6 +21,7 @@ public class HanoiTowerGame extends JFrame {
     private String currentPlayer;
     
     public HanoiTowerGame() {
+        super("Hanoi Tower");
         currentPlayer = UserSession.getCurrentUser();
         
         setTitle("Hanoi Tower - Player: " + currentPlayer);
@@ -183,15 +184,12 @@ public class HanoiTowerGame extends JFrame {
     
     private boolean checkWin() {
         if (towers.get(2).getDisks().size() == numDisks) {
-            // 计算得分 - 使用反向分数
-            // 理论最少步数为 2^n - 1，其中n是盘子数量
-            int minMoves = (1 << numDisks) - 1;  // 2^n - 1
-            // 分数计算公式：10000 * (最少步数/实际步数)
-            // 这样最优解会得到10000分，步数越多分数越低
+            int minMoves = (1 << numDisks) - 1;
             int score = (int)(10000.0 * minMoves / moves);
             
-            // 保存游戏记录
-            GameRecordManager.saveGameRecord(currentPlayer, "Hanoi Tower", score);
+            if (score > 0) {
+                saveScore(score);
+            }
             
             JOptionPane.showMessageDialog(this,
                 String.format("恭喜完成！\n移动次数: %d\n最少步数: %d\n得分: %d",

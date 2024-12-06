@@ -270,6 +270,10 @@ public class SlotMachine extends BaseGame {
         // 重新启用按钮
         spinButton.setEnabled(true);
         betField.setEnabled(true);
+
+        if (score > 0) {
+            saveScore(score);
+        }
     }
 
     private void updateBalance() {

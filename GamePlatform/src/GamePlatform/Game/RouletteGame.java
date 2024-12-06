@@ -29,6 +29,7 @@ public class RouletteGame extends BaseGame {
     private static int highScore = 0;
     private static String topPlayer = "";
     private boolean hasUnsavedScore = false;  // 添加标志来追踪是否有未保存的分数
+    private static int totalPlayers = 0;
 
     public RouletteGame() {
         super("Roulette");
@@ -141,7 +142,7 @@ public class RouletteGame extends BaseGame {
 
     private void spin() {
         try {
-            // 检查下注金额是否为空
+            // 检查下注金额是否���空
             String betAmountText = betAmountField.getText().trim();
             if (betAmountText.isEmpty()) {
                 showMessage("Please enter a bet amount!");
@@ -176,7 +177,7 @@ public class RouletteGame extends BaseGame {
             DatabaseService.updateUserMoney(username, currentBalance - betAmount);
             updateBalance();
 
-            // 生成结果
+            // 随机生成结果
             int rolledNumber = random.nextInt(37); // 0-36
             String rolledColor = (rolledNumber == 0) ? "Green" : 
                                (rolledNumber % 2 == 0) ? "Black" : "Red";
@@ -288,16 +289,35 @@ public class RouletteGame extends BaseGame {
             java.nio.file.Path path = java.nio.file.Paths.get("game_records/Roulette.txt");
             if (java.nio.file.Files.exists(path)) {
                 java.util.List<String> lines = java.nio.file.Files.readAllLines(path);
+                
+                // 用于记录不重复的玩家
+                java.util.Set<String> uniquePlayers = new java.util.HashSet<>();
+                
+                highScore = 0;  // 重置最高分
+                topPlayer = ""; // 重置最高分玩家
+                
                 for (String line : lines) {
                     String[] parts = line.split(",");
                     if (parts.length >= 2) {
+                        String playerName = parts[0].trim();
                         int score = Integer.parseInt(parts[1].trim());
+                        
+                        // 添加到唯一玩家集合
+                        uniquePlayers.add(playerName);
+                        
+                        // 更新最高分
                         if (score > highScore) {
                             highScore = score;
-                            topPlayer = parts[0].trim();
+                            topPlayer = playerName;
                         }
                     }
                 }
+                
+                // 更新总玩家数
+                totalPlayers = uniquePlayers.size();
+                
+                // 更新��示
+                updateScoreDisplay();
             }
         } catch (Exception e) {
             System.err.println("Error loading high score: " + e.getMessage());
@@ -311,46 +331,22 @@ public class RouletteGame extends BaseGame {
             return;
         }
 
-        try {
-            // 确保目录存在
-            java.nio.file.Path dir = java.nio.file.Paths.get("game_records");
-            if (!java.nio.file.Files.exists(dir)) {
-                java.nio.file.Files.createDirectories(dir);
-            }
-            
-            // 构建记录字符串
-            String record = String.format("%s,%d,%s%n", 
-                username, score, new java.util.Date());
-            
-            // 追加写入文件
-            java.nio.file.Files.write(
-                java.nio.file.Paths.get("game_records/Roulette.txt"),
-                record.getBytes(),
-                java.nio.file.StandardOpenOption.CREATE,
-                java.nio.file.StandardOpenOption.APPEND
-            );
-            
-            // 更新最高分
-            if (score > highScore) {
-                highScore = score;
-                topPlayer = username;
-            }
-            
-            // 更新显示
-            updateScoreDisplay();
-            
-        } catch (Exception e) {
-            System.err.println("Error saving score: " + e.getMessage());
-            e.printStackTrace();
-        }
+        // 调用父类的saveScore方法保存记录
+        super.saveScore(score);
         
-        // 不调用super.saveScore(score)，完全由子类处理保存逻辑
+        // 更新最高分和显示
+        if (score > highScore) {
+            highScore = score;
+            topPlayer = username;
+        }
+        updateScoreDisplay();
     }
 
     private void updateScoreDisplay() {
-        scoreLabel.setText(String.format("Net Profit: $%d (Win Rate: %.1f%%) (High Score: $%d by %s)", 
+        scoreLabel.setText(String.format("Net Profit: $%d (Win Rate: %.1f%%) (Players: %d) (High Score: $%d by %s)", 
             netProfit, 
             sessionGames > 0 ? (sessionWins * 100.0 / sessionGames) : 0,
+            totalPlayers,
             highScore, 
             topPlayer));
     }

@@ -109,9 +109,10 @@ public class TicTacToe extends BaseGame {
         if (checkWin(currentPlayer)) {
             gameEnded = true;
             statusLabel.setText("You win!");
-            // 计算分数：首次获胜10000分，之后根据移动次数递减
             int score = Math.max(10000 - (moves - GRID_SIZE * 2) * 1000, 1000);
-            saveScore(score);
+            if (score > 0) {
+                saveScore(score);
+            }
             return;
         }
         

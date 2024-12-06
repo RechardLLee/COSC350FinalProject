@@ -106,9 +106,9 @@ public class MemoryGame extends BaseGame {
                 flippedCards.clear();
 
                 if (matchesFound == 8) {
-                    if (score > 0) {  // 只有在有分数且大于0时才保存
+                    if (score > 0) {
                         saveScore(score);
-                        score = 0;  // 保存后重置分数，避免重复保存
+                        score = 0;  // 保存后重置分数
                     }
                     JOptionPane.showMessageDialog(this, 
                         "Congratulations! Final score: " + score);

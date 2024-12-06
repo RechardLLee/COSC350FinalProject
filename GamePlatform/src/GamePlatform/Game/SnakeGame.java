@@ -326,8 +326,10 @@ public class SnakeGame extends BaseGame {
         gameRunning = false;
         gameTimer.stop();
         
-        // 保存游戏记录，使用当前分数
-        GameRecordManager.saveGameRecord(currentPlayer, "Snake", score);
+        // 替换 GameRecordManager.saveGameRecord
+        if (score > 0) {
+            saveScore(score);
+        }
         
         // 更新最高分
         if (score > highScore) {
