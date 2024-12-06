@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="20" prefWidth="500" prefHeight="600"
+    style="-fx-background-color: #f5f5f5;"
+    xmlns:fx="http://javafx.com/fxml" 
+    fx:controller="GamePlatform.User.Management.SignUpController">
+    
+    <padding>
+        <Insets top="40" right="50" bottom="40" left="50"/>
+    </padding>
+    
+    <Label fx:id="titleLabel" text="Sign Up" 
+        style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+    
+    <VBox spacing="20" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 30;">
+        <VBox spacing="5">
+            <Label fx:id="usernameLabel" text="Username"/>
+            <TextField fx:id="usernameField"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label fx:id="emailLabel" text="Email"/>
+            <TextField fx:id="emailField"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label fx:id="passwordLabel" text="Password"/>
+            <PasswordField fx:id="passwordField"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label fx:id="confirmPasswordLabel" text="Confirm Password"/>
+            <PasswordField fx:id="confirmPasswordField"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label fx:id="verificationCodeLabel" text="Verification Code"/>
+            <HBox spacing="10">
+                <TextField fx:id="verificationCodeField" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="sendCodeButton" text="Send Code"
+                    onAction="#handleSendCode"/>
+            </HBox>
+        </VBox>
+        
+        <Button fx:id="signUpButton" text="Sign Up"
+            style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 12 0; -fx-font-size: 14;"
+            maxWidth="Infinity" onAction="#handleSignUp"/>
+    </VBox>
+</VBox> 

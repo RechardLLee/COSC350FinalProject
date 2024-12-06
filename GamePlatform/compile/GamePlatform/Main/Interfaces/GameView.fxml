@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="30" prefWidth="800" prefHeight="600"
+    style="-fx-background-color: #f5f5f5;"
+    xmlns:fx="http://javafx.com/fxml" 
+    fx:controller="GamePlatform.Main.Interfaces.GameViewController">
+    
+    <padding>
+        <Insets top="40" right="50" bottom="40" left="50"/>
+    </padding>
+    
+    <Label fx:id="titleLabel" text="Game Title" 
+        style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+    
+    <HBox spacing="30">
+        <StackPane minWidth="200" minHeight="200" 
+            style="-fx-background-color: #ffffff; -fx-background-radius: 10; 
+                   -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);">
+            <ImageView fx:id="gameIcon" 
+                fitWidth="180" fitHeight="180"
+                preserveRatio="true"/>
+        </StackPane>
+        
+        <VBox spacing="20" HBox.hgrow="ALWAYS">
+            <TextArea fx:id="gameDescription" wrapText="true" editable="false"
+                prefRowCount="8" style="-fx-background-color: transparent;"/>
+                
+            <GridPane hgap="10" vgap="5">
+                <Label text="Total Players:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Label fx:id="totalPlayersLabel" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                
+                <Label text="High Score:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Label fx:id="highScoreLabel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                
+                <Label text="Top Player:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <Label fx:id="topPlayerLabel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </GridPane>
+            
+            <TitledPane text="Game History" expanded="false">
+                <TableView fx:id="historyTable">
+                    <columns>
+                        <TableColumn fx:id="playerColumn" text="Player"/>
+                        <TableColumn fx:id="scoreColumn" text="Score"/>
+                        <TableColumn fx:id="dateColumn" text="Date"/>
+                    </columns>
+                </TableView>
+            </TitledPane>
+            
+            <Button fx:id="startButton" text="Start Game"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20;"
+                onAction="#handleStartGame"/>
+        </VBox>
+    </HBox>
+</VBox> 

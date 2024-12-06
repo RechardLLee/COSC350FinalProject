@@ -1,58 +1,54 @@
+package GamePlatform.Game;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.Random;
 
-public class SlotMachine {
-
+public class SlotMachine extends JFrame implements ActionListener {
     // GUI 
-    private Label reel1, reel2, reel3;
-    private Button spinButton;
-    private Label resultLabel;
+    private JLabel reel1, reel2, reel3;
+    private JButton spinButton;
+    private JLabel resultLabel;
 
     // symbols
     private String[] symbols = { "♧", "♠︎", "♔", "❤️", "⚅", "⭐", "7" };
 
     public SlotMachine() {
-        
         setTitle("Slot Machine");
         setSize(400, 300);
-        setDefaultCloseOperation(Frame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
         // Create the reels (labels)
-        Panel reelPanel = new Panel();
+        JPanel reelPanel = new JPanel();
         reelPanel.setLayout(new GridLayout(1, 3));
-        reel1 = new Label("♧", SwingConstants.CENTER);
+        reel1 = new JLabel("♧", SwingConstants.CENTER);
         reel1.setFont(new Font("Arial", Font.BOLD, 60));
-        reel2 = new Label("♠︎", SwingConstants.CENTER);
+        reel2 = new JLabel("♠︎", SwingConstants.CENTER);
         reel2.setFont(new Font("Arial", Font.BOLD, 60));
-        reel3 = new Label("♔", SwingConstants.CENTER);
+        reel3 = new JLabel("♔", SwingConstants.CENTER);
         reel3.setFont(new Font("Arial", Font.BOLD, 60));
         reelPanel.add(reel1);
         reelPanel.add(reel2);
         reelPanel.add(reel3);
         
         // Create the spin button
-        spinButton = new Button("Spin");
+        spinButton = new JButton("Spin");
         spinButton.setFont(new Font("Arial", Font.BOLD, 24));
         spinButton.addActionListener(this);
 
         // Create a result label
-        resultLabel = new Label("", SwingConstants.CENTER);
+        resultLabel = new JLabel("", SwingConstants.CENTER);
         resultLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
         // Add components to the frame
         add(reelPanel, BorderLayout.CENTER);
         add(spinButton, BorderLayout.SOUTH);
         add(resultLabel, BorderLayout.NORTH);
-
-        // Set the frame visible
-        setVisible(true);
     }
 
-    // Handle the button click event
     @Override
     public void actionPerformed(ActionEvent e) {
         // Generate random symbols for each reel
@@ -72,10 +68,5 @@ public class SlotMachine {
         } else {
             resultLabel.setText("Try again!");
         }
-    }
-
-    // Main method to run the slot machine game
-    public static void main(String[] args) {
-        new SlotMachine();
     }
 }
