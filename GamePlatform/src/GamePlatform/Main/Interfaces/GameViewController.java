@@ -76,36 +76,53 @@ public class GameViewController {
         if (titleLabel != null && titleLabel.getText() != null) {
             String title = titleLabel.getText();
             
-            // 同步文件记录到数据库
-            GameRecordManager.syncRecordsToDatabase(title);
-            
-            // 刷新游戏统计信息
-            GameStats stats = DatabaseService.getGameStats(title);
-            
-            // 更新统计标签
-            String totalPlayersText = stats.getTotalPlayers() > 0 ? 
-                String.valueOf(stats.getTotalPlayers()) : 
-                LanguageUtil.isEnglish() ? "No players yet" : "暂无玩家";
-            totalPlayersLabel.setText(totalPlayersText);
-            
-            // 处理高分和最佳玩家的显示
-            if (stats.getHighScore() > 0 && stats.getTopPlayer() != null) {
-                if (title.equals("Slot Machine") || title.equals("Roulette")) {
-                    highScoreLabel.setText(String.format("$%d (by %s)", 
-                        stats.getHighScore(), stats.getTopPlayer()));
-                } else {
-                    highScoreLabel.setText(String.format("%d (by %s)", 
-                        stats.getHighScore(), stats.getTopPlayer()));
+            try {
+                java.nio.file.Path path = java.nio.file.Paths.get("game_records/" + title + ".txt");
+                if (java.nio.file.Files.exists(path)) {
+                    java.util.List<String> lines = java.nio.file.Files.readAllLines(path);
+                    
+                    java.util.Set<String> uniquePlayers = new java.util.HashSet<>();
+                    int highScore = 0;
+                    String topPlayer = "";
+                    
+                    for (String line : lines) {
+                        String[] parts = line.split(",");
+                        if (parts.length >= 2) {
+                            String playerName = parts[0].trim();
+                            int score = Integer.parseInt(parts[1].trim());
+                            uniquePlayers.add(playerName);
+                            
+                            if (score > highScore) {
+                                highScore = score;
+                                topPlayer = playerName;
+                            }
+                        }
+                    }
+                    
+                    // 更新显示
+                    totalPlayersLabel.setText(String.valueOf(uniquePlayers.size()));
+                    
+                    // 根据游戏类型设置不同的显示格式
+                    if (title.equals("Roulette") || title.equals("Slot Machine")) {
+                        // 金钱游戏显示带$符号
+                        if (highScore > 0) {
+                            highScoreLabel.setText(String.format("$%d (by %s)", highScore, topPlayer));
+                        } else {
+                            highScoreLabel.setText("No records yet");
+                        }
+                    } else {
+                        // 其他游戏显示普通分数
+                        if (highScore > 0) {
+                            highScoreLabel.setText(String.format("%d (by %s)", highScore, topPlayer));
+                        } else {
+                            highScoreLabel.setText("No records yet");
+                        }
+                    }
+                    
+                    topPlayerLabel.setText(topPlayer.isEmpty() ? "No top player yet" : topPlayer);
                 }
-            } else {
-                highScoreLabel.setText(LanguageUtil.isEnglish() ? "No records yet" : "暂无记录");
-            }
-            
-            // 更新顶部玩家显示
-            if (stats.getTopPlayer() != null) {
-                topPlayerLabel.setText(stats.getTopPlayer());
-            } else {
-                topPlayerLabel.setText(LanguageUtil.isEnglish() ? "No top player yet" : "暂无最佳玩家");
+            } catch (Exception e) {
+                System.err.println("Error loading game records: " + e.getMessage());
             }
             
             // 设置表格列标题
