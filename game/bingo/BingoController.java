@@ -1,5 +1,5 @@
 /**
- * Sample Skeleton for 'CopyBingo.fxml' Controller Class
+ * Sample Skeleton for 'Bingo.fxml' Controller Class
  */
 import java.util.*;
 import java.io.*;
