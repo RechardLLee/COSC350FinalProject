@@ -13,7 +13,7 @@ public class SinglePlayerBingoRunner extends Application{
 	public void start(Stage stage) throws Exception {
 	   Parent root = 
 	      // FXMLLoader.load(getClass().getResource("SinglePlayerBingo.fxml")); //Change the .fxml file
-	      FXMLLoader.load(getClass().getResource("Bingo.fxml")); //Change the .fxml file
+	      FXMLLoader.load(getClass().getResource("CopyBingo.fxml")); //Change the .fxml file
 
 	   Scene scene = new Scene(root); // attach scene graph to scene
 	   stage.setTitle("Bingo"); // Change the Title Bar

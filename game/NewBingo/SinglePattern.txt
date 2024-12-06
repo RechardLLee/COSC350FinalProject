@@ -1,0 +1,84 @@
+VERTICAL LINE
+O   O   X    O   O  
+O   O   X    O   O  
+O   O   X    O   O  
+O   O   X    O   O  
+O   O   X    O   O  
+VERTICAL LINE
+O   X    O   O   O  
+O   X    O   O   O  
+O   X    O   O   O  
+O   X    O   O   O  
+O   X    O   O   O  
+VERTICAL LINE
+X    O   O   O   O  
+X    O   O   O   O  
+X    O   O   O   O  
+X    O   O   O   O  
+X    O   O   O   O  
+VERTICAL LINE
+O   O   O   X    O  
+O   O   O   X    O  
+O   O   O   X    O  
+O   O   O   X    O  
+O   O   O   X    O  
+VERTICAL LINE
+O   O   O   O   X   
+O   O   O   O   X   
+O   O   O   O   X   
+O   O   O   O   X   
+O   O   O   O   X   
+HORIZONTAL LINE
+O   O   O   O   O  
+O   O   O   O   O  
+X    X    X   X    X   
+O   O   O   O   O  
+O   O   O   O   O  
+HORIZONTAL LINE
+X    X    X   X    X   
+O   O   O   O   O  
+O   O   O   O   O  
+O   O   O   O   O  
+O   O   O   O   O  
+HORIZONTAL LINE
+O   O   O   O   O  
+X    X    X   X    X   
+O   O   O   O   O  
+O   O   O   O   O  
+O   O   O   O   O  
+HORIZONTAL LINE
+O   O   O   O   O  
+O   O   O   O   O  
+O   O   O   O   O  
+X    X    X   X    X   
+O   O   O   O   O  
+HORIZONTAL LINE
+O   O   O   O   O  
+O   O   O   O   O  
+O   O   O   O   O  
+O   O   O   O   O  
+X    X    X   X    X   
+DIAGONAL LINE
+X    O   O   O   O  
+O    X   O   O   O  
+O   O    X   O   O  
+O   O   O    X   O  
+O   O   O   O    X   
+DIAGONAL LINE
+O   O   O   O    X   
+O   O   O    X   O  
+O   O    X   O   O  
+O    X   O   O   O  
+X    O   O   O   O  
+FOUR CORNERS
+X    O   O   O   X   
+O   O   O   O   O  
+O   O   O   O   O  
+O   O   O   O   O  
+X    O   O   O   X   
+POSTAGE STAMP
+O   O   O   X    X   
+O   O   O   X    X   
+O   O   O   O   O  
+O   O   O   O   O  
+O   O   O   O   O  

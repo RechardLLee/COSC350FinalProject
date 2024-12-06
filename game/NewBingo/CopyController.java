@@ -23,7 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.event.ActionEvent;
 
-public class BingoController{
+public class CopyController{
 
 
     StandardBingo bingo = new StandardBingo();
