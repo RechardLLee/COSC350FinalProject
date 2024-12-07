@@ -1,6 +1,0 @@
-LADDER
-O    X    O    X    O   
-O    X    X     X    O   
-O    X    O    X    O   
-O    X    X     X    O   
-O    X    O    X    O   

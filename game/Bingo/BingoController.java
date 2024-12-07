@@ -23,7 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.event.ActionEvent;
 
-public class CopyController{
+public class BingoController{
 
 
     StandardBingo bingo = new StandardBingo();
@@ -1303,7 +1303,6 @@ public class CopyController{
         gameTypeTextArea.setText(bingo.pickFirstRound());
         patternType = gameTypeTextArea.getText();
         nextRoundTextField.setText(bingo.pickSecondRound());
-        ArrayList<String[]> list = bingo.readPattern(gameTypeTextArea.getText().toString());
         assert B1Circle != null : "fx:id=\"B1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
         assert B2Circle != null : "fx:id=\"B2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
         assert B3Circle != null : "fx:id=\"B3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
