@@ -1,3 +1,6 @@
+package GamePlatform.Game.bingo;
+
+import java.util.*;
 /**
  * Sample Skeleton for 'CopyBingo.fxml' Controller Class
  */
@@ -1303,7 +1306,6 @@ public class BingoController{
         gameTypeTextArea.setText(bingo.pickFirstRound());
         patternType = gameTypeTextArea.getText();
         nextRoundTextField.setText(bingo.pickSecondRound());
-        ArrayList<String[]> list = bingo.readPattern(gameTypeTextArea.getText().toString());
         assert B1Circle != null : "fx:id=\"B1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
         assert B2Circle != null : "fx:id=\"B2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
         assert B3Circle != null : "fx:id=\"B3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";

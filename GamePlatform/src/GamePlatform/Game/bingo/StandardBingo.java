@@ -3,6 +3,7 @@
 *@author Scott Weckman
 */
 
+package GamePlatform.Game.bingo;
 
 import java.util.*;
 import java.io.*;

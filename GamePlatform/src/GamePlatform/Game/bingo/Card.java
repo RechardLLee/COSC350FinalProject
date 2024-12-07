@@ -1,5 +1,8 @@
+package GamePlatform.Game.bingo;
+
 import java.util.*;
-public class Card{
+
+public class Card {
 
 	//hold nums on card
 	private ArrayList<Integer> card = new ArrayList<Integer>();

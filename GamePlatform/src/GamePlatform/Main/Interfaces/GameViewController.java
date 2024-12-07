@@ -198,17 +198,26 @@ public class GameViewController {
                 case "Roulette":
                     imagePath = "/src/GamePlatform/Game/RouletteGame.png";
                     break;
+                case "Bingo":
+                    imagePath = "/src/GamePlatform/Game/bingo/Bingo.png";
+                    break;
                     
             }
             
             if (imagePath != null) {
-                // 使用文件系统路径加载图片
                 File imageFile = new File(System.getProperty("user.dir") + imagePath);
                 if (imageFile.exists()) {
                     Image image = new Image(imageFile.toURI().toString());
                     gameIcon.setImage(image);
+                    
+                    // 为Bingo游戏设置特殊的图标样式
+                    gameIcon.setFitWidth(200);  // 设置合适的宽度
+                    gameIcon.setFitHeight(200); // 设置合适的高度
+                    gameIcon.setPreserveRatio(true); // 保持图片比例
+                    
                 } else {
                     System.out.println("Cannot find image: " + imageFile.getAbsolutePath());
+                    // 如果找不到图片，设置一个默认的背景样式
                     gameIcon.setStyle(
                         "-fx-background-color: #f0f0f0;" +
                         "-fx-background-radius: 10;" +
@@ -219,11 +228,6 @@ public class GameViewController {
         } catch (Exception e) {
             System.out.println("Error loading image for game: " + title);
             e.printStackTrace();
-            gameIcon.setStyle(
-                "-fx-background-color: #f0f0f0;" +
-                "-fx-background-radius: 10;" +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);"
-            );
         }
         
         // 设置开始按钮文本

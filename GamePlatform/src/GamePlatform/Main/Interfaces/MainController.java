@@ -57,6 +57,7 @@ public class MainController {
         addGameButton("Slot Machine", "SlotMachine");
         addGameButton("Roulette", "RouletteGame");
         addGameButton("Memory Game", "MemoryGame");
+        addGameButton("Bingo", "BinGo");
         
         // 设置定时更新余额
         balanceUpdateTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateBalance()));
@@ -593,6 +594,28 @@ public class MainController {
                        "- Click SPIN! to play\n" +
                        "- New Game to reset\n\n" +
                        "Score shows net profit/loss";
+                       
+            case "Bingo":
+                return "Classic Bingo Game\n\n" +
+                       "Match numbers on your card with called numbers.\n\n" +
+                       "Features:\n" +
+                       "- Multiple bingo patterns\n" +
+                       "- Real-time number calling\n" +
+                       "- Auto-daub numbers\n" +
+                       "- Multiple cards view\n\n" +
+                       "Game Modes:\n" +
+                       "- Single Bingo\n" +
+                       "- Double Bingo\n" +
+                       "- Diamond Inside\n" +
+                       "- Frame Inside\n" +
+                       "- Blackout\n\n" +
+                       "Controls:\n" +
+                       "- Click CALL for next number\n" +
+                       "- Click numbers to mark\n" +
+                       "- Click BINGO to claim win\n\n" +
+                       "Betting:\n" +
+                       "- Place bets before each game\n" +
+                       "- Win multipliers based on pattern";
                        
             default:
                 return "Game description not available.";
