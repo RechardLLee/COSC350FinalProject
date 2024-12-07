@@ -1208,15 +1208,15 @@ public class BingoController{
             startDisplay();
         }
         // pointsTextField.setText(roundIndex.toString());
-        patternIndex = 0;
-        ArrayList<String[]> list = bingo.readPattern(gameTypeTextArea.getText().toString());
-        // bingoPatternTextField.setText(list.get(patternIndex)[0]);
-        patternIndex++;
-        // bingoPatternTextArea.setText(bingo.makePattern(list.get(patternIndex)));
-        patternIndex++;
-        if(patternIndex == list.size()){
-            patternIndex = 0;
-        }
+        // patternIndex = 0;
+        // // ArrayList<String[]> list = bingo.readPattern(gameTypeTextArea.getText().toString());
+        // // bingoPatternTextField.setText(list.get(patternIndex)[0]);
+        // patternIndex++;
+        // // bingoPatternTextArea.setText(bingo.makePattern(list.get(patternIndex)));
+        // patternIndex++;
+        // if(patternIndex == list.size()){
+        //     patternIndex = 0;
+        // }
 
 
         // ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
