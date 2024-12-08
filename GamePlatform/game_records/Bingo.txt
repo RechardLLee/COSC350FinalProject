@@ -7,3 +7,7 @@ admin,800,Mon Dec 02 19:24:03 CST 2024 111,-90,Sun Dec 08 11:09:43 CST 2024
 weckmanscott,-1000,Sun Dec 08 11:25:45 CST 2024
 weckmanscott,-100,Sun Dec 08 11:26:42 CST 2024
 weckmanscott,-10,Sun Dec 08 11:31:49 CST 2024
+weckmanscott,-410,Sun Dec 08 12:23:03 CST 2024
+weckmanscott,-420,Sun Dec 08 12:23:08 CST 2024
+weckmanscott,-560,Sun Dec 08 12:23:41 CST 2024
+weckmanscott,-560,Sun Dec 08 12:23:45 CST 2024
