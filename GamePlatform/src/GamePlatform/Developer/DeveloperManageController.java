@@ -46,8 +46,10 @@ public class DeveloperManageController {
     private void initialize() {
         dashboardPane.setVisible(true);
         userPane.setVisible(false);
+        feedbackPane.setVisible(false);
         
         initializeUserTable();
+        initializeFeedbackTables();
         
         Platform.runLater(() -> {
             initializeCharts();
@@ -302,11 +304,15 @@ public class DeveloperManageController {
         TextField email = new TextField(selectedUser.getEmail());
         PasswordField password = new PasswordField();
         password.setPromptText("New password (leave blank to keep current)");
+        TextField money = new TextField(String.valueOf(DatabaseService.getUserMoney(selectedUser.getUsername())));
+        money.setPromptText("User balance");
 
         grid.add(new Label("Email:"), 0, 0);
         grid.add(email, 1, 0);
         grid.add(new Label("New Password:"), 0, 1);
         grid.add(password, 1, 1);
+        grid.add(new Label("Balance:"), 0, 2);
+        grid.add(money, 1, 2);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -320,6 +326,12 @@ public class DeveloperManageController {
                 }
                 if (!email.getText().equals(selectedUser.getEmail())) {
                     DatabaseService.updateUsername(selectedUser.getEmail(), email.getText());
+                }
+                try {
+                    int newBalance = Integer.parseInt(money.getText());
+                    DatabaseService.updateUserMoney(selectedUser.getUsername(), newBalance);
+                } catch (NumberFormatException e) {
+                    showAlert(Alert.AlertType.ERROR, "Invalid Input", "Please enter a valid number for balance.");
                 }
                 return selectedUser;
             }
@@ -462,5 +474,47 @@ public class DeveloperManageController {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to clear cache.");
             }
         }
+    }
+
+    private void initializeFeedbackTables() {
+        // 初始化评论表格
+        TableColumn<ReviewData, Integer> reviewIdCol = new TableColumn<>("ID");
+        reviewIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
+        TableColumn<ReviewData, String> reviewUserCol = new TableColumn<>("User");
+        reviewUserCol.setCellValueFactory(new PropertyValueFactory<>("username"));
+        
+        TableColumn<ReviewData, String> reviewGameCol = new TableColumn<>("Game");
+        reviewGameCol.setCellValueFactory(new PropertyValueFactory<>("gameName"));
+        
+        TableColumn<ReviewData, Integer> ratingCol = new TableColumn<>("Rating");
+        ratingCol.setCellValueFactory(new PropertyValueFactory<>("rating"));
+        
+        TableColumn<ReviewData, String> reviewCol = new TableColumn<>("Review");
+        reviewCol.setCellValueFactory(new PropertyValueFactory<>("review"));
+        
+        TableColumn<ReviewData, Date> reviewDateCol = new TableColumn<>("Date");
+        reviewDateCol.setCellValueFactory(new PropertyValueFactory<>("reviewDate"));
+        
+        reviewTable.getColumns().setAll(reviewIdCol, reviewUserCol, reviewGameCol, 
+                                      ratingCol, reviewCol, reviewDateCol);
+
+        // 初始化bug表格
+        TableColumn<BugData, Integer> bugIdCol = new TableColumn<>("ID");
+        bugIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
+        TableColumn<BugData, String> bugUserCol = new TableColumn<>("User");
+        bugUserCol.setCellValueFactory(new PropertyValueFactory<>("username"));
+        
+        TableColumn<BugData, String> descCol = new TableColumn<>("Description");
+        descCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+        
+        TableColumn<BugData, String> statusCol = new TableColumn<>("Status");
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
+        
+        TableColumn<BugData, Date> bugDateCol = new TableColumn<>("Date");
+        bugDateCol.setCellValueFactory(new PropertyValueFactory<>("reportDate"));
+        
+        bugTable.getColumns().setAll(bugIdCol, bugUserCol, descCol, statusCol, bugDateCol);
     }
 } 

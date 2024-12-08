@@ -270,6 +270,7 @@ public class DatabaseService {
             return false;
         }
 
+        // 修改 SQL 语句,添加 money 字段
         String sql = "INSERT INTO Users(username, email, password, money) VALUES(?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -277,14 +278,14 @@ public class DatabaseService {
             pstmt.setString(1, username);
             pstmt.setString(2, email);
             pstmt.setString(3, password);
-            pstmt.setInt(4, 1000);
+            pstmt.setInt(4, 1000);  // 设置初始余额
             
             int result = pstmt.executeUpdate();
             System.out.println("Registration result: " + result);
             
             if (result > 0) {
-                userMoney.put(username, 1000);
-                saveUserData();
+                userMoney.put(username, 1000);  // 更新内存中的余额
+                saveUserData();  // 保存到文件
                 System.out.println("User registered successfully");
                 return true;
             }
@@ -379,13 +380,50 @@ public class DatabaseService {
     
     // 获取用户余额
     public static int getUserMoney(String username) {
-        return userMoney.getOrDefault(username, 1000);  // 默认1000
+        String sql = "SELECT money FROM Users WHERE username = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                int money = rs.getInt("money");
+                userMoney.put(username, money);  // 更新内存中的余额
+                return money;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userMoney.getOrDefault(username, 1000);  // 如果查询失败,返回内存中的余额或默认值
     }
     
     // 更新用户余额
     public static void updateUserMoney(String username, int newAmount) {
-        userMoney.put(username, newAmount);
-        saveUserData();  // 立即存到文件
+        // 更新数据库中的余额
+        String sql = "UPDATE Users SET money = ? WHERE username = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, newAmount);
+            pstmt.setString(2, username);
+            pstmt.executeUpdate();
+            
+            // 更新内存中的余额
+            userMoney.put(username, newAmount);
+            saveUserData();  // 保存到文件
+            
+            // 记录到系统日志
+            String logSql = "INSERT INTO system_logs (type, content) VALUES (?, ?)";
+            try (PreparedStatement logStmt = conn.prepareStatement(logSql)) {
+                logStmt.setString(1, "BALANCE_UPDATE");
+                logStmt.setString(2, String.format("User %s balance updated to %d", username, newAmount));
+                logStmt.executeUpdate();
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     
     // 添加用户游戏
@@ -499,7 +537,7 @@ public class DatabaseService {
     
     public static List<UserData> getAllUsers() {
         List<UserData> users = new ArrayList<>();
-        String sql = "SELECT * FROM users ORDER BY created_at DESC";
+        String sql = "SELECT * FROM Users ORDER BY created_date DESC";
         
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -510,7 +548,7 @@ public class DatabaseService {
                     rs.getInt("id"),
                     rs.getString("username"), 
                     rs.getString("email"),
-                    rs.getTimestamp("created_at")
+                    rs.getTimestamp("created_date")
                 ));
             }
             
@@ -589,14 +627,14 @@ public class DatabaseService {
                 data.setActiveUsers(rs.getInt(1));
             }
             
-            // 获取游戏���据
+            // 获取游戏数据
             sql = "SELECT COUNT(DISTINCT game_name) FROM game_records";
             rs = conn.createStatement().executeQuery(sql);
             if (rs.next()) {
                 data.setTotalGames(rs.getInt(1));
             }
             
-            // 获取最近7天的活跃度趋势
+            // 获取活跃度趋势
             sql = "WITH RECURSIVE dates(date) AS (" +
                   "  SELECT DATE('now', '-6 days')" +
                   "  UNION ALL" +
