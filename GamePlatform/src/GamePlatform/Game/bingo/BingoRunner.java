@@ -13,12 +13,17 @@ public class BingoRunner extends Application{
 
 	@Override
 	public void start(Stage stage) throws Exception {
-	   Parent root = FXMLLoader.load(getClass().getResource("/GamePlatform/Game/bingo/Bingo.fxml"));
-
-	   Scene scene = new Scene(root); // attach scene graph to scene
-	   stage.setTitle("Bingo"); // Change the Title Bar
-	   stage.setScene(scene); // attach scene to stage
-	   stage.show(); // display the stage
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("Bingo.fxml"));
+			Parent root = loader.load();
+			Scene scene = new Scene(root);
+			stage.setScene(scene);
+			stage.setTitle("Bingo");
+			stage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	public static void main(String[] args) {

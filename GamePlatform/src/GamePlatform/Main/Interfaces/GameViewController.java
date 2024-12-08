@@ -24,6 +24,8 @@ import javafx.util.Duration;
 import GamePlatform.Game.GameRecord;
 import GamePlatform.Game.GameRecordManager;
 import javafx.scene.image.Image;
+import javafx.application.Platform;
+import GamePlatform.Game.BinGo;
 
 public class GameViewController {
     @FXML private Label titleLabel;
@@ -75,6 +77,12 @@ public class GameViewController {
     private void refreshGameInfo() {
         if (titleLabel != null && titleLabel.getText() != null) {
             String title = titleLabel.getText();
+            
+            if (title.equals("Bingo")) {
+                // 设置Bingo特有的列标题
+                scoreColumn.setText(LanguageUtil.isEnglish() ? 
+                    "Net Profit" : "净收益");
+            }
             
             try {
                 java.nio.file.Path path = java.nio.file.Paths.get("game_records/" + title + ".txt");
@@ -160,7 +168,11 @@ public class GameViewController {
     @FXML
     private void handleStartGame() {
         if (gamePath != null) {
-            GameLauncher.launchGame(gamePath);
+            if (titleLabel.getText().equals("Bingo")) {
+                startBingoGame();
+            } else {
+                GameLauncher.launchGame(gamePath);
+            }
             refreshTimeline.play();
         }
     }
@@ -241,5 +253,16 @@ public class GameViewController {
         
         // 立即刷新历史记录
         refreshGameInfo();
+    }
+    
+    @FXML
+    private void startBingoGame() {
+        Platform.runLater(() -> {
+            try {
+                new BinGo();  // 使用新的BinGo类
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 } 

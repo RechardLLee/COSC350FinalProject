@@ -24,6 +24,22 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.event.ActionEvent;
+import javafx.stage.Stage;
+
+// 添加必要的导入
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.Main.Interfaces.MainController;
+import GamePlatform.User.Management.UserSession;
+import GamePlatform.Game.GameStats;
+import javafx.application.Platform;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+// 添加文件操作相关的导入
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class BingoController{
 
@@ -56,8 +72,6 @@ public class BingoController{
     private Rectangle[] c7Rectangles;
 
     private Rectangle[] c8Rectangles;
-
-    private Rectangle[][] cpuRectangles;
 
     private Card card;
 
@@ -94,6 +108,8 @@ public class BingoController{
     Runnable task = () -> showPatternAction();  
 
     ScheduledFuture<?> executor;  
+
+    private Rectangle[][] cpuRectangles;
 
 
     @FXML // ResourceBundle that was given to the FXMLLoader
@@ -954,6 +970,12 @@ public class BingoController{
     @FXML // fx:id="minusButton"
     private Button minusButton; // Value injected by FXMLLoader
 
+    // 添加用户相关字段
+    private String username = UserSession.getInstance().getUsername();
+    private int totalBet = 0;    // 总下注金额
+    private int totalWin = 0;    // 总赢得金额
+    private int netProfit = 0;   // 净盈亏
+    
     private void startDisplay(){
         // ScheduledFuture<?>
         executor = scheduler.scheduleAtFixedRate(task,0, 1, SECONDS);
@@ -1231,27 +1253,57 @@ public class BingoController{
     }
     @FXML 
     void callAction(ActionEvent event) {
+        int betAmount = Integer.parseInt(betTextField.getText());
+        int currentBalance = DatabaseService.getUserMoney(username);
+        
+        if (betAmount <= 0 || betAmount > currentBalance) {
+            // 显示错误消息
+            return;
+        }
+        
+        // 扣除下注金额
+        totalBet += betAmount;
+        netProfit -= betAmount;
+        DatabaseService.updateUserMoney(username, currentBalance - betAmount);
+        updateBalance();
+        
+        // 原有的call逻辑...
         callTextField.setText(bingo.call());
-        // card.markCall(bingo.getLastCall());
         markCards(bingo.getLastCall());
         cpuMarkCalls(bingo.getLastCall());
-        BTextArea.setText(bingo.printB());
-        ITextArea.setText(bingo.printI());
-        NTextArea.setText(bingo.printN());
-        GTextArea.setText(bingo.printG());
-        OTextArea.setText(bingo.printO());
-        if(checkCPUBingo()){
+        updateCalledNumbers();
+        
+        if(checkCPUBingo()) {
+            // CPU赢了，玩家输了
+            winningsTextField.setText(Integer.toString(netProfit));
+            if (netProfit != 0) {
+                saveScore(netProfit);
+            }
             nextRoundAction();
         }
-        balanceTextField.setText(Boolean.toString(checkCPUBingo()));
     }
 
     @FXML
     void bingoButtonAction(ActionEvent event) {
-        // bingoPatternTextField.setText(patternType);
-        if(card.checkBingo(patternType)){
-            // callTextField.setText("It's a Bingo!");
-            rewardBingo();
+        if(card.checkBingo(patternType)) {
+            int winAmount = Integer.parseInt(betTextField.getText()) * 3 * roundIndex;
+            totalWin += winAmount;
+            netProfit += winAmount;
+            
+            // 更新用户余额
+            Platform.runLater(() -> {
+                DatabaseService.updateUserMoney(username, 
+                    DatabaseService.getUserMoney(username) + winAmount);
+                updateBalance();
+            });
+            
+            winningsTextField.setText(Integer.toString(netProfit));
+            
+            // 保存分数
+            if (netProfit != 0) {
+                saveScore(netProfit);
+            }
+            
             nextRoundAction();
         }
     }
@@ -1267,33 +1319,18 @@ public class BingoController{
 
     @FXML
     void plusAction(ActionEvent event) {
-        boolean bool = true;
-        int index = 0;
-        while(bool){
-            bool = !bingo.getCalledList()[index];
-            index++;
-            if(index == 76){
-                break;
-            }
-        }
-        if(bool){
-            betTextField.setText(Integer.toString(Integer.valueOf(betTextField.getText()) + 10));
+        int currentBalance = DatabaseService.getUserMoney(username);
+        int currentBet = Integer.parseInt(betTextField.getText());
+        if(currentBet + 10 <= currentBalance) {
+            betTextField.setText(Integer.toString(currentBet + 10));
         }
     }
 
     @FXML
     void minusAction(ActionEvent event) {
-        boolean bool = true;
-        int index = 0;
-        while(bool){
-            bool = !bingo.getCalledList()[index];
-            index++;
-            if(index == 76){
-                break;
-            }
-        }
-        if(bool){
-            betTextField.setText(Integer.toString(Integer.valueOf(betTextField.getText()) - 10));
+        int currentBet = Integer.parseInt(betTextField.getText());
+        if(currentBet - 10 >= 10) { // 最小下注10
+            betTextField.setText(Integer.toString(currentBet - 10));
         }
     }
 
@@ -1301,315 +1338,131 @@ public class BingoController{
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        roundIndex = 1;
-        gameTypeTextArea.setText(bingo.pickFirstRound());
-        patternType = gameTypeTextArea.getText();
-        nextRoundTextField.setText(bingo.pickSecondRound());
-        assert B1Circle != null : "fx:id=\"B1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B2Circle != null : "fx:id=\"B2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B3Circle != null : "fx:id=\"B3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B4Circle != null : "fx:id=\"B4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B5Circle != null : "fx:id=\"B5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I1Circle != null : "fx:id=\"I1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I2Circle != null : "fx:id=\"I2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I3Circle != null : "fx:id=\"I3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I4Circle != null : "fx:id=\"I4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I5Circle != null : "fx:id=\"I5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N1Circle != null : "fx:id=\"N1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N2Circle != null : "fx:id=\"N2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N3Circle != null : "fx:id=\"N3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N4Circle != null : "fx:id=\"N4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N5Circle != null : "fx:id=\"N5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G1Circle != null : "fx:id=\"G1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G2Circle != null : "fx:id=\"G2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G3Circle != null : "fx:id=\"G3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G4Circle != null : "fx:id=\"G4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G5Circle != null : "fx:id=\"G5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O1Circle != null : "fx:id=\"O1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O2Circle != null : "fx:id=\"O2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O3Circle != null : "fx:id=\"O3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O4Circle != null : "fx:id=\"O4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O5Circle != null : "fx:id=\"O5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B1Text != null : "fx:id=\"B1Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B2Text != null : "fx:id=\"B2Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B3Text != null : "fx:id=\"B3Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B4Text != null : "fx:id=\"B4Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert B5Text != null : "fx:id=\"B5Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I1Text != null : "fx:id=\"I1Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I2Text != null : "fx:id=\"I2Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I3Text != null : "fx:id=\"I3Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I4Text != null : "fx:id=\"I4Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert I5Text != null : "fx:id=\"I5Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N1Text != null : "fx:id=\"N1Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N2Text != null : "fx:id=\"N2Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N3Text != null : "fx:id=\"N3Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N4Text != null : "fx:id=\"N4Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert N5Text != null : "fx:id=\"N5Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G1Text != null : "fx:id=\"G1Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G2Text != null : "fx:id=\"G2Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G3Text != null : "fx:id=\"G3Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G4Text != null : "fx:id=\"G4Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert G5Text != null : "fx:id=\"G5Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O1Text != null : "fx:id=\"O1Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O2Text != null : "fx:id=\"O2Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O3Text != null : "fx:id=\"O3Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O4Text != null : "fx:id=\"O4Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert O5Text != null : "fx:id=\"O5Text\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayB1Circle != null : "fx:id=\"displayB1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayB2Circle != null : "fx:id=\"displayB2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayB3Circle != null : "fx:id=\"displayB3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayB4Circle != null : "fx:id=\"displayB4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayB5Circle != null : "fx:id=\"displayB5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayI1Circle != null : "fx:id=\"displayI1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayI2Circle != null : "fx:id=\"displayI2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayI3Circle != null : "fx:id=\"displayI3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayI4Circle != null : "fx:id=\"displayI4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayI5Circle != null : "fx:id=\"displayI5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayN1Circle != null : "fx:id=\"displayN1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayN2Circle != null : "fx:id=\"displayN2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayN3Circle != null : "fx:id=\"displayN3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayN4Circle != null : "fx:id=\"displayN4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayN5Circle != null : "fx:id=\"displayN5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayG1Circle != null : "fx:id=\"displayG1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayG2Circle != null : "fx:id=\"displayG2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayG3Circle != null : "fx:id=\"displayG3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayG4Circle != null : "fx:id=\"displayG4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayG5Circle != null : "fx:id=\"displayG5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayO1Circle != null : "fx:id=\"displayO1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayO2Circle != null : "fx:id=\"displayO2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayO3Circle != null : "fx:id=\"displayO3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayO4Circle != null : "fx:id=\"displayO4Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert displayO5Circle != null : "fx:id=\"displayO5Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1B1Rect != null : "fx:id=\"C1B1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1B2Rect != null : "fx:id=\"C1B2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1B3Rect != null : "fx:id=\"C1B3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1B4Rect != null : "fx:id=\"C1B4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1B5Rect != null : "fx:id=\"C1B5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1I1Rect != null : "fx:id=\"C1I1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1I2Rect != null : "fx:id=\"C1I2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1I3Rect != null : "fx:id=\"C1I3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1I4Rect != null : "fx:id=\"C1I4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1I5Rect != null : "fx:id=\"C1I5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1N1Rect != null : "fx:id=\"C1N1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1N2Rect != null : "fx:id=\"C1N2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1N4Rect != null : "fx:id=\"C1N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1N5Rect != null : "fx:id=\"C1N5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1G1Rect != null : "fx:id=\"C1G1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1G2Rect != null : "fx:id=\"C1G2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1G3Rect != null : "fx:id=\"C1G3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1G4Rect != null : "fx:id=\"C1G4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1G5Rect != null : "fx:id=\"C1G5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1O1Rect != null : "fx:id=\"C1O1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1O2Rect != null : "fx:id=\"C1O2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1O3Rect != null : "fx:id=\"C1O3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1O4Rect != null : "fx:id=\"C1O4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C1O5Rect != null : "fx:id=\"C1O5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-         assert C2B1Rect != null : "fx:id=\"C2B1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2B2Rect != null : "fx:id=\"C2B2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2B3Rect != null : "fx:id=\"C2B3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2B4Rect != null : "fx:id=\"C2B4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2B5Rect != null : "fx:id=\"C2B5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2I1Rect != null : "fx:id=\"C2I1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2I2Rect != null : "fx:id=\"C2I2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2I3Rect != null : "fx:id=\"C2I3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2I4Rect != null : "fx:id=\"C2I4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2I5Rect != null : "fx:id=\"C2I5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2N1Rect != null : "fx:id=\"C2N1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2N2Rect != null : "fx:id=\"C2N2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2N4Rect != null : "fx:id=\"C2N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2N5Rect != null : "fx:id=\"C2N5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2G1Rect != null : "fx:id=\"C2G1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2G2Rect != null : "fx:id=\"C2G2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2G3Rect != null : "fx:id=\"C2G3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2G4Rect != null : "fx:id=\"C2G4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2G5Rect != null : "fx:id=\"C2G5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2O1Rect != null : "fx:id=\"C2O1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2O2Rect != null : "fx:id=\"C2O2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2O3Rect != null : "fx:id=\"C2O3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2O4Rect != null : "fx:id=\"C2O4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C2O5Rect != null : "fx:id=\"C2O5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3B1Rect != null : "fx:id=\"C3B1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3B2Rect != null : "fx:id=\"C3B2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3B3Rect != null : "fx:id=\"C3B3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3B4Rect != null : "fx:id=\"C3B4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3B5Rect != null : "fx:id=\"C3B5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3I1Rect != null : "fx:id=\"C3I1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3I2Rect != null : "fx:id=\"C3I2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3I3Rect != null : "fx:id=\"C3I3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3I4Rect != null : "fx:id=\"C3I4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3I5Rect != null : "fx:id=\"C3I5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3N1Rect != null : "fx:id=\"C3N1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3N2Rect != null : "fx:id=\"C3N2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3N4Rect != null : "fx:id=\"C3N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3N5Rect != null : "fx:id=\"C3N5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3G1Rect != null : "fx:id=\"C3G1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3G2Rect != null : "fx:id=\"C3G2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3G3Rect != null : "fx:id=\"C3G3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3G4Rect != null : "fx:id=\"C3G4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3G5Rect != null : "fx:id=\"C3G5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3O1Rect != null : "fx:id=\"C3O1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3O2Rect != null : "fx:id=\"C3O2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3O3Rect != null : "fx:id=\"C3O3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3O4Rect != null : "fx:id=\"C3O4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C3O5Rect != null : "fx:id=\"C3O5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4B1Rect != null : "fx:id=\"C4B1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4B2Rect != null : "fx:id=\"C4B2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4B3Rect != null : "fx:id=\"C4B3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4B4Rect != null : "fx:id=\"C4B4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4B5Rect != null : "fx:id=\"C4B5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4I1Rect != null : "fx:id=\"C4I1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4I2Rect != null : "fx:id=\"C4I2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4I3Rect != null : "fx:id=\"C4I3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4I4Rect != null : "fx:id=\"C4I4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4I5Rect != null : "fx:id=\"C4I5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4N1Rect != null : "fx:id=\"C4N1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4N2Rect != null : "fx:id=\"C4N2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4N4Rect != null : "fx:id=\"C4N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4N5Rect != null : "fx:id=\"C4N5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4G1Rect != null : "fx:id=\"C4G1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4G2Rect != null : "fx:id=\"C4G2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4G3Rect != null : "fx:id=\"C4G3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4G4Rect != null : "fx:id=\"C4G4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4G5Rect != null : "fx:id=\"C4G5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4O1Rect != null : "fx:id=\"C4O1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4O2Rect != null : "fx:id=\"C4O2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4O3Rect != null : "fx:id=\"C4O3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4O4Rect != null : "fx:id=\"C4O4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C4O5Rect != null : "fx:id=\"C4O5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5B1Rect != null : "fx:id=\"C5B1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5B2Rect != null : "fx:id=\"C5B2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5B3Rect != null : "fx:id=\"C5B3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5B4Rect != null : "fx:id=\"C5B4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5B5Rect != null : "fx:id=\"C5B5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5I1Rect != null : "fx:id=\"C5I1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5I2Rect != null : "fx:id=\"C5I2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5I3Rect != null : "fx:id=\"C5I3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5I4Rect != null : "fx:id=\"C5I4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5I5Rect != null : "fx:id=\"C5I5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5N1Rect != null : "fx:id=\"C5N1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5N2Rect != null : "fx:id=\"C5N2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5N4Rect != null : "fx:id=\"C5N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5N5Rect != null : "fx:id=\"C5N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5G1Rect != null : "fx:id=\"C5G1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5G2Rect != null : "fx:id=\"C5G2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5G3Rect != null : "fx:id=\"C5G3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5G4Rect != null : "fx:id=\"C5G4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5G5Rect != null : "fx:id=\"C5G5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5O1Rect != null : "fx:id=\"C5O1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5O2Rect != null : "fx:id=\"C5O2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5O3Rect != null : "fx:id=\"C5O3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5O4Rect != null : "fx:id=\"C5O4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C5O5Rect != null : "fx:id=\"C5O5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6B1Rect != null : "fx:id=\"C6B1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6B2Rect != null : "fx:id=\"C6B2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6B3Rect != null : "fx:id=\"C6B3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6B4Rect != null : "fx:id=\"C6B4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6B5Rect != null : "fx:id=\"C6B5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6I1Rect != null : "fx:id=\"C6I1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6I2Rect != null : "fx:id=\"C6I2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6I3Rect != null : "fx:id=\"C6I3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6I4Rect != null : "fx:id=\"C6I4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6I5Rect != null : "fx:id=\"C6I5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6N1Rect != null : "fx:id=\"C6N1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6N2Rect != null : "fx:id=\"C6N2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6N4Rect != null : "fx:id=\"C6N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6N5Rect != null : "fx:id=\"C6N5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6G1Rect != null : "fx:id=\"C6G1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6G2Rect != null : "fx:id=\"C6G2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6G3Rect != null : "fx:id=\"C6G3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6G4Rect != null : "fx:id=\"C6G4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6G5Rect != null : "fx:id=\"C6G5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6O1Rect != null : "fx:id=\"C6O1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6O2Rect != null : "fx:id=\"C6O2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6O3Rect != null : "fx:id=\"C6O3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6O4Rect != null : "fx:id=\"C6O4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C6O5Rect != null : "fx:id=\"C6O5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7B1Rect != null : "fx:id=\"C7B1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7B2Rect != null : "fx:id=\"C7B2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7B3Rect != null : "fx:id=\"C7B3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7B4Rect != null : "fx:id=\"C7B4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7B5Rect != null : "fx:id=\"C7B5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7I1Rect != null : "fx:id=\"C7I1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7I2Rect != null : "fx:id=\"C7I2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7I3Rect != null : "fx:id=\"C7I3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7I4Rect != null : "fx:id=\"C7I4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7I5Rect != null : "fx:id=\"C7I5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7N1Rect != null : "fx:id=\"C7N1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7N2Rect != null : "fx:id=\"C7N2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7N4Rect != null : "fx:id=\"C7N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7N5Rect != null : "fx:id=\"C7N5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7G1Rect != null : "fx:id=\"C7G1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7G2Rect != null : "fx:id=\"C7G2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7G3Rect != null : "fx:id=\"C7G3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7G4Rect != null : "fx:id=\"C7G4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7G5Rect != null : "fx:id=\"C7G5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7O1Rect != null : "fx:id=\"C7O1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7O2Rect != null : "fx:id=\"C7O2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7O3Rect != null : "fx:id=\"C7O3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7O4Rect != null : "fx:id=\"C7O4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C7O5Rect != null : "fx:id=\"C7O5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8B1Rect != null : "fx:id=\"C8B1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8B2Rect != null : "fx:id=\"C8B2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8B3Rect != null : "fx:id=\"C8B3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8B4Rect != null : "fx:id=\"C8B4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8B5Rect != null : "fx:id=\"C8B5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8I1Rect != null : "fx:id=\"C8I1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8I2Rect != null : "fx:id=\"C8I2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8I3Rect != null : "fx:id=\"C8I3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8I4Rect != null : "fx:id=\"C8I4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8I5Rect != null : "fx:id=\"C8I5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8N1Rect != null : "fx:id=\"C8N1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8N2Rect != null : "fx:id=\"C8N2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8N4Rect != null : "fx:id=\"C8N4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8N5Rect != null : "fx:id=\"C8N5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8G1Rect != null : "fx:id=\"C8G1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8G2Rect != null : "fx:id=\"C8G2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8G3Rect != null : "fx:id=\"C8G3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8G4Rect != null : "fx:id=\"C8G4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8G5Rect != null : "fx:id=\"C8G5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8O1Rect != null : "fx:id=\"C8O1Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8O2Rect != null : "fx:id=\"C8O2Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8O3Rect != null : "fx:id=\"C8O3Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8O4Rect != null : "fx:id=\"C8O4Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert C8O5Rect != null : "fx:id=\"C8O5Rect\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert BTextArea != null : "fx:id=\"BTextArea\" was not injected: check your FXML file 'Bingo.fxml'.";
-        assert ITextArea != null : "fx:id=\"ITextArea\" was not injected: check your FXML file 'Bingo.fxml'.";
-        assert NTextArea != null : "fx:id=\"NTextArea\" was not injected: check your FXML file 'Bingo.fxml'.";
-        assert GTextArea != null : "fx:id=\"GTextArea\" was not injected: check your FXML file 'Bingo.fxml'.";
-        assert OTextArea != null : "fx:id=\"OTextArea\" was not injected: check your FXML file 'Bingo.fxml'.";
-        assert callButton != null : "fx:id=\"callButton\" was not injected: check your FXML file 'Bingo.fxml'.";
-        assert callTextField != null : "fx:id=\"callTextField\" was not injected: check your FXML file 'Bingo.fxml'.";
-        assert bingoButton != null : "fx:id=\"bingoButton\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert showPatternButton != null : "fx:id=\"showPatternButton\" was not injected: check your FXML file 'Bingo.fxml'.";
-        assert balanceTextField != null : "fx:id=\"balanceTextField\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert betTextField != null : "fx:id=\"betTextField\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert plusButton != null : "fx:id=\"plusButton\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert minusButton != null : "fx:id=\"minusButton\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        assert winningsTextField != null : "fx:id=\"winningsTextField\" was not injected: check your FXML file 'CopyBingo.fxml'.";
-        card = new Card();
-        c1Card = new Card();
-        c2Card = new Card();
-        c3Card = new Card();
-        c4Card = new Card();
-        c5Card = new Card();
-        c6Card = new Card();
-        c7Card = new Card();
-        c8Card = new Card();
-        c1Rectangles = new Rectangle[]{C1B1Rect, C1B2Rect, C1B3Rect, C1B4Rect, C1B5Rect, C1I1Rect, C1I2Rect, C1I3Rect, C1I4Rect, C1I5Rect, C1N1Rect, C1N2Rect, C1N4Rect, C1N5Rect, C1G1Rect, C1G2Rect, C1G3Rect, C1G4Rect, C1G5Rect, C1O1Rect, C1O2Rect, C1O3Rect, C1O4Rect, C1O5Rect};
-        c2Rectangles = new Rectangle[]{C2B1Rect, C2B2Rect, C2B3Rect, C2B4Rect, C2B5Rect, C2I1Rect, C2I2Rect, C2I3Rect, C2I4Rect, C2I5Rect, C2N1Rect, C2N2Rect, C2N4Rect, C2N5Rect, C2G1Rect, C2G2Rect, C2G3Rect, C2G4Rect, C2G5Rect, C2O1Rect, C2O2Rect, C2O3Rect, C2O4Rect, C2O5Rect};
-        c3Rectangles = new Rectangle[]{C3B1Rect, C3B2Rect, C3B3Rect, C3B4Rect, C3B5Rect, C3I1Rect, C3I2Rect, C3I3Rect, C3I4Rect, C3I5Rect, C3N1Rect, C3N2Rect, C3N4Rect, C3N5Rect, C3G1Rect, C3G2Rect, C3G3Rect, C3G4Rect, C3G5Rect, C3O1Rect, C3O2Rect, C3O3Rect, C3O4Rect, C3O5Rect};
-        c4Rectangles = new Rectangle[]{C4B1Rect, C4B2Rect, C4B3Rect, C4B4Rect, C4B5Rect, C4I1Rect, C4I2Rect, C4I3Rect, C4I4Rect, C4I5Rect, C4N1Rect, C4N2Rect, C4N4Rect, C4N5Rect, C4G1Rect, C4G2Rect, C4G3Rect, C4G4Rect, C4G5Rect, C4O1Rect, C4O2Rect, C4O3Rect, C4O4Rect, C4O5Rect};
-        c5Rectangles = new Rectangle[]{C5B1Rect, C5B2Rect, C5B3Rect, C5B4Rect, C5B5Rect, C5I1Rect, C5I2Rect, C5I3Rect, C5I4Rect, C5I5Rect, C5N1Rect, C5N2Rect, C5N4Rect, C5N5Rect, C5G1Rect, C5G2Rect, C5G3Rect, C5G4Rect, C5G5Rect, C5O1Rect, C5O2Rect, C5O3Rect, C5O4Rect, C5O5Rect};
-        c6Rectangles = new Rectangle[]{C6B1Rect, C6B2Rect, C6B3Rect, C6B4Rect, C6B5Rect, C6I1Rect, C6I2Rect, C6I3Rect, C6I4Rect, C6I5Rect, C6N1Rect, C6N2Rect, C6N4Rect, C6N5Rect, C6G1Rect, C6G2Rect, C6G3Rect, C6G4Rect, C6G5Rect, C6O1Rect, C6O2Rect, C6O3Rect, C6O4Rect, C6O5Rect};
-        c7Rectangles = new Rectangle[]{C7B1Rect, C7B2Rect, C7B3Rect, C7B4Rect, C7B5Rect, C7I1Rect, C7I2Rect, C7I3Rect, C7I4Rect, C7I5Rect, C7N1Rect, C7N2Rect, C7N4Rect, C7N5Rect, C7G1Rect, C7G2Rect, C7G3Rect, C7G4Rect, C7G5Rect, C7O1Rect, C7O2Rect, C7O3Rect, C7O4Rect, C7O5Rect};
-        c8Rectangles = new Rectangle[]{C8B1Rect, C8B2Rect, C8B3Rect, C8B4Rect, C8B5Rect, C8I1Rect, C8I2Rect, C8I3Rect, C8I4Rect, C8I5Rect, C8N1Rect, C8N2Rect, C8N4Rect, C8N5Rect, C8G1Rect, C8G2Rect, C8G3Rect, C8G4Rect, C8G5Rect, C8O1Rect, C8O2Rect, C8O3Rect, C8O4Rect, C8O5Rect};
-        cpuRectangles = new Rectangle[][]{c1Rectangles, c2Rectangles, c3Rectangles, c4Rectangles, c5Rectangles, c6Rectangles, c7Rectangles, c8Rectangles};
-        cards = new Card[]{card, c1Card, c2Card, c3Card, c4Card, c5Card, c6Card, c7Card, c8Card};
-        cpuCards = new Card[]{c1Card, c2Card, c3Card, c4Card, c5Card, c6Card, c7Card, c8Card};
-        playerCard = new Text[]{B1Text, B2Text, B3Text, B4Text, B5Text, I1Text, I2Text, I3Text, I4Text, I5Text, N1Text, N2Text, N4Text, N5Text, G1Text, G2Text, G3Text, G4Text, G5Text, O1Text, O2Text, O3Text, O4Text, O5Text};
-        playerCircles = new Circle[]{B1Circle, B2Circle, B3Circle, B4Circle, B5Circle, I1Circle, I2Circle, I3Circle, I4Circle, I5Circle, N1Circle, N2Circle, N3Circle, N4Circle, N5Circle, G1Circle, G2Circle, G3Circle, G4Circle, G5Circle, O1Circle, O2Circle, O3Circle, O4Circle, O5Circle};
-        setCards(playerCard);
-        displayCard = new Circle[]{displayB1Circle, displayB2Circle, displayB3Circle, displayB4Circle, displayB5Circle, displayI1Circle, displayI2Circle, displayI3Circle, displayI4Circle, displayI5Circle, displayN1Circle, displayN2Circle, displayN4Circle, displayN5Circle, displayG1Circle, displayG2Circle, displayG3Circle, displayG4Circle, displayG5Circle, displayO1Circle, displayO2Circle, displayO3Circle, displayO4Circle, displayO5Circle};
-        startDisplay();
+        try {
+            roundIndex = 1;
+            gameTypeTextArea.setText(bingo.pickFirstRound());
+            patternType = gameTypeTextArea.getText();
+            nextRoundTextField.setText(bingo.pickSecondRound());
+            
+            // 初始化所有组件
+            card = new Card();
+            c1Card = new Card();
+            c2Card = new Card();
+            c3Card = new Card();
+            c4Card = new Card();
+            c5Card = new Card();
+            c6Card = new Card();
+            c7Card = new Card();
+            c8Card = new Card();
+            
+            // 初始化数组
+            c1Rectangles = new Rectangle[]{C1B1Rect, C1B2Rect, C1B3Rect, C1B4Rect, C1B5Rect, C1I1Rect, C1I2Rect, C1I3Rect, C1I4Rect, C1I5Rect, C1N1Rect, C1N2Rect, C1N4Rect, C1N5Rect, C1G1Rect, C1G2Rect, C1G3Rect, C1G4Rect, C1G5Rect, C1O1Rect, C1O2Rect, C1O3Rect, C1O4Rect, C1O5Rect};
+            c2Rectangles = new Rectangle[]{C2B1Rect, C2B2Rect, C2B3Rect, C2B4Rect, C2B5Rect, C2I1Rect, C2I2Rect, C2I3Rect, C2I4Rect, C2I5Rect, C2N1Rect, C2N2Rect, C2N4Rect, C2N5Rect, C2G1Rect, C2G2Rect, C2G3Rect, C2G4Rect, C2G5Rect, C2O1Rect, C2O2Rect, C2O3Rect, C2O4Rect, C2O5Rect};
+            c3Rectangles = new Rectangle[]{C3B1Rect, C3B2Rect, C3B3Rect, C3B4Rect, C3B5Rect, C3I1Rect, C3I2Rect, C3I3Rect, C3I4Rect, C3I5Rect, C3N1Rect, C3N2Rect, C3N4Rect, C3N5Rect, C3G1Rect, C3G2Rect, C3G3Rect, C3G4Rect, C3G5Rect, C3O1Rect, C3O2Rect, C3O3Rect, C3O4Rect, C3O5Rect};
+            c4Rectangles = new Rectangle[]{C4B1Rect, C4B2Rect, C4B3Rect, C4B4Rect, C4B5Rect, C4I1Rect, C4I2Rect, C4I3Rect, C4I4Rect, C4I5Rect, C4N1Rect, C4N2Rect, C4N4Rect, C4N5Rect, C4G1Rect, C4G2Rect, C4G3Rect, C4G4Rect, C4G5Rect, C4O1Rect, C4O2Rect, C4O3Rect, C4O4Rect, C4O5Rect};
+            c5Rectangles = new Rectangle[]{C5B1Rect, C5B2Rect, C5B3Rect, C5B4Rect, C5B5Rect, C5I1Rect, C5I2Rect, C5I3Rect, C5I4Rect, C5I5Rect, C5N1Rect, C5N2Rect, C5N4Rect, C5N5Rect, C5G1Rect, C5G2Rect, C5G3Rect, C5G4Rect, C5G5Rect, C5O1Rect, C5O2Rect, C5O3Rect, C5O4Rect, C5O5Rect};
+            c6Rectangles = new Rectangle[]{C6B1Rect, C6B2Rect, C6B3Rect, C6B4Rect, C6B5Rect, C6I1Rect, C6I2Rect, C6I3Rect, C6I4Rect, C6I5Rect, C6N1Rect, C6N2Rect, C6N4Rect, C6N5Rect, C6G1Rect, C6G2Rect, C6G3Rect, C6G4Rect, C6G5Rect, C6O1Rect, C6O2Rect, C6O3Rect, C6O4Rect, C6O5Rect};
+            c7Rectangles = new Rectangle[]{C7B1Rect, C7B2Rect, C7B3Rect, C7B4Rect, C7B5Rect, C7I1Rect, C7I2Rect, C7I3Rect, C7I4Rect, C7I5Rect, C7N1Rect, C7N2Rect, C7N4Rect, C7N5Rect, C7G1Rect, C7G2Rect, C7G3Rect, C7G4Rect, C7G5Rect, C7O1Rect, C7O2Rect, C7O3Rect, C7O4Rect, C7O5Rect};
+            c8Rectangles = new Rectangle[]{C8B1Rect, C8B2Rect, C8B3Rect, C8B4Rect, C8B5Rect, C8I1Rect, C8I2Rect, C8I3Rect, C8I4Rect, C8I5Rect, C8N1Rect, C8N2Rect, C8N4Rect, C8N5Rect, C8G1Rect, C8G2Rect, C8G3Rect, C8G4Rect, C8G5Rect, C8O1Rect, C8O2Rect, C8O3Rect, C8O4Rect, C8O5Rect};
+            cpuRectangles = new Rectangle[][]{c1Rectangles, c2Rectangles, c3Rectangles, c4Rectangles, c5Rectangles, c6Rectangles, c7Rectangles, c8Rectangles};
+            cards = new Card[]{card, c1Card, c2Card, c3Card, c4Card, c5Card, c6Card, c7Card, c8Card};
+            cpuCards = new Card[]{c1Card, c2Card, c3Card, c4Card, c5Card, c6Card, c7Card, c8Card};
+            playerCard = new Text[]{B1Text, B2Text, B3Text, B4Text, B5Text, I1Text, I2Text, I3Text, I4Text, I5Text, N1Text, N2Text, N4Text, N5Text, G1Text, G2Text, G3Text, G4Text, G5Text, O1Text, O2Text, O3Text, O4Text, O5Text};
+            playerCircles = new Circle[]{B1Circle, B2Circle, B3Circle, B4Circle, B5Circle, I1Circle, I2Circle, I3Circle, I4Circle, I5Circle, N1Circle, N2Circle, N3Circle, N4Circle, N5Circle, G1Circle, G2Circle, G3Circle, G4Circle, G5Circle, O1Circle, O2Circle, O3Circle, O4Circle, O5Circle};
+            
+            // 设置卡片和显示
+            setCards(playerCard);
+            displayCard = new Circle[]{displayB1Circle, displayB2Circle, displayB3Circle, displayB4Circle, displayB5Circle, displayI1Circle, displayI2Circle, displayI3Circle, displayI4Circle, displayI5Circle, displayN1Circle, displayN2Circle, displayN4Circle, displayN5Circle, displayG1Circle, displayG2Circle, displayG3Circle, displayG4Circle, displayG5Circle, displayO1Circle, displayO2Circle, displayO3Circle, displayO4Circle, displayO5Circle};
+            startDisplay();
+            
+            // 初始化游戏设置
+            betTextField.setText("10");
+            updateBalance();
+            
+            // 设置窗口标题 - 移到Platform.runLater中
+            Platform.runLater(() -> {
+                Stage stage = (Stage) balanceTextField.getScene().getWindow();
+                if (stage != null) {
+                    stage.setTitle("Bingo - Player: " + username);
+                    stage.setOnCloseRequest(event -> {
+                        if (netProfit != 0) {
+                            saveScore(netProfit);
+                        }
+                        scheduler.shutdown();
+                    });
+                }
+            });
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // 修改updateBalance方法
+    private void updateBalance() {
+        if (username != null) {
+            int currentBalance = DatabaseService.getUserMoney(username);
+            Platform.runLater(() -> {
+                if (balanceTextField != null) {
+                    balanceTextField.setText(Integer.toString(currentBalance));
+                    MainController.getInstance().updateBalance();
+                }
+            });
+        }
+    }
+    
+    // 添加保存分数的方法
+    private void saveScore(int score) {
+        try {
+            // 保存到数据库
+            String sql = "INSERT INTO game_records (username, game_name, score, play_date) VALUES (?, ?, ?, ?)";
+            Connection conn = DatabaseService.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            
+            pstmt.setString(1, username);
+            pstmt.setString(2, "Bingo");
+            pstmt.setInt(3, score);
+            pstmt.setTimestamp(4, new java.sql.Timestamp(System.currentTimeMillis()));
+            
+            pstmt.executeUpdate();
+            pstmt.close();
+            conn.close();
+            
+            // 保存到文本文件
+            try {
+                File recordsDir = new File("game_records");
+                if (!recordsDir.exists()) {
+                    recordsDir.mkdir();
+                }
+                
+                String record = String.format("%s,%d,%s\n", 
+                    username, 
+                    score, 
+                    new Date().toString()
+                );
+                
+                Files.write(
+                    Paths.get("game_records/Bingo.txt"), 
+                    record.getBytes(), 
+                    StandardOpenOption.CREATE, 
+                    StandardOpenOption.APPEND
+                );
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // 更新已叫号码显示
+    private void updateCalledNumbers() {
+        BTextArea.setText(bingo.printB());
+        ITextArea.setText(bingo.printI());
+        NTextArea.setText(bingo.printN());
+        GTextArea.setText(bingo.printG());
+        OTextArea.setText(bingo.printO());
     }
 }

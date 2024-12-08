@@ -13,17 +13,17 @@ public class BinGo extends JFrame {
     public BinGo() {
         try {
             // 初始化JavaFX
-            new JFXPanel(); // 这会初始化JavaFX环境
+            new JFXPanel();
             
             // 在JavaFX线程中启动游戏
             Platform.runLater(() -> {
                 try {
-                    bingoGame = new BingoRunner();
                     Stage stage = new javafx.stage.Stage();
+                    bingoGame = new BingoRunner();
                     
                     // 添加窗口关闭事件处理
                     stage.setOnCloseRequest((WindowEvent event) -> {
-                        dispose(); // 只关闭JFrame
+                        dispose();
                     });
                     
                     bingoGame.start(stage);

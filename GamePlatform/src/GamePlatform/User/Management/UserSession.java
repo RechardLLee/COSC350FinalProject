@@ -1,26 +1,40 @@
 package GamePlatform.User.Management;
 
 public class UserSession {
+    private static UserSession instance;
     private static String currentUser;
-    
-    public static void setCurrentUser(String username) {
-        System.out.println("Setting current user: " + username);
-        currentUser = username;
+
+    private UserSession() {
     }
-    
-    public static String getCurrentUser() {
-        if (currentUser == null) {
-            System.err.println("Warning: Attempting to get current user but no user is logged in");
+
+    public static UserSession getInstance() {
+        if (instance == null) {
+            instance = new UserSession();
         }
+        return instance;
+    }
+
+    public String getUsername() {
         return currentUser;
     }
-    
+
+    public void setUsername(String username) {
+        currentUser = username;
+    }
+
+    public static void setCurrentUser(String username) {
+        currentUser = username;
+    }
+
+    public static String getCurrentUser() {
+        return currentUser;
+    }
+
     public static boolean isLoggedIn() {
         return currentUser != null;
     }
-    
+
     public static void clearCurrentUser() {
-        System.out.println("Clearing current user");
         currentUser = null;
     }
 } 
