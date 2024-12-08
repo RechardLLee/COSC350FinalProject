@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import GamePlatform.Models.DashboardData;
+import GamePlatform.Feedback.ReviewData;
+import GamePlatform.Feedback.BugData;
+import java.io.PrintWriter;
+import java.nio.file.StandardCopyOption;
 
 public class DatabaseService {
     private static final String DRIVER = "org.sqlite.JDBC";
@@ -381,7 +385,7 @@ public class DatabaseService {
     // 更新用户余额
     public static void updateUserMoney(String username, int newAmount) {
         userMoney.put(username, newAmount);
-        saveUserData();  // 立即��存到文件
+        saveUserData();  // 立即存到文件
     }
     
     // 添加用户游戏
@@ -585,7 +589,7 @@ public class DatabaseService {
                 data.setActiveUsers(rs.getInt(1));
             }
             
-            // 获取游戏数据
+            // 获取游戏���据
             sql = "SELECT COUNT(DISTINCT game_name) FROM game_records";
             rs = conn.createStatement().executeQuery(sql);
             if (rs.next()) {
@@ -619,5 +623,210 @@ public class DatabaseService {
         }
         
         return data;
+    }
+    
+    // 获取所有评论
+    public static List<ReviewData> getAllReviews() {
+        List<ReviewData> reviews = new ArrayList<>();
+        String sql = "SELECT * FROM GameReviews ORDER BY review_date DESC";
+        
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                reviews.add(new ReviewData(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("game_name"),
+                    rs.getInt("rating"),
+                    rs.getString("review"),
+                    rs.getTimestamp("review_date")
+                ));
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return reviews;
+    }
+    
+    // 获取所有bug报告
+    public static List<BugData> getAllBugReports() {
+        List<BugData> bugs = new ArrayList<>();
+        String sql = "SELECT * FROM BugReports ORDER BY report_date DESC";
+        
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                bugs.add(new BugData(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("description"),
+                    rs.getString("status"),
+                    rs.getTimestamp("report_date")
+                ));
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return bugs;
+    }
+    
+    // 更新bug状态
+    public static void updateBugStatus(int bugId, String newStatus) {
+        String sql = "UPDATE BugReports SET status = ? WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, newStatus);
+            pstmt.setInt(2, bugId);
+            pstmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // 删除评论
+    public static void deleteReview(int reviewId) {
+        String sql = "DELETE FROM GameReviews WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, reviewId);
+            pstmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // 删除bug报告
+    public static void deleteBugReport(int bugId) {
+        String sql = "DELETE FROM BugReports WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, bugId);
+            pstmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // 导出评论到CSV
+    public static void exportReviews(File file) {
+        try (PrintWriter writer = new PrintWriter(file)) {
+            writer.println("ID,User,Game,Rating,Review,Date");
+            
+            String sql = "SELECT * FROM GameReviews ORDER BY review_date DESC";
+            try (Connection conn = getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                
+                while (rs.next()) {
+                    writer.printf("%d,%s,%s,%d,\"%s\",%s%n",
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("game_name"),
+                        rs.getInt("rating"),
+                        rs.getString("review").replace("\"", "\"\""),
+                        rs.getTimestamp("review_date")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // 导出bug报告到CSV
+    public static void exportBugReports(File file) {
+        try (PrintWriter writer = new PrintWriter(file)) {
+            writer.println("ID,User,Description,Status,Date");
+            
+            String sql = "SELECT * FROM BugReports ORDER BY report_date DESC";
+            try (Connection conn = getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                
+                while (rs.next()) {
+                    writer.printf("%d,%s,\"%s\",%s,%s%n",
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("description").replace("\"", "\"\""),
+                        rs.getString("status"),
+                        rs.getTimestamp("report_date")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static boolean backupDatabase(File destination) {
+        try {
+            File sourceFile = new File("gameplatform.db");
+            Files.copy(sourceFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static boolean restoreDatabase(File source) {
+        try {
+            File destFile = new File("gameplatform.db");
+            Files.copy(source.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static List<String> getSystemLogs() {
+        List<String> logs = new ArrayList<>();
+        String sql = "SELECT * FROM system_logs ORDER BY created_date DESC";
+        
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                logs.add(String.format("[%s] %s: %s",
+                    rs.getTimestamp("created_date"),
+                    rs.getString("type"),
+                    rs.getString("content")
+                ));
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return logs;
+    }
+    
+    public static boolean clearCache() {
+        try {
+            Files.deleteIfExists(Paths.get("cache"));
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 } 

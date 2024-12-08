@@ -4,20 +4,27 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.GridPane;
+import javafx.geometry.Insets;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.sql.*;
 import java.util.*;
+import java.io.File;
+import java.util.Date;
 import GamePlatform.Database.DatabaseService;
 import GamePlatform.Models.DashboardData;
 import GamePlatform.User.Management.UserData;
+import GamePlatform.Feedback.ReviewData;
+import GamePlatform.Feedback.BugData;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
 import javafx.scene.chart.*;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
+import javafx.scene.control.ButtonBar.ButtonData;
 
 public class DeveloperManageController {
     @FXML private VBox dashboardPane;
@@ -232,5 +239,233 @@ public class DeveloperManageController {
     @FXML
     private void showSettings() {
         // TODO: 实现系统设置界面
+    }
+
+    @FXML
+    private void handleAddUser() {
+        Dialog<UserData> dialog = new Dialog<>();
+        dialog.setTitle("Add User");
+        dialog.setHeaderText("Enter user details");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField username = new TextField();
+        username.setPromptText("Username");
+        TextField email = new TextField();
+        email.setPromptText("Email");
+        PasswordField password = new PasswordField();
+        password.setPromptText("Password");
+
+        grid.add(new Label("Username:"), 0, 0);
+        grid.add(username, 1, 0);
+        grid.add(new Label("Email:"), 0, 1);
+        grid.add(email, 1, 1);
+        grid.add(new Label("Password:"), 0, 2);
+        grid.add(password, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        ButtonType addButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButtonType) {
+                if (DatabaseService.registerUser(
+                        username.getText(),
+                        email.getText(),
+                        password.getText())) {
+                    return new UserData(0, username.getText(), email.getText(), new java.util.Date());
+                }
+            }
+            return null;
+        });
+
+        Optional<UserData> result = dialog.showAndWait();
+        result.ifPresent(userData -> refreshUserTable());
+    }
+
+    @FXML
+    private void handleEditUser() {
+        UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
+        if (selectedUser == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a user to edit.");
+            return;
+        }
+
+        Dialog<UserData> dialog = new Dialog<>();
+        dialog.setTitle("Edit User");
+        dialog.setHeaderText("Edit user details");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField email = new TextField(selectedUser.getEmail());
+        PasswordField password = new PasswordField();
+        password.setPromptText("New password (leave blank to keep current)");
+
+        grid.add(new Label("Email:"), 0, 0);
+        grid.add(email, 1, 0);
+        grid.add(new Label("New Password:"), 0, 1);
+        grid.add(password, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                if (!password.getText().isEmpty()) {
+                    DatabaseService.updateUserPassword(selectedUser.getEmail(), password.getText());
+                }
+                if (!email.getText().equals(selectedUser.getEmail())) {
+                    DatabaseService.updateUsername(selectedUser.getEmail(), email.getText());
+                }
+                return selectedUser;
+            }
+            return null;
+        });
+
+        Optional<UserData> result = dialog.showAndWait();
+        result.ifPresent(userData -> refreshUserTable());
+    }
+
+    @FXML
+    private void handleDeleteUser() {
+        UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
+        if (selectedUser == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a user to delete.");
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete User");
+        alert.setHeaderText("Delete User Confirmation");
+        alert.setContentText("Are you sure you want to delete user: " + selectedUser.getUsername() + "?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (DatabaseService.deleteUser(selectedUser.getUsername())) {
+                refreshUserTable();
+                showAlert(Alert.AlertType.INFORMATION, "Success", "User deleted successfully.");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete user.");
+            }
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void handleBackupDatabase() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Backup Database");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("SQLite Database", "*.db")
+        );
+        
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            if (DatabaseService.backupDatabase(file)) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Database backup completed successfully.");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to backup database.");
+            }
+        }
+    }
+
+    @FXML
+    private void handleRestoreDatabase() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Restore Database");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("SQLite Database", "*.db")
+        );
+        
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Restore");
+            alert.setHeaderText("Database Restore");
+            alert.setContentText("This will overwrite the current database. Are you sure?");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                if (DatabaseService.restoreDatabase(file)) {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Database restored successfully.");
+                    refreshDashboard();
+                    refreshUserTable();
+                    refreshFeedbackTables();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to restore database.");
+                }
+            }
+        }
+    }
+
+    @FXML
+    private void handleResetDatabase() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Reset Database");
+        alert.setHeaderText("Database Reset");
+        alert.setContentText("This will delete all data and reset the database to its initial state. Are you sure?");
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (DatabaseService.resetDatabase()) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Database reset successfully.");
+                refreshDashboard();
+                refreshUserTable();
+                refreshFeedbackTables();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to reset database.");
+            }
+        }
+    }
+
+    @FXML
+    private void handleViewLogs() {
+        List<String> logs = DatabaseService.getSystemLogs();
+        TextArea textArea = new TextArea();
+        textArea.setText(String.join("\n", logs));
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("System Logs");
+        dialog.setHeaderText(null);
+        dialog.getDialogPane().setContent(textArea);
+        dialog.getDialogPane().setPrefSize(600, 400);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        
+        dialog.showAndWait();
+    }
+
+    @FXML
+    private void handleClearCache() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Clear Cache");
+        alert.setHeaderText("Clear System Cache");
+        alert.setContentText("This will clear all temporary files and cache. Continue?");
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (DatabaseService.clearCache()) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Cache cleared successfully.");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to clear cache.");
+            }
+        }
     }
 } 
