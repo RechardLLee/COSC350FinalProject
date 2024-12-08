@@ -117,6 +117,18 @@ public class DatabaseService {
                 ")"
             );
             
+            // 添加 game_stats 表的创建
+            stmt.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS game_stats (" +
+                "    id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "    game_name TEXT NOT NULL," +
+                "    username TEXT NOT NULL," +
+                "    score INTEGER NOT NULL," +
+                "    play_time TIMESTAMP NOT NULL," +
+                "    FOREIGN KEY (username) REFERENCES Users(username)" +
+                ")"
+            );
+            
             // 只在admin用户不存在时创建
             String checkAdmin = "SELECT COUNT(*) FROM Users WHERE username = 'admin'";
             ResultSet rs = stmt.executeQuery(checkAdmin);
@@ -528,6 +540,25 @@ public class DatabaseService {
             }
             Files.write(Paths.get(USER_DATA_FILE), lines);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void saveGameStats(GameStats gameStats) {
+        try {
+            Connection conn = getConnection();
+            String sql = "INSERT INTO game_stats (game_name, username, score, play_time) VALUES (?, ?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            
+            pstmt.setString(1, gameStats.getGameName());
+            pstmt.setString(2, gameStats.getUsername());
+            pstmt.setInt(3, gameStats.getScore());
+            pstmt.setTimestamp(4, gameStats.getPlayTime());
+            
+            pstmt.executeUpdate();
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
