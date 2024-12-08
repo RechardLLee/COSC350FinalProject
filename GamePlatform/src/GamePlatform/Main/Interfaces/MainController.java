@@ -489,12 +489,10 @@ public class MainController {
                        "- Multiple difficulty levels\n" +
                        "- Score tracking\n" +
                        "- Obstacle mode\n" +
-                       "- Power-ups (costs 10 coins)\n\n" +
                        "Controls:\n" +
                        "WASD - Move snake\n" +
                        "P - Pause game\n" +
                        "R - Restart game\n" +
-                       "B - Buy power-up\n\n" +
                        "Game Over:\n" +
                        "- Hitting walls\n" +
                        "- Hitting obstacles\n" +

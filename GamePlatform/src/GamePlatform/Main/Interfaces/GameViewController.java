@@ -190,6 +190,7 @@ public class GameViewController {
             String imagePath = null;
             switch(title) {
                 case "Snake":
+                case "贪吃蛇":
                     imagePath = "/src/GamePlatform/Game/SnakeGame.png";
                     break;
                 case "Hanoi Tower":
