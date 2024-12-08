@@ -141,8 +141,8 @@ public class MainController {
                         "Features:\n" +
                         "- Multiple difficulty levels\n" +
                         "- Move counter\n" +
-                        "- Auto-solve demonstration (costs 5 coins)\n" +
-                        "- Hint system (costs 2 coins per hint)",
+                        "- Auto-solve demonstration\n" +
+                        "- Score based on moves (Perfect=10000)",
                         "hanoi_tower");
                     break;
                     
@@ -240,7 +240,7 @@ public class MainController {
         if (selectedFile != null) {
             String gameName = showGameNameDialog();
             if (gameName != null && !gameName.trim().isEmpty()) {
-                // 获取类名(去掉.class后缀)
+                // 获��类名(去掉.class后缀)
                 String className = selectedFile.getName().replace(".class", "");
                 // 保存完整的类名作为游戏路径
                 String classPath = "GamePlatform.Game." + className;
@@ -507,8 +507,8 @@ public class MainController {
                        "Features:\n" +
                        "- Multiple difficulty levels\n" +
                        "- Move counter\n" +
-                       "- Auto-solve demonstration (costs 5 coins)\n" +
-                       "- Hint system (costs 2 coins per hint)";
+                       "- Auto-solve demonstration\n" +
+                       "- Score based on moves (Perfect=10000)";
                        
             case "Guess Number":
                 return "Number Guessing Game\n\n" +
