@@ -156,8 +156,7 @@ public class MainController {
                         "- Score based on attempts left\n" +
                         "- Perfect score (10000) for first try\n" +
                         "- Score decreases with more attempts\n" +
-                        "- Zero score for failure\n" +
-                        "- Hint system (costs 3 coins per hint)\n\n" +
+                        "- Zero score for failure\n\n" +
                         "Strategy:\n" +
                         "- Use binary search\n" +
                         "- Think carefully before each guess\n" +
@@ -240,7 +239,7 @@ public class MainController {
         if (selectedFile != null) {
             String gameName = showGameNameDialog();
             if (gameName != null && !gameName.trim().isEmpty()) {
-                // 获��类名(去掉.class后缀)
+                // 获取类名(去掉.class后缀)
                 String className = selectedFile.getName().replace(".class", "");
                 // 保存完整的类名作为游戏路径
                 String classPath = "GamePlatform.Game." + className;
@@ -518,8 +517,7 @@ public class MainController {
                        "- Score based on attempts left\n" +
                        "- Perfect score (10000) for first try\n" +
                        "- Score decreases with more attempts\n" +
-                       "- Zero score for failure\n" +
-                       "- Hint system (costs 3 coins per hint)\n\n" +
+                       "- Zero score for failure\n\n" +
                        "Strategy:\n" +
                        "- Use binary search\n" +
                        "- Think carefully before each guess\n" +
