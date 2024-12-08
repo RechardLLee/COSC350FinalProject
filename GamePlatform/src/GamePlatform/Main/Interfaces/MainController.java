@@ -530,11 +530,12 @@ public class MainController {
                        "- Three difficulty levels (Easy/Medium/Hard)\n" +
                        "- Smart AI opponent\n" +
                        "- Score system based on moves\n" +
-                       "- Perfect score (10000) for quick win\n\n" +
+                       "- Perfect score (10000) for fastest win (5 moves)\n\n" +
                        "Rules:\n" +
                        "- Get three X's in a row to win\n" +
                        "- Block computer's O's to prevent losing\n" +
-                       "- Draw game gives 5000 points\n\n" +
+                       "- Draw game gives 5000 points\n" +
+                       "- Score decreases by 1000 for each extra move\n\n" +
                        "Controls:\n" +
                        "- Click empty cell to place X\n" +
                        "- New Game button to restart\n" +
