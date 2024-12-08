@@ -40,12 +40,7 @@ public class GamePlatformApp extends Application {
         primaryStage.setTitle(LanguageUtil.isEnglish() ? "Login" : "登录");
         primaryStage.setScene(scene);
         
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
-        primaryStage.setWidth(1280);
-        primaryStage.setHeight(720);
         primaryStage.centerOnScreen();
-        
         primaryStage.show();
     }
 
