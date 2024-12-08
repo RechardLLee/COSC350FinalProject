@@ -8,6 +8,8 @@ import javafx.collections.ObservableList;
 import GamePlatform.Database.DatabaseService;
 import GamePlatform.User.Management.UserSession;
 import GamePlatform.Utility.LanguageUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ReviewController {
     @FXML private Label titleLabel;
@@ -33,11 +35,16 @@ public class ReviewController {
         star4.setToggleGroup(ratingGroup);
         star5.setToggleGroup(ratingGroup);
         
-        // 添加游戏列表
+        // 添加完整的游戏列表
         gameComboBox.setItems(FXCollections.observableArrayList(
-            "Snake",
+            "Snake Game",
             "Hanoi Tower",
-            "Guess Number"
+            "Guess Number",
+            "Memory Game",
+            "Roulette",
+            "Slot Machine",
+            "Tic Tac Toe",
+            "Bingo"
         ));
         
         setLanguage(LanguageUtil.isEnglish());
@@ -66,6 +73,19 @@ public class ReviewController {
             star5.setText("5星");
             reviewArea.setPromptText("请输入您的评价...");
             submitButton.setText("提交评价");
+            
+            // 中文游戏名称
+            ObservableList<String> games = FXCollections.observableArrayList(
+                "贪吃蛇",
+                "汉诺塔",
+                "猜数字",
+                "记忆游戏",
+                "轮盘赌",
+                "老虎机",
+                "井字棋",
+                "宾果"
+            );
+            gameComboBox.setItems(games);
         }
     }
     
@@ -107,6 +127,22 @@ public class ReviewController {
         }
         
         int rating = Integer.parseInt(selectedRating.getText().substring(0, 1));
+        
+        // 获取游戏名称时进行转换
+        if (!LanguageUtil.isEnglish()) {
+            // 中文转英文
+            Map<String, String> gameNameMap = new HashMap<>();
+            gameNameMap.put("贪吃蛇", "Snake Game");
+            gameNameMap.put("汉诺塔", "Hanoi Tower");
+            gameNameMap.put("猜数字", "Guess Number");
+            gameNameMap.put("记忆游戏", "Memory Game");
+            gameNameMap.put("轮盘赌", "Roulette");
+            gameNameMap.put("老虎机", "Slot Machine");
+            gameNameMap.put("井字棋", "Tic Tac Toe");
+            gameNameMap.put("宾果", "Bingo");
+            
+            selectedGame = gameNameMap.get(selectedGame);
+        }
         
         if (DatabaseService.saveGameReview(UserSession.getCurrentUser(), selectedGame, rating, review)) {
             showInfo(
