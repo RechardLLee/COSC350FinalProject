@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import GamePlatform.Models.DashboardData;
 
 public class DatabaseService {
     private static final String DRIVER = "org.sqlite.JDBC";
@@ -92,7 +93,7 @@ public class DatabaseService {
                 ")"
             );
             
-            // 创建GameScores表（依赖于Users表）
+            // 创建GameScores表（依赖于Users
             stmt.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS GameScores (" +
                 "    id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -240,7 +241,7 @@ public class DatabaseService {
             
             System.out.println("Login result: " + isValid);
             
-            // 如果登录成功，确保用户在userMoney中有记录
+            // 如果登录成功，保存用户在userMoney中有记录
             if (isValid && !userMoney.containsKey(username)) {
                 int money = rs.getInt("money");
                 userMoney.put(username, money);
@@ -380,7 +381,7 @@ public class DatabaseService {
     // 更新用户余额
     public static void updateUserMoney(String username, int newAmount) {
         userMoney.put(username, newAmount);
-        saveUserData();  // 立即保存到文件
+        saveUserData();  // 立即��存到文件
     }
     
     // 添加用户游戏
@@ -494,7 +495,7 @@ public class DatabaseService {
     
     public static List<UserData> getAllUsers() {
         List<UserData> users = new ArrayList<>();
-        String sql = "SELECT * FROM Users ORDER BY id";
+        String sql = "SELECT * FROM users ORDER BY created_at DESC";
         
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -503,11 +504,12 @@ public class DatabaseService {
             while (rs.next()) {
                 users.add(new UserData(
                     rs.getInt("id"),
-                    rs.getString("username"),
+                    rs.getString("username"), 
                     rs.getString("email"),
-                    rs.getTimestamp("created_date")
+                    rs.getTimestamp("created_at")
                 ));
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -561,5 +563,61 @@ public class DatabaseService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    
+    // 仪表盘数据
+    public static DashboardData getDashboardData() {
+        DashboardData data = new DashboardData();
+        
+        try (Connection conn = getConnection()) {
+            // 获取总用户数
+            String sql = "SELECT COUNT(*) FROM Users";
+            ResultSet rs = conn.createStatement().executeQuery(sql);
+            if (rs.next()) {
+                data.setTotalUsers(rs.getInt(1));
+            }
+            
+            // 获取活跃用户数
+            sql = "SELECT COUNT(DISTINCT username) FROM game_records " +
+                  "WHERE DATE(play_date) = DATE('now')";
+            rs = conn.createStatement().executeQuery(sql);
+            if (rs.next()) {
+                data.setActiveUsers(rs.getInt(1));
+            }
+            
+            // 获取游戏数据
+            sql = "SELECT COUNT(DISTINCT game_name) FROM game_records";
+            rs = conn.createStatement().executeQuery(sql);
+            if (rs.next()) {
+                data.setTotalGames(rs.getInt(1));
+            }
+            
+            // 获取最近7天的活跃度趋势
+            sql = "WITH RECURSIVE dates(date) AS (" +
+                  "  SELECT DATE('now', '-6 days')" +
+                  "  UNION ALL" +
+                  "  SELECT DATE(date, '+1 day')" +
+                  "  FROM dates" +
+                  "  WHERE date < DATE('now')" +
+                  ")" +
+                  "SELECT dates.date, COALESCE(COUNT(DISTINCT username), 0) as count " +
+                  "FROM dates LEFT JOIN game_records " +
+                  "ON DATE(game_records.play_date) = dates.date " +
+                  "GROUP BY dates.date " +
+                  "ORDER BY dates.date";
+                  
+            rs = conn.createStatement().executeQuery(sql);
+            while (rs.next()) {
+                data.addActivityData(
+                    rs.getString("date"),
+                    rs.getInt("count")
+                );
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return data;
     }
 } 

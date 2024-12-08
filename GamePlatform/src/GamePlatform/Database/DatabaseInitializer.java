@@ -7,58 +7,64 @@ import java.sql.SQLException;
 public class DatabaseInitializer {
     
     public static void initializeDatabase() {
+        // 用户表
+        String createUsersTable = """
+            CREATE TABLE IF NOT EXISTS Users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                email TEXT UNIQUE NOT NULL, 
+                password TEXT NOT NULL,
+                money INTEGER DEFAULT 1000,
+                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """;
+
+        // 游戏记录表
+        String createGameRecordsTable = """
+            CREATE TABLE IF NOT EXISTS game_records (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                game_name TEXT NOT NULL,
+                score INTEGER,
+                play_time INTEGER,
+                play_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (username) REFERENCES Users(username)
+            )
+        """;
+
+        // 反馈表
+        String createFeedbackTable = """
+            CREATE TABLE IF NOT EXISTS feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                type TEXT NOT NULL,
+                content TEXT,
+                status TEXT DEFAULT 'pending',
+                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (username) REFERENCES Users(username)
+            )
+        """;
+
+        // 系统日志表
+        String createSystemLogsTable = """
+            CREATE TABLE IF NOT EXISTS system_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL,
+                content TEXT,
+                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """;
+
+        // 执行创建表
         try (Connection conn = DatabaseService.getConnection();
              Statement stmt = conn.createStatement()) {
             
-            // 创建Users表
-            String createUsersTable = 
-                "IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND type in (N'U'))\n" +
-                "BEGIN\n" +
-                "CREATE TABLE Users (\n" +
-                "    id INT IDENTITY(1,1) PRIMARY KEY,\n" +
-                "    username VARCHAR(50) UNIQUE NOT NULL,\n" +
-                "    email VARCHAR(100) UNIQUE NOT NULL,\n" +
-                "    password VARCHAR(100) NOT NULL,\n" +
-                "    created_date DATETIME DEFAULT GETDATE()\n" +
-                ")\n" +
-                "END";
-            stmt.executeUpdate(createUsersTable);
-            
-            // 创建GameReviews表
-            String createReviewsTable = 
-                "IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GameReviews]') AND type in (N'U'))\n" +
-                "BEGIN\n" +
-                "CREATE TABLE GameReviews (\n" +
-                "    id INT IDENTITY(1,1) PRIMARY KEY,\n" +
-                "    username VARCHAR(50),\n" +
-                "    game_name VARCHAR(100),\n" +
-                "    rating INT,\n" +
-                "    review TEXT,\n" +
-                "    review_date DATETIME DEFAULT GETDATE(),\n" +
-                "    FOREIGN KEY (username) REFERENCES Users(username)\n" +
-                ")\n" +
-                "END";
-            stmt.executeUpdate(createReviewsTable);
-            
-            // 创建BugReports表
-            String createBugReportsTable = 
-                "IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[BugReports]') AND type in (N'U'))\n" +
-                "BEGIN\n" +
-                "CREATE TABLE BugReports (\n" +
-                "    id INT IDENTITY(1,1) PRIMARY KEY,\n" +
-                "    username VARCHAR(50),\n" +
-                "    description TEXT,\n" +
-                "    report_date DATETIME DEFAULT GETDATE(),\n" +
-                "    status VARCHAR(20) DEFAULT 'Open',\n" +
-                "    FOREIGN KEY (username) REFERENCES Users(username)\n" +
-                ")\n" +
-                "END";
-            stmt.executeUpdate(createBugReportsTable);
-            
-            System.out.println("Database tables initialized successfully");
+            stmt.execute(createUsersTable);
+            stmt.execute(createGameRecordsTable);
+            stmt.execute(createFeedbackTable);
+            stmt.execute(createSystemLogsTable);
             
         } catch (SQLException e) {
-            System.err.println("Error initializing database tables:");
             e.printStackTrace();
         }
     }
