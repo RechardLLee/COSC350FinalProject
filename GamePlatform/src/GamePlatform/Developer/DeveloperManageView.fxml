@@ -15,9 +15,7 @@
             <Label text="Developer Console" styleClass="sidebar-title"/>
             <Button text="Dashboard" onAction="#showDashboard"/>
             <Button text="Users" onAction="#showUsers"/> 
-            <Button text="Games" onAction="#showGames"/>
             <Button text="Feedback" onAction="#showFeedback"/>
-            <Button text="Settings" onAction="#showSettings"/>
         </VBox>
     </left>
 
@@ -82,6 +80,10 @@
 
             <!-- User Management -->
             <VBox fx:id="userPane" visible="false" spacing="10">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
                 <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn text="ID"/>
@@ -101,6 +103,10 @@
 
             <!-- Feedback Management -->
             <VBox fx:id="feedbackPane" visible="false" spacing="10">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
                 <TabPane>
                     <Tab text="Reviews" closable="false">
                         <TableView fx:id="reviewTable" VBox.vgrow="ALWAYS">
@@ -132,28 +138,6 @@
                     <Button text="Delete" onAction="#handleDeleteFeedback"/>
                     <Button text="Export" onAction="#handleExportFeedback"/>
                 </HBox>
-            </VBox>
-
-            <!-- Settings -->
-            <VBox fx:id="settingsPane" visible="false" spacing="20">
-                <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
-                </padding>
-                
-                <TitledPane text="Database">
-                    <VBox spacing="10">
-                        <Button text="Backup Database" onAction="#handleBackupDatabase"/>
-                        <Button text="Restore Database" onAction="#handleRestoreDatabase"/>
-                        <Button text="Reset Database" onAction="#handleResetDatabase"/>
-                    </VBox>
-                </TitledPane>
-                
-                <TitledPane text="System">
-                    <VBox spacing="10">
-                        <Button text="View Logs" onAction="#handleViewLogs"/>
-                        <Button text="Clear Cache" onAction="#handleClearCache"/>
-                    </VBox>
-                </TitledPane>
             </VBox>
         </StackPane>
     </center>

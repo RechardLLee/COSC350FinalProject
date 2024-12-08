@@ -66,13 +66,13 @@ public class DeveloperManageController {
         TableColumn<UserData, Integer> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         
-        TableColumn<UserData, String> usernameCol = new TableColumn<>("用户名");
+        TableColumn<UserData, String> usernameCol = new TableColumn<>("Username");
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         
-        TableColumn<UserData, String> emailCol = new TableColumn<>("邮箱");
+        TableColumn<UserData, String> emailCol = new TableColumn<>("Email");
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         
-        TableColumn<UserData, java.util.Date> dateCol = new TableColumn<>("注册时间");
+        TableColumn<UserData, java.util.Date> dateCol = new TableColumn<>("Register Date");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("createdDate"));
         
         userTable.getColumns().setAll(idCol, usernameCol, emailCol, dateCol);
@@ -106,7 +106,7 @@ public class DeveloperManageController {
             ((NumberAxis) activityChart.getYAxis()).setAnimated(false);
             
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("每日活跃用户");
+            series.setName("Daily Active Users");
             
             series.getData().add(new XYChart.Data<>("", 0));
             
@@ -114,9 +114,9 @@ public class DeveloperManageController {
             activityChart.getData().add(series);
             
             gameDistChart.setAnimated(false);
-            gameDistChart.setTitle("游戏分布");
+            gameDistChart.setTitle("Game Distribution");
             gameDistChart.getData().clear();
-            gameDistChart.getData().add(new PieChart.Data("暂无数据", 100));
+            gameDistChart.getData().add(new PieChart.Data("No Data", 100));
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,7 +129,7 @@ public class DeveloperManageController {
                 try {
                     if (activityChart.getData().isEmpty()) {
                         XYChart.Series<String, Number> series = new XYChart.Series<>();
-                        series.setName("每日活跃用户");
+                        series.setName("Daily Active Users");
                         activityChart.getData().add(series);
                     }
                     
@@ -159,18 +159,15 @@ public class DeveloperManageController {
     private void showDashboard() {
         dashboardPane.setVisible(true);
         userPane.setVisible(false);
+        feedbackPane.setVisible(false);
     }
 
     @FXML 
     private void showUsers() {
         dashboardPane.setVisible(false);
         userPane.setVisible(true);
+        feedbackPane.setVisible(false);
         refreshUserTable();
-    }
-
-    @FXML
-    private void showGames() {
-        // TODO: 实现游戏管理界面
     }
 
     @FXML
@@ -178,8 +175,6 @@ public class DeveloperManageController {
         dashboardPane.setVisible(false);
         userPane.setVisible(false);
         feedbackPane.setVisible(true);
-        settingsPane.setVisible(false);
-        
         refreshFeedbackTables();
     }
 
