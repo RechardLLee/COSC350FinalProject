@@ -22,9 +22,9 @@ public class DatabaseService {
     private static final String URL = "jdbc:sqlite:gameplatform.db";
     
     // developer username password security answer
-    private static final String DEV_USERNAME = "weckmanscott";
-    private static final String DEV_PASSWORD = "Isengard1";
-    private static final String DEV_SECURITY_ANSWER = "question";
+    private static final String DEV_USERNAME = "admin";
+    private static final String DEV_PASSWORD = "admin";
+    private static final String DEV_SECURITY_ANSWER = "admin";
     
     private static final String USER_DATA_FILE = "user_data.txt";
     private static Map<String, Integer> userMoney = new HashMap<>();

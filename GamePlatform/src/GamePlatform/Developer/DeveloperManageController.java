@@ -25,6 +25,7 @@ import javafx.scene.chart.*;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.beans.property.SimpleIntegerProperty;
 
 public class DeveloperManageController {
     @FXML private VBox dashboardPane;
@@ -77,7 +78,14 @@ public class DeveloperManageController {
         TableColumn<UserData, java.util.Date> dateCol = new TableColumn<>("Register Date");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("createdDate"));
         
-        userTable.getColumns().setAll(idCol, usernameCol, emailCol, dateCol);
+        TableColumn<UserData, Integer> moneyCol = new TableColumn<>("Money");
+        moneyCol.setCellValueFactory(cellData -> {
+            String username = cellData.getValue().getUsername();
+            int money = DatabaseService.getUserMoney(username);
+            return new SimpleIntegerProperty(money).asObject();
+        });
+        
+        userTable.getColumns().setAll(idCol, usernameCol, emailCol, dateCol, moneyCol);
     }
 
     private void refreshUserTable() {

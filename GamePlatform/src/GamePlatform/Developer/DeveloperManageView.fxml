@@ -90,6 +90,7 @@
                         <TableColumn text="Username"/>
                         <TableColumn text="Email"/>
                         <TableColumn text="Register Date"/>
+                        <TableColumn text="Money"/>
                         <TableColumn text="Status"/>
                     </columns>
                 </TableView>
