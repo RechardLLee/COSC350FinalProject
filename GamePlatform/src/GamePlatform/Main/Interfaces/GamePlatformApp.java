@@ -24,6 +24,7 @@ public class GamePlatformApp extends Application {
             "/src/GamePlatform/User/Management/LoginView.fxml"
         };
         
+        
         for (String path : possiblePaths) {
             loginFxml = getClass().getClassLoader().getResource(path);
             System.out.println("Trying path: " + path + " -> " + loginFxml);
@@ -34,9 +35,12 @@ public class GamePlatformApp extends Application {
             throw new IllegalStateException("Cannot find LoginView.fxml. Please check the file location and classpath settings.");
         }
         
+
+        // 加载登录界面
         FXMLLoader loader = new FXMLLoader(loginFxml);
         Parent root = loader.load();
         Scene scene = new Scene(root);
+        
         primaryStage.setTitle(LanguageUtil.isEnglish() ? "Login" : "登录");
         primaryStage.setScene(scene);
         

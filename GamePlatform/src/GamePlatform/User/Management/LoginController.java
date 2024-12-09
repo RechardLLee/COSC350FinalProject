@@ -114,6 +114,7 @@ public class LoginController {
     @FXML
     private void handleSignup() {
         try {
+            // 加载注册界面
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/GamePlatform/User/Management/SignUp.fxml"));
             
