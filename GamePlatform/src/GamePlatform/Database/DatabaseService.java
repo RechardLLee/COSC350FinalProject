@@ -413,14 +413,6 @@ public class DatabaseService {
             userMoney.put(username, newAmount);
             saveUserData();  // 保存到文件
             
-            // 记录到系统日志
-            String logSql = "INSERT INTO system_logs (type, content) VALUES (?, ?)";
-            try (PreparedStatement logStmt = conn.prepareStatement(logSql)) {
-                logStmt.setString(1, "BALANCE_UPDATE");
-                logStmt.setString(2, String.format("User %s balance updated to %d", username, newAmount));
-                logStmt.executeUpdate();
-            }
-            
         } catch (SQLException e) {
             e.printStackTrace();
         }
