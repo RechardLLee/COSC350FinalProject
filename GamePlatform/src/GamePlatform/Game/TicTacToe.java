@@ -3,6 +3,7 @@ package GamePlatform.Game;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class TicTacToe extends BaseGame {
     private static final int CELL_SIZE = 100;
@@ -42,7 +43,7 @@ public class TicTacToe extends BaseGame {
         difficulty = "Medium";
         moves = 0;
         
-        // 初始化棋盘
+        // 初始化��盘
         for (int i = 0; i < GRID_SIZE; i++) {
             for (int j = 0; j < GRID_SIZE; j++) {
                 board[i][j] = ' ';
@@ -109,9 +110,11 @@ public class TicTacToe extends BaseGame {
         if (checkWin(currentPlayer)) {
             gameEnded = true;
             statusLabel.setText("You win!");
-            // 计算分数：首次获胜10000分，之后根据移动次数递减
-            int score = Math.max(10000 - (moves - GRID_SIZE * 2) * 1000, 1000);
-            saveScore(score);
+            int score = 10000 - (moves - 5) * 1000;  // 从10000开始，每多一步减1000分
+            score = Math.max(score, 1000);  // 最低1000分
+            if (score > 0) {
+                saveScore(score);
+            }
             return;
         }
         
@@ -161,7 +164,11 @@ public class TicTacToe extends BaseGame {
             case "Hard":
                 return getHardMove();
             case "Medium":
-                return Math.random() < 0.5 ? getHardMove() : getEasyMove();
+                // Medium难度：80%概率使用智能移动，20%概率随机移动
+                return Math.random() < 0.8 ? getHardMove() : getEasyMove();
+            case "Easy":
+                // Easy难度：30%概率使用智能移动，70%概率随机移动
+                return Math.random() < 0.3 ? getHardMove() : getEasyMove();
             default:
                 return getEasyMove();
         }
@@ -179,7 +186,32 @@ public class TicTacToe extends BaseGame {
     }
     
     private int[] getHardMove() {
-        // 使用极小化极大算法
+        // 1. 首先检查是否能赢
+        int[] winningMove = findWinningMove('O');
+        if (winningMove != null) return winningMove;
+        
+        // 2. 然后检查是否需要阻止玩家赢
+        int[] blockingMove = findWinningMove('X');
+        if (blockingMove != null) return blockingMove;
+        
+        // 3. 如果中心位置空闲，优先选择中心
+        if (board[1][1] == ' ') {
+            return new int[]{1, 1};
+        }
+        
+        // 4. 如果角落位置空闲，优先选择角落
+        int[][] corners = {{0,0}, {0,2}, {2,0}, {2,2}};
+        ArrayList<int[]> availableCorners = new ArrayList<>();
+        for (int[] corner : corners) {
+            if (board[corner[0]][corner[1]] == ' ') {
+                availableCorners.add(corner);
+            }
+        }
+        if (!availableCorners.isEmpty()) {
+            return availableCorners.get((int)(Math.random() * availableCorners.size()));
+        }
+        
+        // 5. 最后使用极小化极大算法
         int bestScore = Integer.MIN_VALUE;
         int[] bestMove = new int[2];
         
@@ -278,6 +310,23 @@ public class TicTacToe extends BaseGame {
             }
         }
         statusLabel.setText("Your turn (X)");
+    }
+    
+    private int[] findWinningMove(char player) {
+        // 检查每个空位，看是否能形成三连
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                if (board[i][j] == ' ') {
+                    board[i][j] = player;
+                    boolean wins = checkWin(player);
+                    board[i][j] = ' ';
+                    if (wins) {
+                        return new int[]{i, j};
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     public static void main(String[] args) {

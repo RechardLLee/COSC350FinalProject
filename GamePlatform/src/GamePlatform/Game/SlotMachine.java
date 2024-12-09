@@ -14,6 +14,8 @@ public class SlotMachine extends BaseGame {
     private JLabel resultLabel;
     private JLabel balanceLabel;
     private JLabel scoreLabel;
+    private JLabel wageredLabel;
+    private JLabel wonLabel;
     private JTextField betField;
     private String[] symbols = { "♠", "♥", "♦", "♣", "★", "7", "$" };  // 使用基本符号
     private int score = 0;
@@ -24,9 +26,9 @@ public class SlotMachine extends BaseGame {
     private static final Color DARK_BG = new Color(44, 62, 80);
     private static final Color REEL_BG = new Color(52, 73, 94);
     private static final Color BORDER_COLOR = new Color(149, 165, 166);
-    private int totalBet = 0;    // 总下注金额
-    private int totalWin = 0;    // 总赢得金额
-    private int netProfit = 0;   // 净盈亏
+    private int totalWagered = 0;    // 累计投注额
+    private int totalWon = 0;        // 累计赢得金额
+    private int netProfit = 0;       // 净盈亏
 
     public SlotMachine() {
         super("Slot Machine");
@@ -100,12 +102,29 @@ public class SlotMachine extends BaseGame {
         balanceLabel.setFont(new Font("Arial", Font.BOLD, 16));
         balanceLabel.setForeground(Color.WHITE);
         
-        scoreLabel = new JLabel("Net Profit: $0");  // 修改标签文本
-        scoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        // 添加更多信息标签
+        JPanel statsPanel = new JPanel(new GridLayout(4, 1, 0, 5));
+        statsPanel.setBackground(DARK_BG);
+        
+        scoreLabel = new JLabel("Net Profit: $0");
+        wageredLabel = new JLabel("Total Wagered: $0");
+        wonLabel = new JLabel("Total Won: $0");
+        
+        // 设置字体和颜色
         scoreLabel.setForeground(Color.WHITE);
+        wageredLabel.setForeground(Color.WHITE);
+        wonLabel.setForeground(Color.WHITE);
+        
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        wageredLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        wonLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        
+        statsPanel.add(scoreLabel);
+        statsPanel.add(wageredLabel);
+        statsPanel.add(wonLabel);
         
         infoPanel.add(balanceLabel);
-        infoPanel.add(scoreLabel);
+        infoPanel.add(statsPanel);
         controlPanel.add(infoPanel);
         controlPanel.add(Box.createVerticalStrut(15));
 
@@ -175,12 +194,13 @@ public class SlotMachine extends BaseGame {
                 return;
             }
 
-            // 更新总下注金额
-            totalBet += betAmount;
+            // 更新累���投注额
+            totalWagered += betAmount;
+            wageredLabel.setText("Total Wagered: $" + totalWagered);
             
             // 更新净盈亏
             netProfit -= betAmount;
-            score = netProfit;  // 更新分数为净盈亏
+            score = netProfit;
             scoreLabel.setText("Net Profit: $" + netProfit);
 
             // 扣除下注金额
@@ -227,9 +247,10 @@ public class SlotMachine extends BaseGame {
         if (finalSymbols[0].equals(finalSymbols[1]) && finalSymbols[1].equals(finalSymbols[2])) {
             // Jackpot!
             int winnings = betAmount * 10;
-            totalWin += winnings;
+            totalWon += winnings;
+            wonLabel.setText("Total Won: $" + totalWon);
             netProfit += winnings;
-            score = netProfit;  // 更新分数为净盈亏
+            score = netProfit;
             
             int finalWinnings = winnings;
             Platform.runLater(() -> {
@@ -245,9 +266,10 @@ public class SlotMachine extends BaseGame {
                    finalSymbols[0].equals(finalSymbols[2])) {
             // 部分匹配
             int winnings = betAmount * 2;
-            totalWin += winnings;
+            totalWon += winnings;
+            wonLabel.setText("Total Won: $" + totalWon);
             netProfit += winnings;
-            score = netProfit;  // 更新分数为净盈亏
+            score = netProfit;
             
             int finalWinnings = winnings;
             Platform.runLater(() -> {
@@ -270,6 +292,10 @@ public class SlotMachine extends BaseGame {
         // 重新启用按钮
         spinButton.setEnabled(true);
         betField.setEnabled(true);
+
+        if (score > 0) {
+            saveScore(score);
+        }
     }
 
     private void updateBalance() {
@@ -283,11 +309,13 @@ public class SlotMachine extends BaseGame {
     }
 
     private void resetGame() {
-        totalBet = 0;
-        totalWin = 0;
+        totalWagered = 0;
+        totalWon = 0;
         netProfit = 0;
         score = 0;
         scoreLabel.setText("Net Profit: $0");
+        wageredLabel.setText("Total Wagered: $0");
+        wonLabel.setText("Total Won: $0");
         resultLabel.setText("Welcome! Place your bet and spin!");
         updateBalance();
     }

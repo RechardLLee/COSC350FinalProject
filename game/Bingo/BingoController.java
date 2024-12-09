@@ -1208,15 +1208,15 @@ public class BingoController{
             startDisplay();
         }
         // pointsTextField.setText(roundIndex.toString());
-        patternIndex = 0;
-        ArrayList<String[]> list = bingo.readPattern(gameTypeTextArea.getText().toString());
-        // bingoPatternTextField.setText(list.get(patternIndex)[0]);
-        patternIndex++;
-        // bingoPatternTextArea.setText(bingo.makePattern(list.get(patternIndex)));
-        patternIndex++;
-        if(patternIndex == list.size()){
-            patternIndex = 0;
-        }
+        // patternIndex = 0;
+        // // ArrayList<String[]> list = bingo.readPattern(gameTypeTextArea.getText().toString());
+        // // bingoPatternTextField.setText(list.get(patternIndex)[0]);
+        // patternIndex++;
+        // // bingoPatternTextArea.setText(bingo.makePattern(list.get(patternIndex)));
+        // patternIndex++;
+        // if(patternIndex == list.size()){
+        //     patternIndex = 0;
+        // }
 
 
         // ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -1303,7 +1303,6 @@ public class BingoController{
         gameTypeTextArea.setText(bingo.pickFirstRound());
         patternType = gameTypeTextArea.getText();
         nextRoundTextField.setText(bingo.pickSecondRound());
-        ArrayList<String[]> list = bingo.readPattern(gameTypeTextArea.getText().toString());
         assert B1Circle != null : "fx:id=\"B1Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
         assert B2Circle != null : "fx:id=\"B2Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";
         assert B3Circle != null : "fx:id=\"B3Circle\" was not injected: check your FXML file 'CopyBingo.fxml'.";

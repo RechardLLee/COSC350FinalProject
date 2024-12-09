@@ -18,6 +18,7 @@ public class MemoryGame extends BaseGame {
     private int matchesFound = 0;
     private List<Integer> flippedCards = new ArrayList<>();
     private Timer timer;
+    private boolean isProcessing = false;  // 添加处理标志，防止快速点击
 
     public MemoryGame() {
         super("Memory Game");
@@ -84,8 +85,13 @@ public class MemoryGame extends BaseGame {
     }
 
     private void handleCardClick(int index) {
-        // 如果卡片已经翻开或游戏结束，忽略点击
-        if (flippedCards.contains(index) || cardValues == null) {
+        // 如果正在处理匹配或卡片已经翻开或游戏结束，忽略点击
+        if (isProcessing || flippedCards.contains(index) || cardValues == null) {
+            return;
+        }
+
+        // 如果已经翻开了两张卡片，忽略新的点击
+        if (flippedCards.size() >= 2) {
             return;
         }
 
@@ -95,6 +101,7 @@ public class MemoryGame extends BaseGame {
 
         // 如果翻开了两张卡片，检查是否匹配
         if (flippedCards.size() == 2) {
+            isProcessing = true;  // 开始处理匹配
             int firstCard = flippedCards.get(0);
             int secondCard = flippedCards.get(1);
 
@@ -104,18 +111,19 @@ public class MemoryGame extends BaseGame {
                 scoreLabel.setText("Score: " + score);
                 matchesFound++;
                 flippedCards.clear();
+                isProcessing = false;  // 处理完成
 
                 if (matchesFound == 8) {
-                    if (score > 0) {  // 只有在有分数且大于0时才保存
-                        saveScore(score);
-                        score = 0;  // 保存后重置分数，避免重复保存
+                    int finalScore = score;  // 保存最终分数
+                    if (finalScore > 0) {
+                        saveScore(finalScore);
                     }
                     JOptionPane.showMessageDialog(this, 
-                        "Congratulations! Final score: " + score);
+                        "Congratulations! Final score: " + finalScore);
                 }
             } else {
-                // 不匹配，延迟翻回
-                final Timer timer = new Timer();
+                // 不匹配，缩短延迟时间并确保正确处理
+                Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -123,9 +131,10 @@ public class MemoryGame extends BaseGame {
                             buttons[firstCard].setText("");
                             buttons[secondCard].setText("");
                             flippedCards.clear();
+                            isProcessing = false;  // 处理完成
                         });
                     }
-                }, 1000);
+                }, 500);  // 从1000ms减少到500ms
             }
         }
     }
@@ -141,14 +150,30 @@ public class MemoryGame extends BaseGame {
     }
 
     private void resetGame() {
+        if (score > 0) {
+            saveScore(score);  // 保存当前分数（如果有）
+        }
         score = 0;
         matchesFound = 0;
         scoreLabel.setText("Score: 0");
-        generateCards();  // 重新生成卡片
+        generateCards();
         for (JButton button : buttons) {
             button.setText("");
             button.setEnabled(true);
         }
         flippedCards.clear();
+        isProcessing = false;  // 重置处理标志
+    }
+
+    // 添加游戏结束时的清理方法
+    @Override
+    public void dispose() {
+        if (score > 0) {
+            saveScore(score);  // 确保保存最终分数
+        }
+        if (timer != null) {
+            timer.cancel();  // 清理定时器
+        }
+        super.dispose();
     }
 }

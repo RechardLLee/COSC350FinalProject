@@ -24,11 +24,18 @@ public class RouletteGame extends BaseGame {
     private int totalBet = 0;    // 总下注金额
     private int totalWin = 0;    // 总赢得金额
     private int netProfit = 0;   // 净盈亏
+    private int sessionWins = 0;    // 本次游戏获胜次数
+    private int sessionGames = 0;   // 本次游戏总局数
+    private static int highScore = 0;
+    private static String topPlayer = "";
+    private boolean hasUnsavedScore = false;  // 添加标志来追踪是否有未保存的分数
+    private static int totalPlayers = 0;
 
     public RouletteGame() {
         super("Roulette");
+        loadHighScore();
         setTitle("Roulette - Player: " + username);
-        setSize(500, 400);
+        setSize(600, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
@@ -43,15 +50,17 @@ public class RouletteGame extends BaseGame {
         }
         
         createComponents();
+        updateScoreDisplay();
         
         // 添加窗口关闭监听器
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (score > 0) {  // 只有在有分数且大于0时才保存
-                    saveScore(score);
-                    score = 0;  // 保存后重置分数，避免重复保存
+                if (hasUnsavedScore && netProfit != 0) {  // 只在有未保存的非零分数时保存
+                    saveScore(netProfit);
+                    hasUnsavedScore = false;
                 }
+                dispose();
             }
         });
     }
@@ -133,7 +142,7 @@ public class RouletteGame extends BaseGame {
 
     private void spin() {
         try {
-            // 检查下注金额是否为空
+            // 检查下注金额是否���空
             String betAmountText = betAmountField.getText().trim();
             if (betAmountText.isEmpty()) {
                 showMessage("Please enter a bet amount!");
@@ -168,7 +177,7 @@ public class RouletteGame extends BaseGame {
             DatabaseService.updateUserMoney(username, currentBalance - betAmount);
             updateBalance();
 
-            // 生成结果
+            // 随机生成结果
             int rolledNumber = random.nextInt(37); // 0-36
             String rolledColor = (rolledNumber == 0) ? "Green" : 
                                (rolledNumber % 2 == 0) ? "Black" : "Red";
@@ -197,27 +206,30 @@ public class RouletteGame extends BaseGame {
             // 更新总下注金额和净盈亏
             totalBet += betAmount;
             netProfit -= betAmount;
-            score = netProfit;  // 更新分数为净盈亏
-            scoreLabel.setText("Net Profit: $" + netProfit);
-
-            // 更新分数和余额
+            sessionGames++;     
+            
+            // 处理获胜情况
             if (won) {
+                sessionWins++;
+                DatabaseService.updateUserMoney(username, DatabaseService.getUserMoney(username) + winnings);
                 totalWin += winnings;
                 netProfit += winnings;
                 score = netProfit;
-                scoreLabel.setText("Net Profit: $" + netProfit);
                 messageArea.append(String.format(
-                    "You win! +$%d (Total bet: $%d, Total win: $%d, Net profit: $%d)\n",
-                    winnings, totalBet, totalWin, netProfit
+                    "You win! +$%d (Wins: %d/%d, Total bet: $%d, Total win: $%d, Net profit: $%d)\n",
+                    winnings, sessionWins, sessionGames, totalBet, totalWin, netProfit
                 ));
             } else {
                 messageArea.append(String.format(
-                    "Better luck next time! -$%d (Total bet: $%d, Total win: $%d, Net profit: $%d)\n",
-                    betAmount, totalBet, totalWin, netProfit
+                    "Better luck next time! -$%d (Wins: %d/%d, Total bet: $%d, Total win: $%d, Net profit: $%d)\n",
+                    betAmount, sessionWins, sessionGames, totalBet, totalWin, netProfit
                 ));
             }
             
-            // 更新显示的余额
+            hasUnsavedScore = true;  // 标记有未保存的分数
+            
+            // 更新显示
+            updateScoreDisplay();
             updateBalance();
 
             // 示结果
@@ -256,13 +268,87 @@ public class RouletteGame extends BaseGame {
     }
 
     private void resetGame() {
+        if (hasUnsavedScore && netProfit != 0) {  // 只在有未保存的非零分数时保存
+            saveScore(netProfit);
+            hasUnsavedScore = false;
+        }
+        
         totalBet = 0;
         totalWin = 0;
         netProfit = 0;
         score = 0;
-        scoreLabel.setText("Net Profit: $0");
+        sessionWins = 0;
+        sessionGames = 0;
+        updateScoreDisplay();
         messageArea.setText("");
         updateBalance();
+    }
+
+    private void loadHighScore() {
+        try {
+            java.nio.file.Path path = java.nio.file.Paths.get("game_records/Roulette.txt");
+            if (java.nio.file.Files.exists(path)) {
+                java.util.List<String> lines = java.nio.file.Files.readAllLines(path);
+                
+                // 用于记录不重复的玩家
+                java.util.Set<String> uniquePlayers = new java.util.HashSet<>();
+                
+                highScore = 0;  // 重置最高分
+                topPlayer = ""; // 重置最高分玩家
+                
+                for (String line : lines) {
+                    String[] parts = line.split(",");
+                    if (parts.length >= 2) {
+                        String playerName = parts[0].trim();
+                        int score = Integer.parseInt(parts[1].trim());
+                        
+                        // 添加到唯一玩家集合
+                        uniquePlayers.add(playerName);
+                        
+                        // 更新最高分
+                        if (score > highScore) {
+                            highScore = score;
+                            topPlayer = playerName;
+                        }
+                    }
+                }
+                
+                // 更新总玩家数
+                totalPlayers = uniquePlayers.size();
+                
+                // 更新��示
+                updateScoreDisplay();
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading high score: " + e.getMessage());
+        }
+    }
+
+    @Override
+    protected void saveScore(int score) {
+        // 如果分数为0，直接返回，不保存记录
+        if (score == 0) {
+            return;
+        }
+
+        // 调用父类的saveScore方法保存记录
+        super.saveScore(score);
+        
+        // 更新最高分和显示
+        if (score > highScore) {
+            highScore = score;
+            topPlayer = username;
+        }
+        updateScoreDisplay();
+    }
+
+    private void updateScoreDisplay() {
+        scoreLabel.setText(String.format("Net Profit: $%d (Win Rate: %.1f%%) (Players: %d) (High Score: $%d by %s)", 
+            netProfit, 
+            sessionGames > 0 ? (sessionWins * 100.0 / sessionGames) : 0,
+            totalPlayers,
+            highScore, 
+            topPlayer));
     }
 
     public static void main(String[] args) {

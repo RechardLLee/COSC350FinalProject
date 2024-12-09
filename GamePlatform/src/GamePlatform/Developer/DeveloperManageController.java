@@ -2,584 +2,370 @@ package GamePlatform.Developer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.GridPane;
+import javafx.geometry.Insets;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.beans.property.SimpleStringProperty;
 import java.sql.*;
+import java.util.*;
+import java.io.File;
 import java.util.Date;
-import java.util.Optional;
 import GamePlatform.Database.DatabaseService;
-import GamePlatform.Utility.LanguageUtil;
+import GamePlatform.Models.DashboardData;
 import GamePlatform.User.Management.UserData;
 import GamePlatform.Feedback.ReviewData;
 import GamePlatform.Feedback.BugData;
-import GamePlatform.Game.GameData;
-import java.util.List;
-import java.util.ArrayList;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
+import javafx.scene.chart.*;
+import javafx.application.Platform;
+import javafx.stage.FileChooser;
+import javafx.scene.control.ButtonBar.ButtonData;
 
 public class DeveloperManageController {
-    @FXML private Label titleLabel;
+    @FXML private VBox dashboardPane;
+    @FXML private VBox userPane;
+    @FXML private Label totalUsersLabel;
+    @FXML private Label activeUsersLabel;
+    @FXML private Label totalGamesLabel;
+    @FXML private LineChart<String,Number> activityChart;
+    @FXML private PieChart gameDistChart;
     @FXML private TableView<UserData> userTable;
     @FXML private TableView<ReviewData> reviewTable;
     @FXML private TableView<BugData> bugTable;
-    @FXML private TableView<Object> queryResultTable;
-    @FXML private TextArea sqlQueryArea;
-    
-    // 用户表列
-    @FXML private TableColumn<UserData, Integer> idColumn;
-    @FXML private TableColumn<UserData, String> usernameColumn;
-    @FXML private TableColumn<UserData, String> emailColumn;
-    @FXML private TableColumn<UserData, Date> createdDateColumn;
-    @FXML private TableColumn<UserData, Integer> balanceColumn;
-    
-    // 评论表列
-    @FXML private TableColumn<ReviewData, Integer> reviewIdColumn;
-    @FXML private TableColumn<ReviewData, String> reviewUserColumn;
-    @FXML private TableColumn<ReviewData, String> reviewGameColumn;
-    @FXML private TableColumn<ReviewData, Integer> ratingColumn;
-    @FXML private TableColumn<ReviewData, String> reviewTextColumn;
-    @FXML private TableColumn<ReviewData, Date> reviewDateColumn;
-    
-    // Bug报告表列
-    @FXML private TableColumn<BugData, Integer> bugIdColumn;
-    @FXML private TableColumn<BugData, String> bugUserColumn;
-    @FXML private TableColumn<BugData, String> descriptionColumn;
-    @FXML private TableColumn<BugData, String> statusColumn;
-    @FXML private TableColumn<BugData, Date> reportDateColumn;
-    
-    @FXML private TableView<GameData> gameTable;
-    @FXML private TableColumn<GameData, String> gameNameColumn;
-    @FXML private TableColumn<GameData, String> ownerColumn;
-    @FXML private TableColumn<GameData, Date> purchaseDateColumn;
-    @FXML private TableColumn<GameData, Integer> playTimeColumn;
-    
-    @FXML private TextField balanceField;
-    
+    @FXML private VBox feedbackPane;
+    @FXML private VBox settingsPane;
+
+    private Timeline refreshTimer;
+
     @FXML
     private void initialize() {
-        initializeColumns();
-        loadAllData();
-        setLanguage(LanguageUtil.isEnglish());
-    }
-    
-    private void initializeColumns() {
-        // 初始化用户表列
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        createdDateColumn.setCellValueFactory(new PropertyValueFactory<>("createdDate"));
-        balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
+        dashboardPane.setVisible(true);
+        userPane.setVisible(false);
+        feedbackPane.setVisible(false);
         
-        // 初始化评论表列
-        reviewIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        reviewUserColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        reviewGameColumn.setCellValueFactory(new PropertyValueFactory<>("gameName"));
-        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
-        reviewTextColumn.setCellValueFactory(new PropertyValueFactory<>("review"));
-        reviewDateColumn.setCellValueFactory(new PropertyValueFactory<>("reviewDate"));
+        initializeUserTable();
+        initializeFeedbackTables();
         
-        // 初始化Bug报告表列
-        bugIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        bugUserColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        reportDateColumn.setCellValueFactory(new PropertyValueFactory<>("reportDate"));
+        Platform.runLater(() -> {
+            initializeCharts();
+            refreshDashboard();
+        });
         
-        // Initialize game table columns
-        gameNameColumn.setCellValueFactory(new PropertyValueFactory<>("gameName"));
-        ownerColumn.setCellValueFactory(new PropertyValueFactory<>("owner"));
-        purchaseDateColumn.setCellValueFactory(new PropertyValueFactory<>("purchaseDate"));
-        playTimeColumn.setCellValueFactory(new PropertyValueFactory<>("playTime"));
+        refreshTimer = new Timeline(
+            new KeyFrame(Duration.seconds(30), 
+                e -> refreshDashboard())
+        );
+        refreshTimer.setCycleCount(Timeline.INDEFINITE);
+        refreshTimer.play();
     }
-    
-    private void loadAllData() {
-        loadUsers();
-        loadReviews();
-        loadBugReports();
+
+    private void initializeUserTable() {
+        TableColumn<UserData, Integer> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
+        TableColumn<UserData, String> usernameCol = new TableColumn<>("Username");
+        usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
+        
+        TableColumn<UserData, String> emailCol = new TableColumn<>("Email");
+        emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+        
+        TableColumn<UserData, java.util.Date> dateCol = new TableColumn<>("Register Date");
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("createdDate"));
+        
+        userTable.getColumns().setAll(idCol, usernameCol, emailCol, dateCol);
     }
-    
-    private void loadUsers() {
+
+    private void refreshUserTable() {
         List<UserData> users = DatabaseService.getAllUsers();
-        if (users != null) {
-            userTable.setItems(FXCollections.observableArrayList(users));
-        } else {
-            showError(
-                LanguageUtil.isEnglish() ? "Database Error" : "数据库错误",
-                LanguageUtil.isEnglish() ? 
-                    "Failed to load users" :
-                    "加载用户失败"
-            );
+        userTable.setItems(FXCollections.observableArrayList(users));
+    }
+
+    private void refreshDashboard() {
+        try {
+            DashboardData data = DatabaseService.getDashboardData();
+            
+            Platform.runLater(() -> {
+                totalUsersLabel.setText(String.valueOf(data.getTotalUsers()));
+                activeUsersLabel.setText(String.valueOf(data.getActiveUsers()));
+                totalGamesLabel.setText(String.valueOf(data.getTotalGames()));
+                
+                updateActivityChart(data.getActivityData());
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-    
-    private void loadReviews() {
-        try (Connection conn = DatabaseService.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM GameReviews")) {
+
+    private void initializeCharts() {
+        try {
+            activityChart.setAnimated(false);
+            ((CategoryAxis) activityChart.getXAxis()).setAnimated(false);
+            ((NumberAxis) activityChart.getYAxis()).setAnimated(false);
             
-            ObservableList<ReviewData> reviews = FXCollections.observableArrayList();
-            while (rs.next()) {
-                reviews.add(new ReviewData(
-                    rs.getInt("id"),
-                    rs.getString("username"),
-                    rs.getString("game_name"),
-                    rs.getInt("rating"),
-                    rs.getString("review"),
-                    rs.getTimestamp("review_date")
-                ));
-            }
-            reviewTable.setItems(reviews);
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Daily Active Users");
             
-        } catch (SQLException e) {
-            showError("Database Error", "Failed to load reviews: " + e.getMessage());
+            series.getData().add(new XYChart.Data<>("", 0));
+            
+            activityChart.getData().clear();
+            activityChart.getData().add(series);
+            
+            gameDistChart.setAnimated(false);
+            gameDistChart.setTitle("Game Distribution");
+            gameDistChart.getData().clear();
+            gameDistChart.getData().add(new PieChart.Data("No Data", 100));
+            
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-    
-    private void loadBugReports() {
-        try (Connection conn = DatabaseService.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM BugReports")) {
-            
-            ObservableList<BugData> bugs = FXCollections.observableArrayList();
-            while (rs.next()) {
-                bugs.add(new BugData(
-                    rs.getInt("id"),
-                    rs.getString("username"),
-                    rs.getString("description"),
-                    rs.getString("status"),
-                    rs.getTimestamp("report_date")
-                ));
-            }
-            bugTable.setItems(bugs);
-            
-        } catch (SQLException e) {
-            showError("Database Error", "Failed to load bug reports: " + e.getMessage());
+
+    private void updateActivityChart(Map<String, Integer> data) {
+        try {
+            Platform.runLater(() -> {
+                try {
+                    if (activityChart.getData().isEmpty()) {
+                        XYChart.Series<String, Number> series = new XYChart.Series<>();
+                        series.setName("Daily Active Users");
+                        activityChart.getData().add(series);
+                    }
+                    
+                    XYChart.Series<String, Number> series = activityChart.getData().get(0);
+                    series.getData().clear();
+                    
+                    if (data.isEmpty()) {
+                        series.getData().add(new XYChart.Data<>("", 0));
+                    } else {
+                        List<Map.Entry<String, Integer>> sortedData = new ArrayList<>(data.entrySet());
+                        sortedData.sort(Map.Entry.comparingByKey());
+                        
+                        for (Map.Entry<String, Integer> entry : sortedData) {
+                            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-    
+
     @FXML
-    private void handleExecuteQuery() {
-        String query = sqlQueryArea.getText().trim();
-        if (query.isEmpty()) {
-            showError(
-                LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Please enter a SQL query" : "请输入SQL查询"
-            );
+    private void showDashboard() {
+        dashboardPane.setVisible(true);
+        userPane.setVisible(false);
+        feedbackPane.setVisible(false);
+    }
+
+    @FXML 
+    private void showUsers() {
+        dashboardPane.setVisible(false);
+        userPane.setVisible(true);
+        feedbackPane.setVisible(false);
+        refreshUserTable();
+    }
+
+    @FXML
+    private void showFeedback() {
+        dashboardPane.setVisible(false);
+        userPane.setVisible(false);
+        feedbackPane.setVisible(true);
+        refreshFeedbackTables();
+    }
+
+    private void refreshFeedbackTables() {
+        // 加载评论数据
+        List<ReviewData> reviews = DatabaseService.getAllReviews();
+        reviewTable.setItems(FXCollections.observableArrayList(reviews));
+        
+        // 加载bug报告数据
+        List<BugData> bugs = DatabaseService.getAllBugReports();
+        bugTable.setItems(FXCollections.observableArrayList(bugs));
+    }
+
+    @FXML
+    private void handleResolveBug() {
+        BugData selectedBug = bugTable.getSelectionModel().getSelectedItem();
+        if (selectedBug != null) {
+            DatabaseService.updateBugStatus(selectedBug.getId(), "Resolved");
+            refreshFeedbackTables();
+        }
+    }
+
+    @FXML
+    private void handleDeleteFeedback() {
+        if (reviewTable.isFocused()) {
+            ReviewData selectedReview = reviewTable.getSelectionModel().getSelectedItem();
+            if (selectedReview != null) {
+                DatabaseService.deleteReview(selectedReview.getId());
+            }
+        } else if (bugTable.isFocused()) {
+            BugData selectedBug = bugTable.getSelectionModel().getSelectedItem();
+            if (selectedBug != null) {
+                DatabaseService.deleteBugReport(selectedBug.getId());
+            }
+        }
+        refreshFeedbackTables();
+    }
+
+    @FXML
+    private void handleExportFeedback() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Export Feedback");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+        );
+        
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            if (reviewTable.isFocused()) {
+                DatabaseService.exportReviews(file);
+            } else if (bugTable.isFocused()) {
+                DatabaseService.exportBugReports(file);
+            }
+        }
+    }
+
+    @FXML
+    private void showSettings() {
+        // TODO: 实现系统设置界面
+    }
+
+    @FXML
+    private void handleAddUser() {
+        Dialog<UserData> dialog = new Dialog<>();
+        dialog.setTitle("Add User");
+        dialog.setHeaderText("Enter user details");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField username = new TextField();
+        username.setPromptText("Username");
+        TextField email = new TextField();
+        email.setPromptText("Email");
+        PasswordField password = new PasswordField();
+        password.setPromptText("Password");
+
+        grid.add(new Label("Username:"), 0, 0);
+        grid.add(username, 1, 0);
+        grid.add(new Label("Email:"), 0, 1);
+        grid.add(email, 1, 1);
+        grid.add(new Label("Password:"), 0, 2);
+        grid.add(password, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        ButtonType addButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButtonType) {
+                if (DatabaseService.registerUser(
+                        username.getText(),
+                        email.getText(),
+                        password.getText())) {
+                    return new UserData(0, username.getText(), email.getText(), new java.util.Date());
+                }
+            }
+            return null;
+        });
+
+        Optional<UserData> result = dialog.showAndWait();
+        result.ifPresent(userData -> refreshUserTable());
+    }
+
+    @FXML
+    private void handleEditUser() {
+        UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
+        if (selectedUser == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a user to edit.");
             return;
         }
-        
-        try (Connection conn = DatabaseService.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-            
-            // 清除现有列
-            queryResultTable.getColumns().clear();
-            
-            // 获取结果集元数据
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            
-            // 创建列
-            for (int i = 1; i <= columnCount; i++) {
-                final int j = i;
-                TableColumn<ObservableList<String>, String> col = new TableColumn<>(metaData.getColumnName(i));
-                col.setCellValueFactory(cellData -> 
-                    new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().get(j-1)
-                    )
-                );
-                queryResultTable.getColumns().add((TableColumn)col);
-            }
-            
-            // 添加数据
-            ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
-            while (rs.next()) {
-                ObservableList<String> row = FXCollections.observableArrayList();
-                for (int i = 1; i <= columnCount; i++) {
-                    Object value = rs.getObject(i);
-                    row.add(value == null ? "null" : value.toString());
+
+        Dialog<UserData> dialog = new Dialog<>();
+        dialog.setTitle("Edit User");
+        dialog.setHeaderText("Edit user details");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField email = new TextField(selectedUser.getEmail());
+        PasswordField password = new PasswordField();
+        password.setPromptText("New password (leave blank to keep current)");
+        TextField money = new TextField(String.valueOf(DatabaseService.getUserMoney(selectedUser.getUsername())));
+        money.setPromptText("User balance");
+
+        grid.add(new Label("Email:"), 0, 0);
+        grid.add(email, 1, 0);
+        grid.add(new Label("New Password:"), 0, 1);
+        grid.add(password, 1, 1);
+        grid.add(new Label("Balance:"), 0, 2);
+        grid.add(money, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                if (!password.getText().isEmpty()) {
+                    DatabaseService.updateUserPassword(selectedUser.getEmail(), password.getText());
                 }
-                data.add(row);
+                if (!email.getText().equals(selectedUser.getEmail())) {
+                    DatabaseService.updateUsername(selectedUser.getEmail(), email.getText());
+                }
+                try {
+                    int newBalance = Integer.parseInt(money.getText());
+                    DatabaseService.updateUserMoney(selectedUser.getUsername(), newBalance);
+                } catch (NumberFormatException e) {
+                    showAlert(Alert.AlertType.ERROR, "Invalid Input", "Please enter a valid number for balance.");
+                }
+                return selectedUser;
             }
-            
-            // 使用类型转换来解决类型不匹配问题
-            @SuppressWarnings("unchecked")
-            TableView<ObservableList<String>> tableView = (TableView<ObservableList<String>>) (TableView<?>) queryResultTable;
-            tableView.setItems(data);
-            
-        } catch (SQLException e) {
-            showError("Query Error", e.getMessage());
-        }
+            return null;
+        });
+
+        Optional<UserData> result = dialog.showAndWait();
+        result.ifPresent(userData -> refreshUserTable());
     }
-    
-    private void setLanguage(boolean english) {
-        if (english) {
-            titleLabel.setText("Developer Management");
-        } else {
-            titleLabel.setText("开发者管理");
-        }
-    }
-    
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-    
+
     @FXML
     private void handleDeleteUser() {
         UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
         if (selectedUser == null) {
-            showError(
-                LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Please select a user to delete" : "请选择要删除的用户"
-            );
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select a user to delete.");
             return;
         }
-        
-        // 显示确认对话框
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(LanguageUtil.isEnglish() ? "Confirm Delete" : "确认删除");
-        alert.setHeaderText(null);
-        alert.setContentText(LanguageUtil.isEnglish() ? 
-            "Are you sure you want to delete user: " + selectedUser.getUsername() + "?" :
-            "确定要删除用户：" + selectedUser.getUsername() + "吗？");
-        
-        if (alert.showAndWait().get() == ButtonType.OK) {
+        alert.setTitle("Delete User");
+        alert.setHeaderText("Delete User Confirmation");
+        alert.setContentText("Are you sure you want to delete user: " + selectedUser.getUsername() + "?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             if (DatabaseService.deleteUser(selectedUser.getUsername())) {
-                loadUsers();  // 重新加载用户列表
-                showInfo(
-                    LanguageUtil.isEnglish() ? "Success" : "成功",
-                    LanguageUtil.isEnglish() ? "User deleted successfully" : "用户删除成功"
-                );
+                refreshUserTable();
+                showAlert(Alert.AlertType.INFORMATION, "Success", "User deleted successfully.");
             } else {
-                showError(
-                    LanguageUtil.isEnglish() ? "Error" : "错误",
-                    LanguageUtil.isEnglish() ? "Failed to delete user" : "删除用户失败"
-                );
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete user.");
             }
         }
     }
-    
-    private void showInfo(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-    
-    @FXML
-    private void handleResetDatabase() {
-        // 显示警告对话框
-        Alert confirmAlert = new Alert(Alert.AlertType.WARNING);
-        confirmAlert.setTitle(LanguageUtil.isEnglish() ? "Warning" : "警告");
-        confirmAlert.setHeaderText(
-            LanguageUtil.isEnglish() ? 
-            "You are about to reset the entire database" :
-            "您即将重置整个数据库"
-        );
-        confirmAlert.setContentText(
-            LanguageUtil.isEnglish() ? 
-            "This action will delete ALL data and cannot be undone. Are you sure?" :
-            "此操作将删除所有数据且无法撤销。您确定要继续吗？"
-        );
-        
-        // 加自定义按钮
-        ButtonType confirmButton = new ButtonType(
-            LanguageUtil.isEnglish() ? "Yes, Reset Database" : "是的，重置数据库", 
-            ButtonBar.ButtonData.OK_DONE
-        );
-        ButtonType cancelButton = new ButtonType(
-            LanguageUtil.isEnglish() ? "Cancel" : "取消", 
-            ButtonBar.ButtonData.CANCEL_CLOSE
-        );
-        confirmAlert.getButtonTypes().setAll(confirmButton, cancelButton);
-        
-        // 要求输入确认码
-        if (confirmAlert.showAndWait().get() == confirmButton) {
-            TextInputDialog confirmDialog = new TextInputDialog();
-            confirmDialog.setTitle(LanguageUtil.isEnglish() ? "Confirm Reset" : "确认重置");
-            confirmDialog.setHeaderText(
-                LanguageUtil.isEnglish() ? 
-                "Please type 'RESET' to confirm" :
-                "请输入'RESET'以确认"
-            );
-            confirmDialog.setContentText(
-                LanguageUtil.isEnglish() ? 
-                "Confirmation code:" :
-                "确认码："
-            );
-            
-            Optional<String> result = confirmDialog.showAndWait();
-            if (result.isPresent() && result.get().equals("RESET")) {
-                if (DatabaseService.resetDatabase()) {
-                    showInfo(
-                        LanguageUtil.isEnglish() ? "Success" : "成功",
-                        LanguageUtil.isEnglish() ? 
-                        "Database has been reset successfully" :
-                        "数据库已成功重置"
-                    );
-                    // 重新加载所有数据
-                    loadAllData();
-                } else {
-                    showError(
-                        LanguageUtil.isEnglish() ? "Error" : "错误",
-                        LanguageUtil.isEnglish() ? 
-                        "Failed to reset database" :
-                        "重置数据库失败"
-                    );
-                }
-            } else {
-                showError(
-                    LanguageUtil.isEnglish() ? "Error" : "错误",
-                    LanguageUtil.isEnglish() ? 
-                    "Invalid confirmation code" :
-                    "确认码错误"
-                );
-            }
-        }
-    }
-    
-    @FXML
-    private void handleAddMoney() {
-        UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
-        if (selectedUser != null) {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Add Money");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Enter amount to add:");
-            
-            Optional<String> result = dialog.showAndWait();
-            if (result.isPresent()) {
-                try {
-                    int value = Integer.parseInt(result.get());
-                    if (value <= 0) {
-                        showAlert(Alert.AlertType.ERROR, 
-                            "Error", 
-                            "Please enter a positive number"
-                        );
-                        return;
-                    }
-                    
-                    int currentMoney = DatabaseService.getUserMoney(selectedUser.getUsername());
-                    DatabaseService.updateUserMoney(selectedUser.getUsername(), currentMoney + value);
-                    refreshUserTable();
-                    
-                    showAlert(Alert.AlertType.INFORMATION, 
-                        "Success", 
-                        String.format("Added $%d to user %s", value, selectedUser.getUsername())
-                    );
-                    
-                } catch (NumberFormatException e) {
-                    showAlert(Alert.AlertType.ERROR, 
-                        "Error", 
-                        "Please enter a valid number"
-                    );
-                }
-            }
-        } else {
-            showAlert(Alert.AlertType.WARNING, 
-                "Warning", 
-                "Please select a user first"
-            );
-        }
-    }
-    
-    @FXML
-    private void handleDeductMoney() {
-        UserData selectedUser = userTable.getSelectionModel().getSelectedItem();
-        if (selectedUser != null) {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Deduct Money");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Enter amount to deduct:");
-            
-            Optional<String> result = dialog.showAndWait();
-            if (result.isPresent()) {
-                try {
-                    int value = Integer.parseInt(result.get());
-                    if (value <= 0) {
-                        showAlert(Alert.AlertType.ERROR, 
-                            "Error", 
-                            "Please enter a positive number"
-                        );
-                        return;
-                    }
-                    
-                    int currentMoney = DatabaseService.getUserMoney(selectedUser.getUsername());
-                    if (currentMoney >= value) {
-                        DatabaseService.updateUserMoney(selectedUser.getUsername(), currentMoney - value);
-                        refreshUserTable();
-                        
-                        showAlert(Alert.AlertType.INFORMATION, 
-                            "Success", 
-                            String.format("Deducted $%d from user %s", value, selectedUser.getUsername())
-                        );
-                    } else {
-                        showAlert(Alert.AlertType.ERROR, 
-                            "Error", 
-                            "Insufficient balance"
-                        );
-                    }
-                    
-                } catch (NumberFormatException e) {
-                    showAlert(Alert.AlertType.ERROR, 
-                        "Error", 
-                        "Please enter a valid number"
-                    );
-                }
-            }
-        } else {
-            showAlert(Alert.AlertType.WARNING, 
-                "Warning", 
-                "Please select a user first"
-            );
-        }
-    }
-    
-    @FXML
-    private void handleGameStats() {
-        // ... implement game statistics display ...
-    }
-    
-    @FXML
-    private void handleRemoveGame() {
-        // ... implement game removal ...
-    }
-    
-    @FXML
-    private void handleReviewAnalytics() {
-        // ... implement review analytics ...
-    }
-    
-    @FXML
-    private void handleUpdateBugStatus() {
-        // ... implement bug status update ...
-    }
-    
-    @FXML
-    private void handleBackupDatabase() {
-        // ... implement database backup ...
-    }
-    
-    @FXML
-    private void handleRestoreDatabase() {
-        // ... implement database restore ...
-    }
-    
-    @FXML
-    private void handleViewLogs() {
-        // ... implement log viewing ...
-    }
-    
-    @FXML
-    private void handleSaveQuery() {
-        // ... implement query saving ...
-    }
-    
-    @FXML
-    private void handleLoadQuery() {
-        // ... implement query loading ...
-    }
-    
-    @FXML
-    private void handleDeleteReview() {
-        ReviewData selectedReview = reviewTable.getSelectionModel().getSelectedItem();
-        if (selectedReview == null) {
-            showError(
-                LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Please select a review to delete" : "请选择要删除的评论"
-            );
-            return;
-        }
-        
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(LanguageUtil.isEnglish() ? "Confirm Delete" : "确认删除");
-        alert.setHeaderText(null);
-        alert.setContentText(LanguageUtil.isEnglish() ? 
-            "Are you sure you want to delete this review?" :
-            "确定要删除这条评论吗？");
-        
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            try (Connection conn = DatabaseService.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(
-                     "DELETE FROM GameReviews WHERE id = ?"
-                 )) {
-                
-                pstmt.setInt(1, selectedReview.getId());
-                if (pstmt.executeUpdate() > 0) {
-                    loadReviews();  // 重新加载评论列表
-                    showInfo(
-                        LanguageUtil.isEnglish() ? "Success" : "成功",
-                        LanguageUtil.isEnglish() ? "Review deleted successfully" : "评论删除成功"
-                    );
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                showError(
-                    LanguageUtil.isEnglish() ? "Error" : "错误",
-                    LanguageUtil.isEnglish() ? 
-                        "Failed to delete review: " + e.getMessage() :
-                        "删除评论失败：" + e.getMessage()
-                );
-            }
-        }
-    }
-    
-    @FXML
-    private void handleDeleteBugReport() {
-        BugData selectedBug = bugTable.getSelectionModel().getSelectedItem();
-        if (selectedBug == null) {
-            showError(
-                LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Please select a bug report to delete" : "请选择要删除的问题报告"
-            );
-            return;
-        }
-        
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(LanguageUtil.isEnglish() ? "Confirm Delete" : "确认删除");
-        alert.setHeaderText(null);
-        alert.setContentText(LanguageUtil.isEnglish() ? 
-            "Are you sure you want to delete this bug report?" :
-            "确定要删除这条问题报告吗？");
-        
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            try (Connection conn = DatabaseService.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(
-                     "DELETE FROM BugReports WHERE id = ?"
-                 )) {
-                
-                pstmt.setInt(1, selectedBug.getId());
-                if (pstmt.executeUpdate() > 0) {
-                    loadBugReports();  // 重新加载问题报告列表
-                    showInfo(
-                        LanguageUtil.isEnglish() ? "Success" : "成功",
-                        LanguageUtil.isEnglish() ? "Bug report deleted successfully" : "问题报告删除成功"
-                    );
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                showError(
-                    LanguageUtil.isEnglish() ? "Error" : "错误",
-                    LanguageUtil.isEnglish() ? 
-                        "Failed to delete bug report: " + e.getMessage() :
-                        "删除问题报告失败：" + e.getMessage()
-                );
-            }
-        }
-    }
-    
-    private void refreshUserList() {
-        // 重新加载用户列表
-        List<UserData> users = DatabaseService.getAllUsers();
-        userTable.setItems(FXCollections.observableArrayList(users));
-    }
-    
+
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -587,10 +373,148 @@ public class DeveloperManageController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-    
-    private void refreshUserTable() {
-        // 重新加载用户列表
-        List<UserData> users = DatabaseService.getAllUsers();
-        userTable.setItems(FXCollections.observableArrayList(users));
+
+    @FXML
+    private void handleBackupDatabase() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Backup Database");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("SQLite Database", "*.db")
+        );
+        
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            if (DatabaseService.backupDatabase(file)) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Database backup completed successfully.");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to backup database.");
+            }
+        }
+    }
+
+    @FXML
+    private void handleRestoreDatabase() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Restore Database");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("SQLite Database", "*.db")
+        );
+        
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Restore");
+            alert.setHeaderText("Database Restore");
+            alert.setContentText("This will overwrite the current database. Are you sure?");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                if (DatabaseService.restoreDatabase(file)) {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Database restored successfully.");
+                    refreshDashboard();
+                    refreshUserTable();
+                    refreshFeedbackTables();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to restore database.");
+                }
+            }
+        }
+    }
+
+    @FXML
+    private void handleResetDatabase() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Reset Database");
+        alert.setHeaderText("Database Reset");
+        alert.setContentText("This will delete all data and reset the database to its initial state. Are you sure?");
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (DatabaseService.resetDatabase()) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Database reset successfully.");
+                refreshDashboard();
+                refreshUserTable();
+                refreshFeedbackTables();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to reset database.");
+            }
+        }
+    }
+
+    @FXML
+    private void handleViewLogs() {
+        List<String> logs = DatabaseService.getSystemLogs();
+        TextArea textArea = new TextArea();
+        textArea.setText(String.join("\n", logs));
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("System Logs");
+        dialog.setHeaderText(null);
+        dialog.getDialogPane().setContent(textArea);
+        dialog.getDialogPane().setPrefSize(600, 400);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        
+        dialog.showAndWait();
+    }
+
+    @FXML
+    private void handleClearCache() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Clear Cache");
+        alert.setHeaderText("Clear System Cache");
+        alert.setContentText("This will clear all temporary files and cache. Continue?");
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (DatabaseService.clearCache()) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Cache cleared successfully.");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to clear cache.");
+            }
+        }
+    }
+
+    private void initializeFeedbackTables() {
+        // 初始化评论表格
+        TableColumn<ReviewData, Integer> reviewIdCol = new TableColumn<>("ID");
+        reviewIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
+        TableColumn<ReviewData, String> reviewUserCol = new TableColumn<>("User");
+        reviewUserCol.setCellValueFactory(new PropertyValueFactory<>("username"));
+        
+        TableColumn<ReviewData, String> reviewGameCol = new TableColumn<>("Game");
+        reviewGameCol.setCellValueFactory(new PropertyValueFactory<>("gameName"));
+        
+        TableColumn<ReviewData, Integer> ratingCol = new TableColumn<>("Rating");
+        ratingCol.setCellValueFactory(new PropertyValueFactory<>("rating"));
+        
+        TableColumn<ReviewData, String> reviewCol = new TableColumn<>("Review");
+        reviewCol.setCellValueFactory(new PropertyValueFactory<>("review"));
+        
+        TableColumn<ReviewData, Date> reviewDateCol = new TableColumn<>("Date");
+        reviewDateCol.setCellValueFactory(new PropertyValueFactory<>("reviewDate"));
+        
+        reviewTable.getColumns().setAll(reviewIdCol, reviewUserCol, reviewGameCol, 
+                                      ratingCol, reviewCol, reviewDateCol);
+
+        // 初始化bug表格
+        TableColumn<BugData, Integer> bugIdCol = new TableColumn<>("ID");
+        bugIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
+        TableColumn<BugData, String> bugUserCol = new TableColumn<>("User");
+        bugUserCol.setCellValueFactory(new PropertyValueFactory<>("username"));
+        
+        TableColumn<BugData, String> descCol = new TableColumn<>("Description");
+        descCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+        
+        TableColumn<BugData, String> statusCol = new TableColumn<>("Status");
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
+        
+        TableColumn<BugData, Date> bugDateCol = new TableColumn<>("Date");
+        bugDateCol.setCellValueFactory(new PropertyValueFactory<>("reportDate"));
+        
+        bugTable.getColumns().setAll(bugIdCol, bugUserCol, descCol, statusCol, bugDateCol);
     }
 } 

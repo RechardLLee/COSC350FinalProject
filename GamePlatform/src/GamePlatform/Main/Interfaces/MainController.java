@@ -57,6 +57,7 @@ public class MainController {
         addGameButton("Slot Machine", "SlotMachine");
         addGameButton("Roulette", "RouletteGame");
         addGameButton("Memory Game", "MemoryGame");
+        addGameButton("Bingo", "BinGo");
         
         // 设置定时更新余额
         balanceUpdateTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateBalance()));
@@ -140,8 +141,8 @@ public class MainController {
                         "Features:\n" +
                         "- Multiple difficulty levels\n" +
                         "- Move counter\n" +
-                        "- Auto-solve demonstration (costs 5 coins)\n" +
-                        "- Hint system (costs 2 coins per hint)",
+                        "- Auto-solve demonstration\n" +
+                        "- Score based on moves (Perfect=10000)",
                         "hanoi_tower");
                     break;
                     
@@ -155,8 +156,7 @@ public class MainController {
                         "- Score based on attempts left\n" +
                         "- Perfect score (10000) for first try\n" +
                         "- Score decreases with more attempts\n" +
-                        "- Zero score for failure\n" +
-                        "- Hint system (costs 3 coins per hint)\n\n" +
+                        "- Zero score for failure\n\n" +
                         "Strategy:\n" +
                         "- Use binary search\n" +
                         "- Think carefully before each guess\n" +
@@ -488,12 +488,10 @@ public class MainController {
                        "- Multiple difficulty levels\n" +
                        "- Score tracking\n" +
                        "- Obstacle mode\n" +
-                       "- Power-ups (costs 10 coins)\n\n" +
                        "Controls:\n" +
                        "WASD - Move snake\n" +
                        "P - Pause game\n" +
                        "R - Restart game\n" +
-                       "B - Buy power-up\n\n" +
                        "Game Over:\n" +
                        "- Hitting walls\n" +
                        "- Hitting obstacles\n" +
@@ -508,8 +506,8 @@ public class MainController {
                        "Features:\n" +
                        "- Multiple difficulty levels\n" +
                        "- Move counter\n" +
-                       "- Auto-solve demonstration (costs 5 coins)\n" +
-                       "- Hint system (costs 2 coins per hint)";
+                       "- Auto-solve demonstration\n" +
+                       "- Score based on moves (Perfect=10000)";
                        
             case "Guess Number":
                 return "Number Guessing Game\n\n" +
@@ -519,8 +517,7 @@ public class MainController {
                        "- Score based on attempts left\n" +
                        "- Perfect score (10000) for first try\n" +
                        "- Score decreases with more attempts\n" +
-                       "- Zero score for failure\n" +
-                       "- Hint system (costs 3 coins per hint)\n\n" +
+                       "- Zero score for failure\n\n" +
                        "Strategy:\n" +
                        "- Use binary search\n" +
                        "- Think carefully before each guess\n" +
@@ -533,11 +530,12 @@ public class MainController {
                        "- Three difficulty levels (Easy/Medium/Hard)\n" +
                        "- Smart AI opponent\n" +
                        "- Score system based on moves\n" +
-                       "- Perfect score (10000) for quick win\n\n" +
+                       "- Perfect score (10000) for fastest win (5 moves)\n\n" +
                        "Rules:\n" +
                        "- Get three X's in a row to win\n" +
                        "- Block computer's O's to prevent losing\n" +
-                       "- Draw game gives 5000 points\n\n" +
+                       "- Draw game gives 5000 points\n" +
+                       "- Score decreases by 1000 for each extra move\n\n" +
                        "Controls:\n" +
                        "- Click empty cell to place X\n" +
                        "- New Game button to restart\n" +
@@ -593,6 +591,28 @@ public class MainController {
                        "- Click SPIN! to play\n" +
                        "- New Game to reset\n\n" +
                        "Score shows net profit/loss";
+                       
+            case "Bingo":
+                return "Classic Bingo Game\n\n" +
+                       "Match numbers on your card with called numbers.\n\n" +
+                       "Features:\n" +
+                       "- Multiple bingo patterns\n" +
+                       "- Real-time number calling\n" +
+                       "- Auto-daub numbers\n" +
+                       "- Multiple cards view\n\n" +
+                       "Game Modes:\n" +
+                       "- Single Bingo\n" +
+                       "- Double Bingo\n" +
+                       "- Diamond Inside\n" +
+                       "- Frame Inside\n" +
+                       "- Blackout\n\n" +
+                       "Controls:\n" +
+                       "- Click CALL for next number\n" +
+                       "- Click numbers to mark\n" +
+                       "- Click BINGO to claim win\n\n" +
+                       "Betting:\n" +
+                       "- Place bets before each game\n" +
+                       "- Win multipliers based on pattern";
                        
             default:
                 return "Game description not available.";

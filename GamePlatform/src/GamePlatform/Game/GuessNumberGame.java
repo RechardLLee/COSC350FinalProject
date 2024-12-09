@@ -7,7 +7,7 @@ import java.util.*;
 import javax.swing.border.*;
 import GamePlatform.User.Management.UserSession;
 
-public class GuessNumberGame extends JFrame {
+public class GuessNumberGame extends BaseGame {
     private Map<String, Map<String, Integer>> difficulties;
     private String currentDifficulty;
     private int targetNumber;
@@ -22,6 +22,7 @@ public class GuessNumberGame extends JFrame {
     private JComboBox<String> difficultyCombo;
     
     public GuessNumberGame() {
+        super("Guess Number");
         currentPlayer = UserSession.getCurrentUser();
         
         // Initialize game settings
@@ -147,7 +148,9 @@ public class GuessNumberGame extends JFrame {
     }
     
     private void showGameResult(boolean won, int score) {
-        GameRecordManager.saveGameRecord(currentPlayer, "Guess Number", score);
+        if (score > 0) {
+            saveScore(score);
+        }
         
         String message = won ? 
             String.format("Congratulations! You won!\nAttempts used: %d\nAttempts left: %d\nScore: %d", 

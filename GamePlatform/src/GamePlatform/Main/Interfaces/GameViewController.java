@@ -24,6 +24,8 @@ import javafx.util.Duration;
 import GamePlatform.Game.GameRecord;
 import GamePlatform.Game.GameRecordManager;
 import javafx.scene.image.Image;
+import javafx.application.Platform;
+import GamePlatform.Game.BinGo;
 
 public class GameViewController {
     @FXML private Label titleLabel;
@@ -76,36 +78,59 @@ public class GameViewController {
         if (titleLabel != null && titleLabel.getText() != null) {
             String title = titleLabel.getText();
             
-            // 同步文件记录到数据库
-            GameRecordManager.syncRecordsToDatabase(title);
-            
-            // 刷新游戏统计信息
-            GameStats stats = DatabaseService.getGameStats(title);
-            
-            // 更新统计标签
-            String totalPlayersText = stats.getTotalPlayers() > 0 ? 
-                String.valueOf(stats.getTotalPlayers()) : 
-                LanguageUtil.isEnglish() ? "No players yet" : "暂无玩家";
-            totalPlayersLabel.setText(totalPlayersText);
-            
-            // 处理高分和最佳玩家的显示
-            if (stats.getHighScore() > 0 && stats.getTopPlayer() != null) {
-                if (title.equals("Slot Machine") || title.equals("Roulette")) {
-                    highScoreLabel.setText(String.format("$%d (by %s)", 
-                        stats.getHighScore(), stats.getTopPlayer()));
-                } else {
-                    highScoreLabel.setText(String.format("%d (by %s)", 
-                        stats.getHighScore(), stats.getTopPlayer()));
-                }
-            } else {
-                highScoreLabel.setText(LanguageUtil.isEnglish() ? "No records yet" : "暂无记录");
+            if (title.equals("Bingo")) {
+                // 设置Bingo特有的列标题
+                scoreColumn.setText(LanguageUtil.isEnglish() ? 
+                    "Net Profit" : "净收益");
             }
             
-            // 更新顶部玩家显示
-            if (stats.getTopPlayer() != null) {
-                topPlayerLabel.setText(stats.getTopPlayer());
-            } else {
-                topPlayerLabel.setText(LanguageUtil.isEnglish() ? "No top player yet" : "暂无最佳玩家");
+            try {
+                java.nio.file.Path path = java.nio.file.Paths.get("game_records/" + title + ".txt");
+                if (java.nio.file.Files.exists(path)) {
+                    java.util.List<String> lines = java.nio.file.Files.readAllLines(path);
+                    
+                    java.util.Set<String> uniquePlayers = new java.util.HashSet<>();
+                    int highScore = 0;
+                    String topPlayer = "";
+                    
+                    for (String line : lines) {
+                        String[] parts = line.split(",");
+                        if (parts.length >= 2) {
+                            String playerName = parts[0].trim();
+                            int score = Integer.parseInt(parts[1].trim());
+                            uniquePlayers.add(playerName);
+                            
+                            if (score > highScore) {
+                                highScore = score;
+                                topPlayer = playerName;
+                            }
+                        }
+                    }
+                    
+                    // 更新显示
+                    totalPlayersLabel.setText(String.valueOf(uniquePlayers.size()));
+                    
+                    // 根据游戏类型设置不同的显示格式
+                    if (title.equals("Roulette") || title.equals("Slot Machine")) {
+                        // 金钱游戏显示带$符号
+                        if (highScore > 0) {
+                            highScoreLabel.setText(String.format("$%d (by %s)", highScore, topPlayer));
+                        } else {
+                            highScoreLabel.setText("No records yet");
+                        }
+                    } else {
+                        // 其他游戏显示普通分数
+                        if (highScore > 0) {
+                            highScoreLabel.setText(String.format("%d (by %s)", highScore, topPlayer));
+                        } else {
+                            highScoreLabel.setText("No records yet");
+                        }
+                    }
+                    
+                    topPlayerLabel.setText(topPlayer.isEmpty() ? "No top player yet" : topPlayer);
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading game records: " + e.getMessage());
             }
             
             // 设置表格列标题
@@ -143,7 +168,11 @@ public class GameViewController {
     @FXML
     private void handleStartGame() {
         if (gamePath != null) {
-            GameLauncher.launchGame(gamePath);
+            if (titleLabel.getText().equals("Bingo")) {
+                startBingoGame();
+            } else {
+                GameLauncher.launchGame(gamePath);
+            }
             refreshTimeline.play();
         }
     }
@@ -161,6 +190,7 @@ public class GameViewController {
             String imagePath = null;
             switch(title) {
                 case "Snake":
+                case "贪吃蛇":
                     imagePath = "/src/GamePlatform/Game/SnakeGame.png";
                     break;
                 case "Hanoi Tower":
@@ -181,17 +211,26 @@ public class GameViewController {
                 case "Roulette":
                     imagePath = "/src/GamePlatform/Game/RouletteGame.png";
                     break;
+                case "Bingo":
+                    imagePath = "/src/GamePlatform/Game/bingo/Bingo.png";
+                    break;
                     
             }
             
             if (imagePath != null) {
-                // 使用文件系统路径加载图片
                 File imageFile = new File(System.getProperty("user.dir") + imagePath);
                 if (imageFile.exists()) {
                     Image image = new Image(imageFile.toURI().toString());
                     gameIcon.setImage(image);
+                    
+                    // 为Bingo游戏设置特殊的图标样式
+                    gameIcon.setFitWidth(200);  // 设置合适的宽度
+                    gameIcon.setFitHeight(200); // 设置合适的高度
+                    gameIcon.setPreserveRatio(true); // 保持图片比例
+                    
                 } else {
                     System.out.println("Cannot find image: " + imageFile.getAbsolutePath());
+                    // 如果找不到图片，设置一个默认的背景样式
                     gameIcon.setStyle(
                         "-fx-background-color: #f0f0f0;" +
                         "-fx-background-radius: 10;" +
@@ -202,11 +241,6 @@ public class GameViewController {
         } catch (Exception e) {
             System.out.println("Error loading image for game: " + title);
             e.printStackTrace();
-            gameIcon.setStyle(
-                "-fx-background-color: #f0f0f0;" +
-                "-fx-background-radius: 10;" +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);"
-            );
         }
         
         // 设置开始按钮文本
@@ -220,5 +254,16 @@ public class GameViewController {
         
         // 立即刷新历史记录
         refreshGameInfo();
+    }
+    
+    @FXML
+    private void startBingoGame() {
+        Platform.runLater(() -> {
+            try {
+                new BinGo();  // 使用新的BinGo类
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 } 

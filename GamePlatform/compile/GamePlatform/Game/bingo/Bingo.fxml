@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GamePlatform.Game.bingo.BingoController">
+   <center>
+      <Pane prefHeight="350.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+         <children>
+
+
+
+
+            <!-- Circles around player card-->
+            <!-- B circles -->
+            <Circle fx:id="B1Circle" centerX="64.0" fill="#f9fbfc" layoutX="20.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="B2Circle" centerX="64.0" fill="#f9fbfc" layoutX="20.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="B3Circle" centerX="64.0" fill="#f9fbfc" layoutX="20.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="B4Circle" centerX="64.0" fill="#f9fbfc" layoutX="20.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="B5Circle" centerX="64.0" fill="#f9fbfc" layoutX="20.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <!-- I circles -->
+            <Circle fx:id="I1Circle" centerX="64.0" fill="#f9fbfc" layoutX="80.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="I2Circle" centerX="64.0" fill="#f9fbfc" layoutX="80.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="I3Circle" centerX="64.0" fill="#f9fbfc" layoutX="80.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="I4Circle" centerX="64.0" fill="#f9fbfc" layoutX="80.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="I5Circle" centerX="64.0" fill="#f9fbfc" layoutX="80.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <!-- N circles -->
+            <Circle fx:id="N1Circle" centerX="64.0" fill="#f9fbfc" layoutX="140.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="N2Circle" centerX="64.0" fill="#f9fbfc" layoutX="140.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="N3Circle" centerX="64.0" fill="#f9fbfc" layoutX="140.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="N4Circle" centerX="64.0" fill="#f9fbfc" layoutX="140.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="N5Circle" centerX="64.0" fill="#f9fbfc" layoutX="140.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <!-- G circles -->
+            <Circle fx:id="G1Circle" centerX="64.0" fill="#f9fbfc" layoutX="200.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="G2Circle" centerX="64.0" fill="#f9fbfc" layoutX="200.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="G3Circle" centerX="64.0" fill="#f9fbfc" layoutX="200.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="G4Circle" centerX="64.0" fill="#f9fbfc" layoutX="200.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="G5Circle" centerX="64.0" fill="#f9fbfc" layoutX="200.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <!-- O circles -->
+            <Circle fx:id="O1Circle" centerX="64.0" fill="#f9fbfc" layoutX="260.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="O2Circle" centerX="64.0" fill="#f9fbfc" layoutX="260.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="O3Circle" centerX="64.0" fill="#f9fbfc" layoutX="260.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="O4Circle" centerX="64.0" fill="#f9fbfc" layoutX="260.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="O5Circle" centerX="64.0" fill="#f9fbfc" layoutX="260.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" />
+
+            <!-- Labels for Player Card -->
+            <Label alignment="CENTER" layoutX="64.0" prefHeight="40.0" prefWidth="40.0" text="B">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutX="124.0" prefHeight="40.0" prefWidth="40.0" text="I">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutX="184.0" layoutY="0.0" prefHeight="40.0" prefWidth="40.0" text="N">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" layoutX="244.0" layoutY="0.0" prefHeight="40.0" prefWidth="40.0" text="G">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="CENTER" layoutX="304.0" layoutY="0.0" prefHeight="40.0" prefWidth="40.0" text="O">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+
+
+            <!-- Text for column values -->
+            <!-- B texts -->
+            <Text fx:id="B1Text" layoutX="60.0" layoutY="90.0" onMouseClicked="#B1Action" strokeType="OUTSIDE" strokeWidth="0.0" text="B1" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="B2Text" layoutX="60.0" layoutY="150.0" onMouseClicked="#B2Action" strokeType="OUTSIDE" strokeWidth="0.0" text="B2" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="B3Text" layoutX="60.0" layoutY="210.0" onMouseClicked="#B3Action" strokeType="OUTSIDE" strokeWidth="0.0" text="B3" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="B4Text" layoutX="60.0" layoutY="270.0" onMouseClicked="#B4Action" strokeType="OUTSIDE" strokeWidth="0.0" text="B4" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="B5Text" layoutX="60.0" layoutY="330.0" onMouseClicked="#B5Action" strokeType="OUTSIDE" strokeWidth="0.0" text="B5" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+
+            <!-- I Texts -->
+            <Text fx:id="I1Text" layoutX="124.0" layoutY="90.0" onMouseClicked="#I1Action" strokeType="OUTSIDE" strokeWidth="0.0" text="I1" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="I2Text" layoutX="124.0" layoutY="150.0" onMouseClicked="#I2Action" strokeType="OUTSIDE" strokeWidth="0.0" text="I2" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="I3Text" layoutX="124.0" layoutY="210.0" onMouseClicked="#I3Action" strokeType="OUTSIDE" strokeWidth="0.0" text="I3" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="I4Text" layoutX="124.0" layoutY="270.0" onMouseClicked="#I4Action" strokeType="OUTSIDE" strokeWidth="0.0" text="I4" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="I5Text" layoutX="124.0" layoutY="330.0" onMouseClicked="#I5Action" strokeType="OUTSIDE" strokeWidth="0.0" text="I5" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <!-- N Texts -->
+
+            <Text fx:id="N1Text" layoutX="180.0" layoutY="90.0" onMouseClicked="#N1Action" strokeType="OUTSIDE" strokeWidth="0.0" text="N1" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="N2Text" layoutX="180.0" layoutY="150.0" onMouseClicked="#N2Action" strokeType="OUTSIDE" strokeWidth="0.0" text="N2" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="N3Text" layoutX="179.0" layoutY="197.0" onMouseClicked="#N3Action" strokeType="OUTSIDE" strokeWidth="0.0" text="Free Space" wrappingWidth="35.0" x="10.0">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></Text>
+            <Text fx:id="N4Text" layoutX="180.0" layoutY="270.0" onMouseClicked="#N4Action" strokeType="OUTSIDE" strokeWidth="0.0" text="N4" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="N5Text" layoutX="180.0" layoutY="330.0" onMouseClicked="#N5Action" strokeType="OUTSIDE" strokeWidth="0.0" text="N5" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+
+            <!-- G Texts -->
+
+            <Text fx:id="G1Text" layoutX="240.0" layoutY="90.0" onMouseClicked="#G1Action" strokeType="OUTSIDE" strokeWidth="0.0" text="G1" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="G2Text" layoutX="240.0" layoutY="150.0" onMouseClicked="#G2Action" strokeType="OUTSIDE" strokeWidth="0.0" text="G2" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="G3Text" layoutX="240.0" layoutY="210.0" onMouseClicked="#G3Action" strokeType="OUTSIDE" strokeWidth="0.0" text="G3" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="G4Text" layoutX="240.0" layoutY="270.0" onMouseClicked="#G4Action" strokeType="OUTSIDE" strokeWidth="0.0" text="G4" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="G5Text" layoutX="240.0" layoutY="330.0" onMouseClicked="#G5Action" strokeType="OUTSIDE" strokeWidth="0.0" text="G5" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <!-- O Texts -->
+
+            <Text fx:id="O1Text" layoutX="300.0" layoutY="90.0" onMouseClicked="#O1Action" strokeType="OUTSIDE" strokeWidth="0.0" text="O1" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="O2Text" layoutX="300.0" layoutY="150.0" onMouseClicked="#O2Action" strokeType="OUTSIDE" strokeWidth="0.0" text="O2" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="O3Text" layoutX="300.0" layoutY="210.0" onMouseClicked="#O3Action" strokeType="OUTSIDE" strokeWidth="0.0" text="O3" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="O4Text" layoutX="300.0" layoutY="270.0" onMouseClicked="#O4Action" strokeType="OUTSIDE" strokeWidth="0.0" text="O4" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+            <Text fx:id="O5Text" layoutX="300.0" layoutY="330.0" onMouseClicked="#O5Action" strokeType="OUTSIDE" strokeWidth="0.0" text="O5" x="10.0">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Text>
+         </children>
+      </Pane>
+   </center>
+
+
+
+
+   <bottom>
+      <Pane prefHeight="100.0" prefWidth="1200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="bingoButton" layoutX="552.0" layoutY="14.0" mnemonicParsing="false" onAction="#bingoButtonAction" text="BINGO" textFill="#f50b0b">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Button>
+            <Label layoutX="58.0" layoutY="31.0" text="Balance" />
+            <TextField fx:id="balanceTextField" alignment="CENTER" focusTraversable="false" layoutX="121.0" layoutY="27.0" promptText="Balance" text="0" />
+            <Label layoutX="306.0" layoutY="31.0" text="Bet" />
+            <TextField fx:id="betTextField" alignment="CENTER" focusTraversable="false" layoutX="353.0" layoutY="27.0" prefHeight="25.0" prefWidth="47.0" text="0" />
+            <Button fx:id="plusButton" layoutX="400.0" layoutY="27.0" mnemonicParsing="false" onAction="#plusAction" text="+" />
+            <Button fx:id="minusButton" layoutX="424.0" layoutY="27.0" mnemonicParsing="false" onAction="#minusAction" text="-" />
+            <Label layoutX="798.0" layoutY="31.0" text="Winnings" />
+            <TextField fx:id="winningsTextField" layoutX="877.0" layoutY="27.0" text="0" />
+         </children></Pane>
+   </bottom>
+
+
+
+
+   <top>
+      <Pane prefHeight="350.0" prefWidth="1200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#fafbfc" height="338.0" layoutX="890.0" layoutY="14.0" stroke="BLACK" strokeType="INSIDE" width="308.0" />
+
+            <!-- Game Type displays -->
+            <TextArea fx:id="gameTypeTextArea" focusTraversable="false" layoutX="709.0" layoutY="30.0" prefHeight="41.0" prefWidth="156.0" promptText="Game Type" />
+            <TextField fx:id="nextRoundTextField" focusTraversable="false" layoutX="713.0" layoutY="92.0" promptText="Next Round" />
+
+            <!-- Called Numbers Display -->
+            <TextArea fx:id="BTextArea" focusTraversable="false" layoutX="20.0" layoutY="50.0" prefHeight="300.0" prefWidth="50.0" />
+            <TextArea fx:id="ITextArea" focusTraversable="false" layoutX="70.0" layoutY="50.0" prefHeight="300.0" prefWidth="50.0" />
+            <TextArea fx:id="NTextArea" focusTraversable="false" layoutX="120.0" layoutY="50.0" prefHeight="300.0" prefWidth="50.0" />
+            <TextArea fx:id="GTextArea" focusTraversable="false" layoutX="170.0" layoutY="50.0" prefHeight="300.0" prefWidth="50.0" />
+            <TextArea fx:id="OTextArea" focusTraversable="false" layoutX="220.0" layoutY="50.0" prefHeight="300.0" prefWidth="50.0" />
+            <Label alignment="TOP_CENTER" focusTraversable="false" layoutX="20.0" layoutY="20.0" prefHeight="25.0" prefWidth="50.0" text="B">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="TOP_CENTER" focusTraversable="false" layoutX="70.0" layoutY="20.0" prefHeight="25.0" prefWidth="50.0" text="I">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="TOP_CENTER" focusTraversable="false" layoutX="120.0" layoutY="20.0" prefHeight="25.0" prefWidth="50.0" text="N">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="TOP_CENTER" focusTraversable="false" layoutX="170.0" layoutY="20.0" prefHeight="25.0" prefWidth="50.0" text="G">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="TOP_CENTER" focusTraversable="false" layoutX="220.0" layoutY="20.0" prefHeight="25.0" prefWidth="50.0" text="O">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+
+            <!-- Caller -->
+            <TextField fx:id="callTextField" alignment="CENTER" focusTraversable="false" layoutX="359.0" layoutY="92.0" prefHeight="100.0" prefWidth="200.0" promptText="Call">
+               <font>
+                  <Font size="36.0" />
+               </font></TextField>
+            <Button fx:id="callButton" layoutX="440.0" layoutY="233.0" mnemonicParsing="false" onAction="#callAction" prefHeight="25.0" prefWidth="55.0" text="Call" />
+
+
+
+            <!-- Pattern Display -->
+            <!-- Circles for Display -->
+
+            <!-- B Circles -->
+            <Circle fx:id="displayB1Circle" centerX="64.0" fill="WHITE" layoutX="856.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayB2Circle" centerX="64.0" fill="WHITE" layoutX="856.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayB3Circle" centerX="64.0" fill="WHITE" layoutX="856.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayB4Circle" centerX="64.0" fill="WHITE" layoutX="856.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayB5Circle" centerX="64.0" fill="WHITE" layoutX="856.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+
+            <!-- I Circles -->
+            <Circle fx:id="displayI1Circle" centerX="64.0" fill="WHITE" layoutX="916.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayI2Circle" centerX="64.0" fill="WHITE" layoutX="916.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayI3Circle" centerX="64.0" fill="WHITE" layoutX="916.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayI4Circle" centerX="64.0" fill="WHITE" layoutX="916.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayI5Circle" centerX="64.0" fill="WHITE" layoutX="916.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+
+            <!-- N Circles -->
+            <Circle fx:id="displayN1Circle" centerX="64.0" fill="WHITE" layoutX="976.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayN2Circle" centerX="64.0" fill="WHITE" layoutX="976.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayN3Circle" centerX="64.0" fill="RED" layoutX="976.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayN4Circle" centerX="64.0" fill="WHITE" layoutX="976.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayN5Circle" centerX="64.0" fill="WHITE" layoutX="976.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+
+            <!-- G Circles -->
+            <Circle fx:id="displayG1Circle" centerX="64.0" fill="WHITE" layoutX="1036.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayG2Circle" centerX="64.0" fill="WHITE" layoutX="1036.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayG3Circle" centerX="64.0" fill="WHITE" layoutX="1036.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayG4Circle" centerX="64.0" fill="WHITE" layoutX="1036.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayG5Circle" centerX="64.0" fill="WHITE" layoutX="1036.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+
+            <!-- O Circles -->
+            <Circle fx:id="displayO1Circle" centerX="64.0" fill="WHITE" layoutX="1096.0" layoutY="80.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayO2Circle" centerX="64.0" fill="WHITE" layoutX="1096.0" layoutY="140.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayO3Circle" centerX="64.0" fill="WHITE" layoutX="1096.0" layoutY="200.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayO4Circle" centerX="64.0" fill="WHITE" layoutX="1096.0" layoutY="260.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            <Circle fx:id="displayO5Circle" centerX="64.0" fill="WHITE" layoutX="1096.0" layoutY="320.0" radius="25.0" stroke="BLACK" strokeType="INSIDE" /> 
+            
+
+
+            <!-- Labels for Pattern Display -->
+            <Label alignment="CENTER" layoutX="900.0" layoutY="20.0" prefHeight="40.0" prefWidth="40.0" text="B">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="CENTER" layoutX="960.0" layoutY="20.0" prefHeight="40.0" prefWidth="40.0" text="I">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="CENTER" layoutX="1020.0" layoutY="20.0" prefHeight="40.0" prefWidth="40.0" text="N">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="CENTER" layoutX="1080.0" layoutY="20.0" prefHeight="40.0" prefWidth="40.0" text="G">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+            <Label alignment="CENTER" layoutX="1140.0" layoutY="20.0" prefHeight="40.0" prefWidth="40.0" text="O">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font></Label>
+         </children></Pane>
+   </top>
+
+
+
+
+   <left>
+      <Pane prefHeight="350.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+         <children>
+
+            <!-- labels for CPU Card 1 -->
+            <Label alignment="CENTER" layoutX="25.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="50.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="I">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="75.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="N">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="100.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="125.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="O">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <!-- Rectangles to display CPU Card 1-->
+            <!-- B Column -->
+            <Rectangle fx:id="C1B1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1B2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1B3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1B4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1B5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- I Column -->
+            <Rectangle fx:id="C1I1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1I2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1I3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1I4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1I5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- N Column -->
+            <Rectangle fx:id="C1N1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1N2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f20b0b" height="20.0" layoutX="75.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1N4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1N5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- G Column -->
+            <Rectangle fx:id="C1G1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1G2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1G3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1G4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1G5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- O Column -->
+            <Rectangle fx:id="C1O1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1O2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1O3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1O4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C1O5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+
+            <!-- labels for CPU Card 2 -->
+            <Label alignment="CENTER" layoutX="200.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="225.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="I">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="250.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="N">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="275.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="300.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="O">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+
+
+            <!-- Rectangles to display CPU Card 2-->
+            <!-- B Column -->
+            <Rectangle fx:id="C2B1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2B2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2B3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2B4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2B5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- I Column -->
+            <Rectangle fx:id="C2I1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2I2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2I3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2I4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2I5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- N Column -->
+            <Rectangle fx:id="C2N1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2N2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f20b0b" height="20.0" layoutX="250.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2N4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2N5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- G Column -->
+            <Rectangle fx:id="C2G1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2G2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2G3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2G4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2G5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- O Column -->
+            <Rectangle fx:id="C2O1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2O2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2O3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2O4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C2O5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+
+            <!-- labels for CPU Card 3 -->
+            <Label alignment="CENTER" layoutX="25.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="50.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="I">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="75.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="N">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="100.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="125.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="O">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <!-- Rectangles to display CPU Card 3-->
+            <!-- B Column -->
+            <Rectangle fx:id="C3B1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3B2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3B3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3B4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3B5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- I Column -->
+            <Rectangle fx:id="C3I1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3I2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3I3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3I4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3I5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- N Column -->
+            <Rectangle fx:id="C3N1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3N2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f20b0b" height="20.0" layoutX="75.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3N4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3N5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- G Column -->
+            <Rectangle fx:id="C3G1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3G2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3G3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3G4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3G5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- O Column -->
+            <Rectangle fx:id="C3O1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3O2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3O3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3O4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C3O5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+
+
+            <!-- labels for CPU Card 4 -->
+            <Label alignment="CENTER" layoutX="200.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="225.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="I">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="250.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="N">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="275.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="300.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="O">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <!-- Rectangles to display CPU Card 4-->
+            <!-- B Column -->
+            <Rectangle fx:id="C4B1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4B2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4B3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4B4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4B5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- I Column -->
+            <Rectangle fx:id="C4I1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4I2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4I3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4I4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4I5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- N Column -->
+            <Rectangle fx:id="C4N1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4N2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f20b0b" height="20.0" layoutX="250.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4N4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4N5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- G Column -->
+            <Rectangle fx:id="C4G1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4G2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4G3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4G4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4G5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- O Column -->
+            <Rectangle fx:id="C4O1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4O2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4O3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4O4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C4O5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+         </children></Pane>
+   </left>
+   <right>
+      <Pane prefHeight="350.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+         <children>
+         <!-- labels for CPU Card 5 -->
+            <Label alignment="CENTER" layoutX="25.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="50.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="I">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="75.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="N">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="100.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="125.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="O">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <!-- Rectangles to display CPU Card 5-->
+            <!-- B Column -->
+            <Rectangle fx:id="C5B1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5B2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5B3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5B4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5B5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- I Column -->
+            <Rectangle fx:id="C5I1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5I2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5I3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5I4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5I5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- N Column -->
+            <Rectangle fx:id="C5N1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5N2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f20b0b" height="20.0" layoutX="75.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5N4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5N5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- G Column -->
+            <Rectangle fx:id="C5G1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5G2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5G3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5G4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5G5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- O Column -->
+            <Rectangle fx:id="C5O1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5O2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5O3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5O4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C5O5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+
+            <!-- labels for CPU Card 6 -->
+            <Label alignment="CENTER" layoutX="200.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="225.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="I">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="250.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="N">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="275.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="300.0" layoutY="20.0" prefHeight="20.0" prefWidth="20.0" text="O">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+
+
+            <!-- Rectangles to display CPU Card 6-->
+            <!-- B Column -->
+            <Rectangle fx:id="C6B1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6B2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6B3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6B4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6B5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- I Column -->
+            <Rectangle fx:id="C6I1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6I2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6I3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6I4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6I5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- N Column -->
+            <Rectangle fx:id="C6N1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6N2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f20b0b" height="20.0" layoutX="250.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6N4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6N5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- G Column -->
+            <Rectangle fx:id="C6G1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6G2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6G3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6G4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6G5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- O Column -->
+            <Rectangle fx:id="C6O1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="40.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6O2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6O3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6O4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C6O5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+
+            <!-- labels for CPU Card 7 -->
+            <Label alignment="CENTER" layoutX="25.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="50.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="I">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="75.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="N">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="100.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="125.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="O">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <!-- Rectangles to display CPU Card 7-->
+            <!-- B Column -->
+            <Rectangle fx:id="C7B1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7B2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7B3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7B4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7B5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="25.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- I Column -->
+            <Rectangle fx:id="C7I1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7I2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7I3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7I4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7I5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="50.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- N Column -->
+            <Rectangle fx:id="C7N1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7N2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f20b0b" height="20.0" layoutX="75.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7N4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7N5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="75.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- G Column -->
+            <Rectangle fx:id="C7G1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7G2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7G3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7G4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7G5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="100.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- O Column -->
+            <Rectangle fx:id="C7O1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7O2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7O3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7O4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C7O5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="125.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+
+
+            <!-- labels for CPU Card 8 -->
+            <Label alignment="CENTER" layoutX="200.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="225.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="I">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="250.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="N">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="275.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+               
+            <Label alignment="CENTER" layoutX="300.0" layoutY="160.0" prefHeight="20.0" prefWidth="20.0" text="O">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <!-- Rectangles to display CPU Card 8-->
+            <!-- B Column -->
+            <Rectangle fx:id="C8B1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8B2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8B3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8B4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8B5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="200.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- I Column -->
+            <Rectangle fx:id="C8I1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8I2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8I3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8I4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8I5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="225.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- N Column -->
+            <Rectangle fx:id="C8N1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8N2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f20b0b" height="20.0" layoutX="250.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8N4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8N5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="250.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- G Column -->
+            <Rectangle fx:id="C8G1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8G2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8G3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8G4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8G5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="275.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+
+            <!-- O Column -->
+            <Rectangle fx:id="C8O1Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8O2Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8O3Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8O4Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            <Rectangle fx:id="C8O5Rect" arcHeight="5.0" arcWidth="5.0" fill="#eeeeee" height="20.0" layoutX="300.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="20.0" />
+            </children></Pane>
+   </right>
+</BorderPane>

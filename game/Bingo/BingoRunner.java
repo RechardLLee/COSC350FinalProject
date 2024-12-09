@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 
 
 //To open Bingo.fmxl
-public class SinglePlayerBingoRunner extends Application{
+public class BingoRunner extends Application{
 
 	@Override
 	public void start(Stage stage) throws Exception {

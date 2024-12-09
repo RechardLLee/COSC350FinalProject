@@ -21,12 +21,14 @@ mkdir "compile\GamePlatform\Developer" 2>nul
 mkdir "compile\GamePlatform\Feedback" 2>nul
 mkdir "compile\GamePlatform\Main\Interfaces" 2>nul
 mkdir "compile\GamePlatform\Game" 2>nul
+mkdir "compile\GamePlatform\Game\bingo" 2>nul
 
 :: Copy FXML files
 xcopy /s /y "src\GamePlatform\User\Management\*.fxml" "compile\GamePlatform\User\Management\"
 xcopy /s /y "src\GamePlatform\Developer\*.fxml" "compile\GamePlatform\Developer\"
 xcopy /s /y "src\GamePlatform\Feedback\*.fxml" "compile\GamePlatform\Feedback\"
 xcopy /s /y "src\GamePlatform\Main\Interfaces\*.fxml" "compile\GamePlatform\Main\Interfaces\"
+xcopy /s /y "src\GamePlatform\Game\bingo\*.fxml" "compile\GamePlatform\Game\bingo\"
 
 :: Compile in correct order
 javac -encoding UTF-8 -d compile -sourcepath src ^
@@ -36,6 +38,10 @@ javac -encoding UTF-8 -d compile -sourcepath src ^
     src\GamePlatform\Utility\*.java ^
     src\GamePlatform\User\Management\UserData.java ^
     src\GamePlatform\Feedback\*.java ^
+    src\GamePlatform\Game\bingo\Bingo.java ^
+    src\GamePlatform\Game\bingo\StandardBingo.java ^
+    src\GamePlatform\Game\bingo\BingoController.java ^
+    src\GamePlatform\Game\bingo\BingoRunner.java ^
     src\GamePlatform\Game\*.java ^
     src\GamePlatform\Developer\*.java ^
     src\GamePlatform\Main\Interfaces\*.java ^
