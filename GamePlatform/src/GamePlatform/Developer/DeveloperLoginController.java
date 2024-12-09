@@ -30,7 +30,7 @@ public class DeveloperLoginController {
             titleLabel.setText("Developer Login");
             usernameLabel.setText("Username:");
             passwordLabel.setText("Password:");
-            securityLabel.setText("Security Question:");
+            securityLabel.setText("What is a good question?");
             usernameField.setPromptText("Enter username");
             passwordField.setPromptText("Enter password");
             securityField.setPromptText("Enter answer");
@@ -39,7 +39,7 @@ public class DeveloperLoginController {
             titleLabel.setText("开发者登录");
             usernameLabel.setText("用户名:");
             passwordLabel.setText("密码:");
-            securityLabel.setText("安全问题:");
+            securityLabel.setText("什么是一个好问题?");
             usernameField.setPromptText("请输入用户名");
             passwordField.setPromptText("请输入密码");
             securityField.setPromptText("请输入答案");
