@@ -21,6 +21,19 @@ public class LoginController {
     @FXML
     private void initialize() {
         setLanguage(LanguageUtil.isEnglish());
+        
+        // 添加回车键监听器
+        passwordField.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")) {
+                handleLogin();
+            }
+        });
+        
+        usernameField.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")) {
+                handleLogin();
+            }
+        });
     }
     
     private void setLanguage(boolean english) {
@@ -67,6 +80,13 @@ public class LoginController {
                 Stage stage = new Stage();
                 stage.setTitle(LanguageUtil.isEnglish() ? "Game Platform" : "游戏平台");
                 stage.setScene(new Scene(root));
+                
+                // 只为主窗口设置尺寸
+                stage.setMinWidth(800);
+                stage.setMinHeight(600);
+                stage.setWidth(1280);
+                stage.setHeight(720);
+                
                 stage.show();
                 
                 // 关闭登录窗口

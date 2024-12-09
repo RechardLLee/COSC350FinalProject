@@ -30,6 +30,10 @@ xcopy /s /y "src\GamePlatform\Feedback\*.fxml" "compile\GamePlatform\Feedback\" 
 xcopy /s /y "src\GamePlatform\Main\Interfaces\*.fxml" "compile\GamePlatform\Main\Interfaces\" > nul
 xcopy /s /y "src\GamePlatform\Game\bingo\*.fxml" "compile\GamePlatform\Game\bingo\" > nul
 
+:: Copy styles files
+mkdir "compile\GamePlatform\Developer\styles" 2>nul
+copy /y "src\GamePlatform\Developer\styles\styles.css" "compile\GamePlatform\Developer\styles\styles.css" > nul
+
 :: Compile in correct order
 javac -encoding UTF-8 -d compile -sourcepath src ^
     src\GamePlatform\Game\GameStats.java ^

@@ -4,32 +4,38 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="20" prefWidth="400" prefHeight="300"
+<VBox alignment="CENTER" spacing="20" prefWidth="400" prefHeight="500"
     style="-fx-background-color: #f5f5f5;"
     xmlns:fx="http://javafx.com/fxml" 
     fx:controller="GamePlatform.User.Management.LoginController">
     
     <padding>
-        <Insets top="20" right="40" bottom="20" left="40"/>
+        <Insets top="40" right="50" bottom="40" left="50"/>
     </padding>
     
     <Label fx:id="titleLabel" text="Game Platform" 
-        style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+        style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #333;"/>
     
-    <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20;">
-        <TextField fx:id="usernameField" promptText="Username"
-            style="-fx-background-radius: 5;"/>
-        <PasswordField fx:id="passwordField" promptText="Password"
-            style="-fx-background-radius: 5;"/>
+    <VBox spacing="20" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 30;">
+        <VBox spacing="5">
+            <Label text="Username"/>
+            <TextField fx:id="usernameField" 
+                style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 8;"/>
+        </VBox>
         
-        <HBox spacing="10" alignment="CENTER_RIGHT">
-            <Button fx:id="loginButton" text="Login"
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5;"
-                onAction="#handleLogin"/>
-            <Button fx:id="signupButton" text="Sign Up"
-                style="-fx-background-color: transparent; -fx-border-color: #4CAF50; -fx-text-fill: #4CAF50; -fx-background-radius: 5; -fx-border-radius: 5;"
-                onAction="#handleSignup"/>
-        </HBox>
+        <VBox spacing="5">
+            <Label text="Password"/>
+            <PasswordField fx:id="passwordField"
+                style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 8;"/>
+        </VBox>
+        
+        <Button fx:id="loginButton" text="Login"
+            style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 12 0; -fx-font-size: 14;"
+            maxWidth="Infinity" onAction="#handleLogin"/>
+            
+        <Button fx:id="signupButton" text="Sign Up"
+            style="-fx-background-color: transparent; -fx-text-fill: #4CAF50; -fx-background-radius: 25; -fx-padding: 12 0; -fx-font-size: 14;"
+            maxWidth="Infinity" onAction="#handleSignup"/>
     </VBox>
     
     <Button fx:id="languageButton" text="中文"

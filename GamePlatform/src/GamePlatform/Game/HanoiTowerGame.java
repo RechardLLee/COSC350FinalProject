@@ -65,7 +65,6 @@ public class HanoiTowerGame extends BaseGame {
         diffCombo.setSelectedItem(currentDifficulty);
         diffCombo.addActionListener(e -> {
             currentDifficulty = (String)diffCombo.getSelectedItem();
-            numDisks = difficulties.get(currentDifficulty);
             resetGame();
         });
         
@@ -239,9 +238,7 @@ public class HanoiTowerGame extends BaseGame {
             "2. Otherwise:\n" +
             "   a. Move n-1 disks from source to auxiliary (recursive)\n" +
             "   b. Move the nth disk from source to target\n" +
-            "   c. Move n-1 disks from auxiliary to target (recursive)\n\n" +
-            "Time Complexity: O(2^n)\n" +
-            "Space Complexity: O(n)";
+            "   c. Move n-1 disks from auxiliary to target (recursive)";
         
         JTextArea textArea = new JTextArea(explanation);
         textArea.setEditable(false);

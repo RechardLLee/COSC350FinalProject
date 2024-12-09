@@ -3,112 +3,142 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
 
-<VBox alignment="CENTER" spacing="20" prefWidth="1000" prefHeight="700"
-    style="-fx-background-color: #f5f5f5;"
-    xmlns:fx="http://javafx.com/fxml" 
-    fx:controller="GamePlatform.Developer.DeveloperManageController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" 
+    fx:controller="GamePlatform.Developer.DeveloperManageController"
+    stylesheets="@styles/styles.css">
     
-    <padding>
-        <Insets top="20" right="40" bottom="20" left="40"/>
-    </padding>
-    
-    <Label fx:id="titleLabel" text="Developer Management" 
-        style="-fx-font-size: 24; -fx-font-weight: bold;"/>
-    
-    <TabPane VBox.vgrow="ALWAYS">
-        <Tab text="Users" closable="false">
-            <VBox spacing="10">
+    <!-- Left Sidebar -->
+    <left>
+        <VBox styleClass="sidebar">
+            <Label text="Developer Console" styleClass="sidebar-title"/>
+            <Button text="Dashboard" onAction="#showDashboard"/>
+            <Button text="Users" onAction="#showUsers"/> 
+            <Button text="Feedback" onAction="#showFeedback"/>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <StackPane>
+            <!-- Dashboard -->
+            <VBox fx:id="dashboardPane" visible="false">
+                <HBox spacing="20">
+                    <!-- Stats Cards -->
+                    <VBox styleClass="stat-card">
+                        <Label text="Total Users"/>
+                        <Label fx:id="totalUsersLabel"/>
+                    </VBox>
+                    <VBox styleClass="stat-card">
+                        <Label text="Active Today"/>
+                        <Label fx:id="activeUsersLabel"/>
+                    </VBox>
+                    <VBox styleClass="stat-card">
+                        <Label text="Total Games"/>
+                        <Label fx:id="totalGamesLabel"/> 
+                    </VBox>
+                </HBox>
+
+                <!-- Charts -->
+                <HBox spacing="20" alignment="CENTER">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    
+                    <VBox alignment="CENTER" spacing="10">
+                        <LineChart fx:id="activityChart" 
+                                  prefHeight="300" prefWidth="400" 
+                                  animated="false"
+                                  createSymbols="true"
+                                  title="Daily Active Users">
+                            <xAxis>
+                                <CategoryAxis fx:id="xAxis" 
+                                            label="Date" 
+                                            animated="false"
+                                            tickLabelRotation="45"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxis" 
+                                           label="Users" 
+                                           animated="false"
+                                           autoRanging="true"
+                                           forceZeroInRange="true"/>
+                            </yAxis>
+                        </LineChart>
+                    </VBox>
+                    
+                    <VBox alignment="CENTER" spacing="10">
+                        <PieChart fx:id="gameDistChart" 
+                                  prefHeight="300" prefWidth="400" 
+                                  animated="false"
+                                  labelsVisible="true"
+                                  title="Game Distribution"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- User Management -->
+            <VBox fx:id="userPane" visible="false" spacing="10">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
                 <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="idColumn" text="ID"/>
-                        <TableColumn fx:id="usernameColumn" text="Username"/>
-                        <TableColumn fx:id="emailColumn" text="Email"/>
-                        <TableColumn fx:id="balanceColumn" text="Balance"/>
-                        <TableColumn fx:id="createdDateColumn" text="Created Date"/>
+                        <TableColumn text="ID"/>
+                        <TableColumn text="Username"/>
+                        <TableColumn text="Email"/>
+                        <TableColumn text="Register Date"/>
+                        <TableColumn text="Status"/>
                     </columns>
                 </TableView>
-                <HBox spacing="10" alignment="CENTER">
-                    <TextField fx:id="balanceField" promptText="Enter amount"/>
-                    <Button text="Add Money" onAction="#handleAddMoney"/>
-                </HBox>
-            </VBox>
-        </Tab>
-        
-        <Tab text="Games" closable="false">
-            <VBox spacing="10">
-                <TableView fx:id="gameTable" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="gameNameColumn" text="Game Name"/>
-                        <TableColumn fx:id="ownerColumn" text="Owner"/>
-                        <TableColumn fx:id="purchaseDateColumn" text="Purchase Date"/>
-                        <TableColumn fx:id="playTimeColumn" text="Play Time"/>
-                    </columns>
-                </TableView>
+                
                 <HBox spacing="10">
-                    <Button text="Remove Game" onAction="#handleRemoveGame"/>
-                    <Button text="Game Statistics" onAction="#handleGameStats"/>
+                    <Button text="Add User" onAction="#handleAddUser"/>
+                    <Button text="Edit" onAction="#handleEditUser"/>
+                    <Button text="Delete" onAction="#handleDeleteUser"/>
                 </HBox>
             </VBox>
-        </Tab>
-        
-        <Tab text="Reviews" closable="false">
-            <VBox spacing="10">
-                <TableView fx:id="reviewTable" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="reviewIdColumn" text="ID"/>
-                        <TableColumn fx:id="reviewUserColumn" text="User"/>
-                        <TableColumn fx:id="reviewGameColumn" text="Game"/>
-                        <TableColumn fx:id="ratingColumn" text="Rating"/>
-                        <TableColumn fx:id="reviewTextColumn" text="Review"/>
-                        <TableColumn fx:id="reviewDateColumn" text="Date"/>
-                    </columns>
-                </TableView>
+
+            <!-- Feedback Management -->
+            <VBox fx:id="feedbackPane" visible="false" spacing="10">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
+                <TabPane>
+                    <Tab text="Reviews" closable="false">
+                        <TableView fx:id="reviewTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn text="ID"/>
+                                <TableColumn text="User"/>
+                                <TableColumn text="Game"/>
+                                <TableColumn text="Rating"/>
+                                <TableColumn text="Review"/>
+                                <TableColumn text="Date"/>
+                            </columns>
+                        </TableView>
+                    </Tab>
+                    <Tab text="Bug Reports" closable="false">
+                        <TableView fx:id="bugTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn text="ID"/>
+                                <TableColumn text="User"/>
+                                <TableColumn text="Description"/>
+                                <TableColumn text="Status"/>
+                                <TableColumn text="Date"/>
+                            </columns>
+                        </TableView>
+                    </Tab>
+                </TabPane>
+                
                 <HBox spacing="10">
-                    <Button text="Delete Review" onAction="#handleDeleteReview"/>
-                    <Button text="Review Analytics" onAction="#handleReviewAnalytics"/>
+                    <Button text="Mark as Resolved" onAction="#handleResolveBug"/>
+                    <Button text="Delete" onAction="#handleDeleteFeedback"/>
+                    <Button text="Export" onAction="#handleExportFeedback"/>
                 </HBox>
             </VBox>
-        </Tab>
-        
-        <Tab text="Bug Reports" closable="false">
-            <VBox spacing="10">
-                <TableView fx:id="bugTable" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="bugIdColumn" text="ID"/>
-                        <TableColumn fx:id="bugUserColumn" text="User"/>
-                        <TableColumn fx:id="descriptionColumn" text="Description"/>
-                        <TableColumn fx:id="statusColumn" text="Status"/>
-                        <TableColumn fx:id="reportDateColumn" text="Date"/>
-                    </columns>
-                </TableView>
-                <HBox spacing="10">
-                    <Button text="Update Status" onAction="#handleUpdateBugStatus"/>
-                    <Button text="Delete Report" onAction="#handleDeleteBugReport"/>
-                </HBox>
-            </VBox>
-        </Tab>
-        
-        <Tab text="SQL Query" closable="false">
-            <VBox spacing="10">
-                <TextArea fx:id="sqlQueryArea" prefHeight="200" wrapText="true"
-                    promptText="Enter SQL query here..."/>
-                <HBox spacing="10">
-                    <Button text="Execute Query" onAction="#handleExecuteQuery"/>
-                    <Button text="Save Query" onAction="#handleSaveQuery"/>
-                    <Button text="Load Query" onAction="#handleLoadQuery"/>
-                </HBox>
-                <TableView fx:id="queryResultTable" VBox.vgrow="ALWAYS"/>
-            </VBox>
-        </Tab>
-        
-        <Tab text="System" closable="false">
-            <VBox spacing="10">
-                <Button text="Reset Database" onAction="#handleResetDatabase"/>
-                <Button text="Backup Database" onAction="#handleBackupDatabase"/>
-                <Button text="Restore Database" onAction="#handleRestoreDatabase"/>
-                <Button text="View System Logs" onAction="#handleViewLogs"/>
-            </VBox>
-        </Tab>
-    </TabPane>
-</VBox> 
+        </StackPane>
+    </center>
+</BorderPane> 
