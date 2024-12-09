@@ -1253,32 +1253,26 @@ public class BingoController{
     }
     @FXML 
     void callAction(ActionEvent event) {
-        int betAmount = Integer.parseInt(betTextField.getText());
-        int currentBalance = DatabaseService.getUserMoney(username);
-        
-        if (betAmount <= 0 || betAmount > currentBalance) {
-            // 显示错误消息
-            return;
-        }
-        
-        // 扣除下注金额
-        totalBet += betAmount;
-        netProfit -= betAmount;
-        DatabaseService.updateUserMoney(username, currentBalance - betAmount);
-        updateBalance();
-        
-        // 原有的call逻辑...
+        // 原有的call逻辑
         callTextField.setText(bingo.call());
         markCards(bingo.getLastCall());
         cpuMarkCalls(bingo.getLastCall());
         updateCalledNumbers();
         
         if(checkCPUBingo()) {
-            // CPU赢了，玩家输了
+            // CPU赢了,玩家输掉下注金额
+            int betAmount = Integer.parseInt(betTextField.getText());
+            int currentBalance = DatabaseService.getUserMoney(username);
+            DatabaseService.updateUserMoney(username, currentBalance - betAmount);
+            
+            netProfit -= betAmount;
             winningsTextField.setText(Integer.toString(netProfit));
+            
             if (netProfit != 0) {
                 saveScore(netProfit);
             }
+            
+            updateBalance();
             nextRoundAction();
         }
     }
@@ -1286,24 +1280,26 @@ public class BingoController{
     @FXML
     void bingoButtonAction(ActionEvent event) {
         if(card.checkBingo(patternType)) {
-            int winAmount = Integer.parseInt(betTextField.getText()) * 3 * roundIndex;
-            totalWin += winAmount;
-            netProfit += winAmount;
+            // 玩家赢了,获得奖励
+            int betAmount = Integer.parseInt(betTextField.getText());
+            int winAmount = betAmount * 3 * roundIndex;
+            int currentBalance = DatabaseService.getUserMoney(username);
             
-            // 更新用户余额
-            Platform.runLater(() -> {
-                DatabaseService.updateUserMoney(username, 
-                    DatabaseService.getUserMoney(username) + winAmount);
-                updateBalance();
-            });
+            // 先扣除下注金额
+            currentBalance -= betAmount;
+            // 再加上赢得金额
+            currentBalance += winAmount;
             
+            DatabaseService.updateUserMoney(username, currentBalance);
+            
+            netProfit = winAmount - betAmount;
             winningsTextField.setText(Integer.toString(netProfit));
             
-            // 保存分数
             if (netProfit != 0) {
                 saveScore(netProfit);
             }
             
+            updateBalance();
             nextRoundAction();
         }
     }
@@ -1375,8 +1371,10 @@ public class BingoController{
             displayCard = new Circle[]{displayB1Circle, displayB2Circle, displayB3Circle, displayB4Circle, displayB5Circle, displayI1Circle, displayI2Circle, displayI3Circle, displayI4Circle, displayI5Circle, displayN1Circle, displayN2Circle, displayN4Circle, displayN5Circle, displayG1Circle, displayG2Circle, displayG3Circle, displayG4Circle, displayG5Circle, displayO1Circle, displayO2Circle, displayO3Circle, displayO4Circle, displayO5Circle};
             startDisplay();
             
-            // 初始化游戏设置
+            // 设置初始下注金额和净收益
             betTextField.setText("10");
+            netProfit = 0;
+            winningsTextField.setText("0");
             updateBalance();
             
             // 设置窗口标题 - 移到Platform.runLater中
