@@ -1042,6 +1042,22 @@ public class BingoController{
     private void rewardBingo(){
         balanceTextField.setText(Integer.toString(Integer.valueOf(betTextField.getText()) * 3 * roundIndex));
         winningsTextField.setText(Integer.toString(Integer.valueOf(winningsTextField.getText()) + Integer.valueOf(betTextField.getText())));
+
+        int winAmount = Integer.parseInt(betTextField.getText()) * 3 * roundIndex;
+        totalWin += winAmount;
+        netProfit += winAmount;
+            
+            // 更新用户余额
+        Platform.runLater(() -> {
+          DatabaseService.updateUserMoney(username, 
+          DatabaseService.getUserMoney(username) + winAmount);
+          updateBalance();
+        });
+        winningsTextField.setText(Integer.toString(netProfit));
+        // 保存分数
+        if (netProfit != 0) {
+          saveScore(netProfit);
+        }
     }
     // private Boolean checkBingo();
 
@@ -1253,19 +1269,9 @@ public class BingoController{
     }
     @FXML 
     void callAction(ActionEvent event) {
-        int betAmount = Integer.parseInt(betTextField.getText());
-        int currentBalance = DatabaseService.getUserMoney(username);
         
-        if (betAmount <= 0 || betAmount > currentBalance) {
-            // 显示错误消息
-            return;
-        }
         
-        // 扣除下注金额
-        totalBet += betAmount;
-        netProfit -= betAmount;
-        DatabaseService.updateUserMoney(username, currentBalance - betAmount);
-        updateBalance();
+        
         
         // 原有的call逻辑...
         callTextField.setText(bingo.call());
@@ -1274,6 +1280,18 @@ public class BingoController{
         updateCalledNumbers();
         
         if(checkCPUBingo()) {
+          int betAmount = Integer.parseInt(betTextField.getText());
+          int currentBalance = DatabaseService.getUserMoney(username);
+          if (betAmount <= 0 || betAmount > currentBalance) {
+            // 显示错误消息
+            return;
+          }
+
+          // 扣除下注金额
+          totalBet += betAmount;
+          netProfit -= betAmount;
+          DatabaseService.updateUserMoney(username, currentBalance - betAmount);
+          updateBalance();
             // CPU赢了，玩家输了
             winningsTextField.setText(Integer.toString(netProfit));
             if (netProfit != 0) {

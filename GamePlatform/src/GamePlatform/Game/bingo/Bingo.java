@@ -74,21 +74,4 @@ public abstract class Bingo{
 	//format call based on game mode
 	public abstract String formatCall(Integer call);
 
-
-
-
-
-
-
-
-	// public String readBalance(){
-	// 	try (Scanner scanner = new Scanner(new File("user_data.txt"))) {
-    //         while (scanner.hasNextLine()) {
-    //             System.out.println(scanner.nextLine());
-    //         }
-    //     } catch (FileNotFoundException e) {
-    //         e.printStackTrace();
-    //     }
-
-	// }
 }
