@@ -1,7 +1,9 @@
-package BlackJackGui;
+package GamePlatform.Game.BlackJackGui;
 
-public class App extends BlackJack {
-    public static void main(String[] args) throws Exception {
-        BlackJack blackJack = new BlackJack();
+public class App {
+    public static void main(String[] args) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            new BlackJack();
+        });
     }
 }

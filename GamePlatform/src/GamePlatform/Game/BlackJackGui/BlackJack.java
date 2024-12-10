@@ -1,4 +1,4 @@
-package BlackJackGui;
+package GamePlatform.Game.BlackJackGui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -35,7 +35,7 @@ public class BlackJack {
         }
 
         public String getImagePath() {
-            return "./cards/" + toString() + ".png";
+            return "/GamePlatform/Game/BlackJackGui/cards/" + toString() + ".png";
         }
     }
 
