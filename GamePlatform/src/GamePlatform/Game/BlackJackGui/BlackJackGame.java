@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
 import GamePlatform.Game.BaseGame;
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.User.Management.UserSession;
+import java.awt.image.BufferedImage;
 
 public class BlackJackGame extends BaseGame {
     private class Card {
@@ -133,14 +136,26 @@ public class BlackJackGame extends BaseGame {
 
     public BlackJackGame() {
         super("Black Jack");
+        username = UserSession.getCurrentUser();
         startGame();
 
         frame = new JFrame("Black Jack - Player: " + username);
-        frame.setVisible(true);
         frame.setSize(boardWidth, boardHeight);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setVisible(false);
+        
+        // 设置游戏图标
+        try {
+            String iconPath = "/GamePlatform/Game/BlackJackGui/BlackJack.png";
+            ImageIcon icon = new ImageIcon(getClass().getResource(iconPath));
+            frame.setIconImage(icon.getImage());
+        } catch (Exception e) {
+            System.err.println("Failed to load game icon");
+            // 如果加载失败，使用空图标
+            frame.setIconImage(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
+        }
 
         gamePanel.setLayout(new BorderLayout());
         gamePanel.setBackground(new Color(53, 101, 77));
@@ -200,6 +215,16 @@ public class BlackJackGame extends BaseGame {
         });
 
         gamePanel.repaint();
+
+        // 添加窗口关闭监听器
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (score != 0) {
+                    BlackJackGame.this.saveScore(score);
+                }
+            }
+        });
     }
 
     private void checkGameOver() {
@@ -207,18 +232,23 @@ public class BlackJackGame extends BaseGame {
         if (gameOver) {
             nextGameButton.setEnabled(true);
             
+            // 验证下注金
+            if (!validateBet()) {
+                return;
+            }
+            
             // 计算分数
             int finalScore;
             if (playerSum > 21) {
-                finalScore = -betAmount;  // 爆牌输掉赌注
+                finalScore = -betAmount;
             } else if (dealerSum > 21) {
-                finalScore = betAmount * 2;  // 庄家爆牌赢双倍
+                finalScore = betAmount * 2;
             } else if (playerSum > dealerSum) {
-                finalScore = betAmount * 2;  // 赢了赢双倍
+                finalScore = betAmount * 2;
             } else if (playerSum == dealerSum) {
-                finalScore = 0;  // 平局返还赌注
+                finalScore = 0;
             } else {
-                finalScore = -betAmount;  // 输了输掉赌注
+                finalScore = -betAmount;
             }
             
             // 更新用户余额
@@ -301,17 +331,32 @@ public class BlackJackGame extends BaseGame {
     }
 
     private boolean validateBet() {
-        String betText = betField.getText();
+        String betText = betField.getText().trim();
         try {
             betAmount = Integer.parseInt(betText);
             if (betAmount <= 0) {
                 JOptionPane.showMessageDialog(frame, "Please enter a positive bet amount.");
                 return false;
             }
+            
+            // 检查余额是否足够
+            int currentBalance = DatabaseService.getUserMoney(username);
+            if (betAmount > currentBalance) {
+                JOptionPane.showMessageDialog(frame, 
+                    "Insufficient balance. Your current balance is: $" + currentBalance);
+                return false;
+            }
+            
             return true;
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame, "Invalid bet. Please enter a number.");
             return false;
         }
+    }
+
+    // 添加显示方法
+    public void showGame() {
+        frame.setVisible(true);
+        frame.requestFocus();
     }
 }

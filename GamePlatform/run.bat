@@ -34,6 +34,7 @@ xcopy /s /y "src\GamePlatform\Game\bingo\*.fxml" "compile\GamePlatform\Game\bing
 :: Copy BlackJack card images
 mkdir "compile\GamePlatform\Game\BlackJackGui\cards" 2>nul
 xcopy /s /y "src\GamePlatform\Game\BlackJackGui\cards\*.*" "compile\GamePlatform\Game\BlackJackGui\cards\"
+xcopy /s /y "src\GamePlatform\Game\BlackJackGui\BlackJack.png" "compile\GamePlatform\Game\BlackJackGui\"
 
 :: Compile in correct order
 javac -encoding UTF-8 -d compile -sourcepath src ^
