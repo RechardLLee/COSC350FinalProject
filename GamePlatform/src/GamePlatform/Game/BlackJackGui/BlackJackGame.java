@@ -5,8 +5,11 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
+import GamePlatform.Game.GameRecordManager;
+import GamePlatform.Database.DatabaseService;
+import GamePlatform.User.Management.UserSession;
 
-public class BlackJack {
+public class BlackJackGame {
     private class Card {
         String value;
         String type;
@@ -60,7 +63,7 @@ public class BlackJack {
     int cardWidth = 110; //ratio should 1/1.4
     int cardHeight = 154;
 
-    JFrame frame = new JFrame("Black Jack");
+    public JFrame frame;
     JPanel gamePanel = new JPanel() {
         @Override
         public void paintComponent(Graphics g) {
@@ -127,14 +130,19 @@ public class BlackJack {
     JButton nextGameButton = new JButton("Next Game");
     private int betAmount = 0;
 
-    BlackJack() {
+    private String username;
+    private int score = 0;
+
+    public BlackJackGame() {
+        username = UserSession.getCurrentUser();
         startGame();
 
+        frame = new JFrame("Black Jack");
         frame.setVisible(true);
         frame.setSize(boardWidth, boardHeight);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         gamePanel.setLayout(new BorderLayout());
         gamePanel.setBackground(new Color(53, 101, 77));
@@ -197,9 +205,29 @@ public class BlackJack {
     }
 
     private void checkGameOver() {
-        boolean gameOver = (playerSum > 21 || !stayButton.isEnabled()); // Game is over if player busts or presses "Stay"
+        boolean gameOver = (playerSum > 21 || !stayButton.isEnabled());
         if (gameOver) {
-            nextGameButton.setEnabled(true); // Enable the "Next Game" button
+            nextGameButton.setEnabled(true);
+            
+            // 计算分数
+            int finalScore;
+            if (playerSum > 21) {
+                finalScore = 0;  // 爆牌得0分
+            } else if (dealerSum > 21) {
+                finalScore = playerSum * 100;  // 庄家爆牌，玩家获得点数*100的分数
+            } else if (playerSum > dealerSum) {
+                finalScore = (playerSum - dealerSum) * 200;  // 赢得越多，分数越高
+            } else if (playerSum == dealerSum) {
+                finalScore = playerSum * 50;  // 平局得到点数*50的分数
+            } else {
+                finalScore = 0;  // 输了得0分
+            }
+            
+            // 保存分数
+            if (finalScore > 0) {
+                GameRecordManager.saveGameRecord(username, "Black Jack", finalScore);
+                score = finalScore;
+            }
         }
     }
 

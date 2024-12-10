@@ -1,15 +1,20 @@
 package GamePlatform.Game;
 
 import javax.swing.JFrame;
-import GamePlatform.Game.BlackJackGui.BlackJack;
+import GamePlatform.Game.BlackJackGui.BlackJackGame;
+import GamePlatform.User.Management.UserSession;
 
-public class BlackJack extends JFrame {
-    private BlackJack blackJackGame;
+public class BlackJack extends BaseGame {
+    private BlackJackGame blackJackGame;
     
     public BlackJack() {
+        super("Black Jack");
         try {
+            // 设置窗口标题包含玩家名
+            setTitle("Black Jack - Player: " + UserSession.getCurrentUser());
+            
             // 创建21点游戏实例
-            blackJackGame = new BlackJack();
+            blackJackGame = new BlackJackGame();
             
             // 设置JFrame属性
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -32,7 +37,7 @@ public class BlackJack extends JFrame {
     
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> {
-            new BlackJack();
+            new BlackJack().setVisible(true);
         });
     }
 }

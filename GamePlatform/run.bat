@@ -30,9 +30,16 @@ xcopy /s /y "src\GamePlatform\Feedback\*.fxml" "compile\GamePlatform\Feedback\"
 xcopy /s /y "src\GamePlatform\Main\Interfaces\*.fxml" "compile\GamePlatform\Main\Interfaces\"
 xcopy /s /y "src\GamePlatform\Game\bingo\*.fxml" "compile\GamePlatform\Game\bingo\"
 
+:: Copy BlackJack card images
+mkdir "compile\GamePlatform\Game\BlackJackGui\cards" 2>nul
+xcopy /s /y "src\GamePlatform\Game\BlackJackGui\cards\*.*" "compile\GamePlatform\Game\BlackJackGui\cards\"
+
 :: Compile in correct order
 javac -encoding UTF-8 -d compile -sourcepath src ^
     src\GamePlatform\Game\GameStats.java ^
+    src\GamePlatform\Game\BaseGame.java ^
+    src\GamePlatform\Game\BlackJackGui\*.java ^
+    src\GamePlatform\Game\BlackJack.java ^
     src\GamePlatform\Database\DatabaseService.java ^
     src\GamePlatform\User\Management\UserSession.java ^
     src\GamePlatform\Utility\*.java ^
