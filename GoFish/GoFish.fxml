@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="GoFishController" spacing="10" alignment="CENTER" prefWidth="600" prefHeight="400" style = "-fx-background-color: lightpink;">
+    <!-- Title Section -->
+    <Label text="Go Fish" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+
+    <!-- Message Area -->
+    <Label fx:id="messageArea" text="Pick a card from your hand." wrapText="true" style="-fx-font-size: 30px;" />
+    
+    <!-- Player Hand Section -->
+    <VBox spacing="5" alignment="CENTER">
+        <Label text="Your Hand:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <HBox fx:id="playerHand" spacing="5" alignment="CENTER" />
+    </VBox>
+
+    <!-- Selected Card Label -->
+    <Label fx:id="selectedCardLabel" text="You selected: None" style="-fx-font-size: 14px;" />
+
+    <!-- Bot Hand Section -->
+    <VBox spacing="5" alignment="CENTER">
+        <Label text="Bot's Hand:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <HBox fx:id="robotHand" spacing="5" alignment="CENTER" />
+    </VBox>
+
+    <!-- Buttons Section -->
+    <HBox spacing="20" alignment="CENTER">
+        <Button fx:id="newGameButton" text="New Game" onAction="#newGame" />
+        <Button fx:id="exitButton" text="Exit" onAction="#exit" />
+    </HBox>
+
+</VBox>
