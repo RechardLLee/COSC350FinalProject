@@ -5,11 +5,9 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
-import GamePlatform.Game.GameRecordManager;
-import GamePlatform.Database.DatabaseService;
-import GamePlatform.User.Management.UserSession;
+import GamePlatform.Game.BaseGame;
 
-public class BlackJackGame {
+public class BlackJackGame extends BaseGame {
     private class Card {
         String value;
         String type;
@@ -134,10 +132,10 @@ public class BlackJackGame {
     private int score = 0;
 
     public BlackJackGame() {
-        username = UserSession.getCurrentUser();
+        super("Black Jack");
         startGame();
 
-        frame = new JFrame("Black Jack");
+        frame = new JFrame("Black Jack - Player: " + username);
         frame.setVisible(true);
         frame.setSize(boardWidth, boardHeight);
         frame.setLocationRelativeTo(null);
@@ -212,20 +210,20 @@ public class BlackJackGame {
             // 计算分数
             int finalScore;
             if (playerSum > 21) {
-                finalScore = 0;  // 爆牌得0分
+                finalScore = -betAmount;  // 爆牌输掉赌注
             } else if (dealerSum > 21) {
-                finalScore = playerSum * 100;  // 庄家爆牌，玩家获得点数*100的分数
+                finalScore = betAmount * 2;  // 庄家爆牌赢双倍
             } else if (playerSum > dealerSum) {
-                finalScore = (playerSum - dealerSum) * 200;  // 赢得越多，分数越高
+                finalScore = betAmount * 2;  // 赢了赢双倍
             } else if (playerSum == dealerSum) {
-                finalScore = playerSum * 50;  // 平局得到点数*50的分数
+                finalScore = 0;  // 平局返还赌注
             } else {
-                finalScore = 0;  // 输了得0分
+                finalScore = -betAmount;  // 输了输掉赌注
             }
             
-            // 保存分数
-            if (finalScore > 0) {
-                GameRecordManager.saveGameRecord(username, "Black Jack", finalScore);
+            // 更新用户余额
+            if (finalScore != 0) {
+                saveScore(finalScore);
                 score = finalScore;
             }
         }
@@ -310,7 +308,6 @@ public class BlackJackGame {
                 JOptionPane.showMessageDialog(frame, "Please enter a positive bet amount.");
                 return false;
             }
-            // Logic to handle the bet (e.g., deduct from balance) can go here
             return true;
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame, "Invalid bet. Please enter a number.");

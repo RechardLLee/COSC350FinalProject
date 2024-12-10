@@ -21,6 +21,7 @@ mkdir "compile\GamePlatform\Developer" 2>nul
 mkdir "compile\GamePlatform\Feedback" 2>nul
 mkdir "compile\GamePlatform\Main\Interfaces" 2>nul
 mkdir "compile\GamePlatform\Game" 2>nul
+mkdir "compile\GamePlatform\Game\BlackJackGui" 2>nul
 mkdir "compile\GamePlatform\Game\bingo" 2>nul
 
 :: Copy FXML files
@@ -37,8 +38,10 @@ xcopy /s /y "src\GamePlatform\Game\BlackJackGui\cards\*.*" "compile\GamePlatform
 :: Compile in correct order
 javac -encoding UTF-8 -d compile -sourcepath src ^
     src\GamePlatform\Game\GameStats.java ^
+    src\GamePlatform\Game\GameRecord.java ^
+    src\GamePlatform\Game\GameRecordManager.java ^
     src\GamePlatform\Game\BaseGame.java ^
-    src\GamePlatform\Game\BlackJackGui\*.java ^
+    src\GamePlatform\Game\BlackJackGui\BlackJackGame.java ^
     src\GamePlatform\Game\BlackJack.java ^
     src\GamePlatform\Database\DatabaseService.java ^
     src\GamePlatform\User\Management\UserSession.java ^

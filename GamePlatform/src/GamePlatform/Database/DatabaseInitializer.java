@@ -96,6 +96,18 @@ public class DatabaseInitializer {
                 ")"
             );
             
+            // 创建21点游戏记录表
+            stmt.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS BlackJackRecords (" +
+                "    id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "    username TEXT NOT NULL," +
+                "    bet_amount INTEGER NOT NULL," +
+                "    win_amount INTEGER NOT NULL," +
+                "    play_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "    FOREIGN KEY (username) REFERENCES Users(username)" +
+                ")"
+            );
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }

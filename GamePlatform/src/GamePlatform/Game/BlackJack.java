@@ -2,7 +2,6 @@ package GamePlatform.Game;
 
 import javax.swing.JFrame;
 import GamePlatform.Game.BlackJackGui.BlackJackGame;
-import GamePlatform.User.Management.UserSession;
 
 public class BlackJack extends BaseGame {
     private BlackJackGame blackJackGame;
@@ -10,10 +9,6 @@ public class BlackJack extends BaseGame {
     public BlackJack() {
         super("Black Jack");
         try {
-            // 设置窗口标题包含玩家名
-            setTitle("Black Jack - Player: " + UserSession.getCurrentUser());
-            
-            // 创建21点游戏实例
             blackJackGame = new BlackJackGame();
             
             // 设置JFrame属性
@@ -29,7 +24,7 @@ public class BlackJack extends BaseGame {
     
     @Override
     public void dispose() {
-        if (blackJackGame != null) {
+        if (blackJackGame != null && blackJackGame.frame != null) {
             blackJackGame.frame.dispose();
         }
         super.dispose();
