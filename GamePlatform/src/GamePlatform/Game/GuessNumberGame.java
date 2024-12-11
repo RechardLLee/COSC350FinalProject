@@ -159,7 +159,7 @@ public class GuessNumberGame extends BaseGame {
     
     private void showGameResult(boolean won, int score) {
         if (score > 0) {
-            saveScore(score);
+            GameRecordManager.saveGameRecord(username, gameName, score);
         }
         
         String message = won ? 

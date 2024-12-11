@@ -353,7 +353,7 @@ public class SnakeGame extends BaseGame {
         gameTimer.stop();
         
         if (score > 0) {
-            saveScore(0);
+            GameRecordManager.saveGameRecord(username, "Snake", score);;
         }
         
         if (score > highScore) {
