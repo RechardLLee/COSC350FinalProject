@@ -1,3 +1,7 @@
 admin,10000,Mon Dec 02 16:46:09 CST 2024
 111,100000,Mon Dec 02 16:46:09 CST 2024
 weckmanscott,8750,Sun Dec 08 11:02:22 CST 2024
+weckmanscott,10000,Tue Dec 10 14:54:10 CST 2024
+weckmanscott,10000,Tue Dec 10 14:54:41 CST 2024
+weckmanscott,10000,Tue Dec 10 15:00:37 CST 2024
+Scottster,10000,Tue Dec 10 17:22:14 CST 2024

@@ -12,3 +12,9 @@ weckmanscott,11000,Sun Dec 08 12:06:55 CST 2024
 weckmanscott,5000,Sun Dec 08 12:07:06 CST 2024
 weckmanscott,9000,Sun Dec 08 12:07:12 CST 2024
 weckmanscott,5000,Sun Dec 08 12:07:23 CST 2024
+Ellary,5000,Tue Dec 10 14:23:59 CST 2024
+Ellary,10000,Tue Dec 10 14:24:30 CST 2024
+Scottster,8000,Tue Dec 10 17:38:38 CST 2024
+Scottster,5000,Tue Dec 10 17:38:49 CST 2024
+Scottster,5000,Tue Dec 10 17:38:58 CST 2024
+Scottster,8000,Tue Dec 10 17:39:04 CST 2024
