@@ -1,4 +1,5 @@
 111,1024040
 test,1000
 admin,1000
+eckertmorgan,1000
 weckmanscott,1000000000
