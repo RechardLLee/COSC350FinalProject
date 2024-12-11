@@ -59,6 +59,7 @@ public class MainController {
         addGameButton("Memory Game", "MemoryGame");
         addGameButton("Bingo", "BinGo");
         addGameButton("Black Jack", "BlackJack");
+        addGameButton("Go Fish", "Gofish");
         
         // 设置定时更新余额
         balanceUpdateTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateBalance()));
@@ -188,6 +189,11 @@ public class MainController {
                     controller.setGameInfo("Slot Machine", 
                         getGameDescription("Slot Machine"),
                         "SlotMachine");
+                    break;
+                case "Go Fish":
+                    controller.setGameInfo("Go Fish", 
+                        getGameDescription("Go Fish"),
+                        "Gofish");
                     break;
             }
             
@@ -632,6 +638,23 @@ public class MainController {
                        "- Hit to take another card\n" +
                        "- Stay to keep current hand\n" +
                        "- Place bets before each hand";
+
+            case "Go Fish":
+                return "Classic Go Fish Card Game\n\n" +
+                       "Match pairs of cards to earn points.\n\n" +
+                       "Features:\n" +
+                       "- 4x4 grid of cards\n" +
+                       "- Score based on matches\n" +
+                       "- 100 points per match\n" +
+                       "- Memory training\n\n" +
+                       "Rules:\n" +
+                       "- Click cards to reveal them\n" +
+                       "- Find matching pairs\n" +
+                       "- Cards flip back if no match\n" +
+                       "- Game ends when all pairs found\n\n" +
+                       "Controls:\n" +
+                       "- Click to flip cards\n" +
+                       "- New Game to restart";
                        
             default:
                 return "Game description not available.";

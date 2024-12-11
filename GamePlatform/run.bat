@@ -23,6 +23,7 @@ mkdir "compile\GamePlatform\Main\Interfaces" 2>nul
 mkdir "compile\GamePlatform\Game" 2>nul
 mkdir "compile\GamePlatform\Game\BlackJackGui" 2>nul
 mkdir "compile\GamePlatform\Game\bingo" 2>nul
+mkdir "compile\GamePlatform\Game\GoFish" 2>nul
 
 :: Copy FXML files
 xcopy /s /y "src\GamePlatform\User\Management\*.fxml" "compile\GamePlatform\User\Management\"
@@ -30,11 +31,15 @@ xcopy /s /y "src\GamePlatform\Developer\*.fxml" "compile\GamePlatform\Developer\
 xcopy /s /y "src\GamePlatform\Feedback\*.fxml" "compile\GamePlatform\Feedback\"
 xcopy /s /y "src\GamePlatform\Main\Interfaces\*.fxml" "compile\GamePlatform\Main\Interfaces\"
 xcopy /s /y "src\GamePlatform\Game\bingo\*.fxml" "compile\GamePlatform\Game\bingo\"
+xcopy /s /y "src\GamePlatform\Game\GoFish\*.fxml" "compile\GamePlatform\Game\GoFish\"
 
-:: Copy BlackJack card images
+:: Copy card images
 mkdir "compile\GamePlatform\Game\BlackJackGui\cards" 2>nul
 xcopy /s /y "src\GamePlatform\Game\BlackJackGui\cards\*.*" "compile\GamePlatform\Game\BlackJackGui\cards\"
 xcopy /s /y "src\GamePlatform\Game\BlackJackGui\BlackJack.png" "compile\GamePlatform\Game\BlackJackGui\"
+mkdir "compile\GamePlatform\Game\GoFish\cards" 2>nul
+xcopy /s /y "src\GamePlatform\Game\GoFish\cards\*.png" "compile\GamePlatform\Game\GoFish\cards\"
+xcopy /s /y "src\GamePlatform\Game\GoFish\card_back.png" "compile\GamePlatform\Game\GoFish\"
 
 :: Compile in correct order
 javac -encoding UTF-8 -d compile -sourcepath src ^
@@ -42,6 +47,12 @@ javac -encoding UTF-8 -d compile -sourcepath src ^
     src\GamePlatform\Game\GameRecord.java ^
     src\GamePlatform\Game\GameRecordManager.java ^
     src\GamePlatform\Game\BaseGame.java ^
+    src\GamePlatform\Game\GoFish\Rank.java ^
+    src\GamePlatform\Game\GoFish\Suit.java ^
+    src\GamePlatform\Game\GoFish\Card.java ^
+    src\GamePlatform\Game\GoFish\Deck.java ^
+    src\GamePlatform\Game\GoFish\GoFishController.java ^
+    src\GamePlatform\Game\GoFish\GoFish.java ^
     src\GamePlatform\Game\BlackJackGui\BlackJackGame.java ^
     src\GamePlatform\Game\BlackJack.java ^
     src\GamePlatform\Database\DatabaseService.java ^

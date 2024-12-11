@@ -217,6 +217,9 @@ public class GameViewController {
                 case "Black Jack":
                     imagePath = "/src/GamePlatform/Game/BlackJackGui/BlackJack.png";
                     break;
+                case "Go Fish":
+                    imagePath = "/src/GamePlatform/Game/GoFish/Gofish.png";
+                    break;
             }
             
             if (imagePath != null) {
