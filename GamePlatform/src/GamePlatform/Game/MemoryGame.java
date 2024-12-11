@@ -47,7 +47,7 @@ public class MemoryGame extends BaseGame {
             @Override
             public void windowClosing(WindowEvent e) {
                 if (score > 0) {  // 只有在有分数且大于0时才保存
-                    saveScore(score);
+                    GameRecordManager.saveGameRecord(username, gameName, score);
                     score = 0;  // 保存后重置分数，避免重复保存
                 }
             }
@@ -116,7 +116,7 @@ public class MemoryGame extends BaseGame {
                 if (matchesFound == 8) {
                     int finalScore = score;  // 保存最终分数
                     if (finalScore > 0) {
-                        saveScore(finalScore);
+                        GameRecordManager.saveGameRecord(username, gameName, score);
                     }
                     JOptionPane.showMessageDialog(this, 
                         "Congratulations! Final score: " + finalScore);
@@ -151,7 +151,7 @@ public class MemoryGame extends BaseGame {
 
     private void resetGame() {
         if (score > 0) {
-            saveScore(score);  // 保存当前分数（如果有）
+            GameRecordManager.saveGameRecord(username, gameName, score);  // 保存当前分数（如果有）
         }
         score = 0;
         matchesFound = 0;
@@ -169,7 +169,7 @@ public class MemoryGame extends BaseGame {
     @Override
     public void dispose() {
         if (score > 0) {
-            saveScore(score);  // 确保保存最终分数
+            GameRecordManager.saveGameRecord(username, gameName, score);  // 确保保存最终分数
         }
         if (timer != null) {
             timer.cancel();  // 清理定时器

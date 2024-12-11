@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
+import GamePlatform.User.Management.UserSession;
+
 public class TicTacToe extends BaseGame {
     private static final int CELL_SIZE = 100;
     private static final int GRID_SIZE = 3;
@@ -113,7 +115,8 @@ public class TicTacToe extends BaseGame {
             int score = 10000 - (moves - 5) * 1000;  // 从10000开始，每多一步减1000分
             score = Math.max(score, 1000);  // 最低1000分
             if (score > 0) {
-                saveScore(score);
+                GameRecordManager.saveGameRecord(UserSession.getCurrentUser(), "Tic Tac Toe", score);
+                System.out.println(UserSession.getCurrentUser());
             }
             return;
         }
