@@ -462,7 +462,7 @@ public class MainController {
     // }
     
     private void addGameButtonAction(String gameName, String gameId) {
-        String imagePath = "C:/Users/Ecker/COSC350/COSC350FinalProject/GamePlatform/src/GamePlatform/Image/" + gameName.replace(" ", "").toLowerCase() + ".png";
+        String imagePath = "C:/Users/weckm/Documents/GitHub/COSC350FinalProject/GamePlatform/src/GamePlatform/Image/" + gameName.replace(" ", "").toLowerCase() + ".png";
         Button gameButton = new Button(gameName);
         gameButton.setMinWidth(250);
         gameButton.setMinHeight(250);
