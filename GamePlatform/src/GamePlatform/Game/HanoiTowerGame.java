@@ -187,12 +187,8 @@ public class HanoiTowerGame extends BaseGame {
             int minMoves = (1 << numDisks) - 1;
             int score = (int)(10000.0 * minMoves / moves);
             
-            if (score > 0) {
-                saveScore(score);
-            }
-            
             JOptionPane.showMessageDialog(this,
-                String.format("Congratulations!\nMoves: %d\nMinimum moves: %d\nScore: %d",
+                String.format("Congration!\nMove Time: %d\nLess moves: %d\nScores: %d",
                     moves, minMoves, score),
                 "Victory",
                 JOptionPane.INFORMATION_MESSAGE);
