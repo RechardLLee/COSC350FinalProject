@@ -5,7 +5,7 @@
 <?import javafx.geometry.Insets?>
 
 <VBox alignment="CENTER" spacing="30" prefWidth="700" prefHeight="600"
-    style="-fx-background-color: #f5f5f5;"
+    style="-fx-background-color: darkkhaki;"
     xmlns:fx="http://javafx.com/fxml" fx:controller="GamePlatform.Feedback.BugReportController">
     
     <padding>
@@ -15,7 +15,7 @@
     <Label fx:id="titleLabel" text="Bug Report" 
         style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #333;"/>
     
-    <VBox spacing="20" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+    <VBox spacing="20" style="-fx-background-color: khaki; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
         <padding>
             <Insets top="30" right="30" bottom="30" left="30"/>
         </padding>

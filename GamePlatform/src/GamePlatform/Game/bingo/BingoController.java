@@ -1265,7 +1265,7 @@ public class BingoController{
         boolean cpuBingo = checkCPUBingo();
         boolean playerBingo = card.checkBingo(patternType);
         
-        if (cpuBingo || playerBingo) {
+        if (cpuBingo) {
             int betAmount = Integer.parseInt(betTextField.getText());
             int currentBalance = DatabaseService.getUserMoney(username);
             
@@ -1282,11 +1282,7 @@ public class BingoController{
                 netProfit = -betAmount;
                 message = "CPU got BINGO!\nYou lost your bet.";
             } else {
-                // 玩家赢 - 获得3倍赌注
-                int winAmount = betAmount * 3;
-                DatabaseService.updateUserMoney(username, currentBalance + winAmount - betAmount);
-                netProfit = winAmount - betAmount;
-                message = "You got BINGO!\nYou won " + winAmount + " credits!";
+              message = "There was an error";
             }
             
             winningsTextField.setText(Integer.toString(netProfit));
@@ -1367,18 +1363,41 @@ public class BingoController{
 
     @FXML
     void plusAction(ActionEvent event) {
+       boolean bool = true;
+        int index = 0;
+        while(bool){
+            bool = !bingo.getCalledList()[index];
+            index++;
+            if(index == 76){
+                break;
+            }
+        }
         int currentBalance = DatabaseService.getUserMoney(username);
         int currentBet = Integer.parseInt(betTextField.getText());
-        if(currentBet + 10 <= currentBalance) {
+        if(bool){
+            if(currentBet + 10 <= currentBalance) { 
             betTextField.setText(Integer.toString(currentBet + 10));
         }
+        }
+        
     }
 
     @FXML
     void minusAction(ActionEvent event) {
+      boolean bool = true;
+        int index = 0;
+        while(bool){
+            bool = !bingo.getCalledList()[index];
+            index++;
+            if(index == 76){
+                break;
+            }
+        }
         int currentBet = Integer.parseInt(betTextField.getText());
-        if(currentBet - 10 >= 10) { // 最小下注10
+        if(bool){
+            if(currentBet - 10 >= 0) { // 最小下注10
             betTextField.setText(Integer.toString(currentBet - 10));
+          }
         }
     }
 
