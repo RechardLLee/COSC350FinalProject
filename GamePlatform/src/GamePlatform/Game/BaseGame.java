@@ -19,7 +19,6 @@ public abstract class BaseGame extends JFrame {
             // 更新用户余额
             int currentBalance = DatabaseService.getUserMoney(username);
             DatabaseService.updateUserMoney(username, currentBalance + score);
-            
             // 保存游戏记录
             GameRecordManager.saveGameRecord(username, gameName, score);
         }
