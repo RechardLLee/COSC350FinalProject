@@ -58,6 +58,8 @@ public class MainController {
         addGameButton("Roulette", "RouletteGame");
         addGameButton("Memory Game", "MemoryGame");
         addGameButton("Bingo", "BinGo");
+        addGameButton("Black Jack", "BlackJack");
+        addGameButton("Go Fish", "Gofish");
         
         // 设置定时更新余额
         balanceUpdateTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateBalance()));
@@ -188,6 +190,11 @@ public class MainController {
                         getGameDescription("Slot Machine"),
                         "SlotMachine");
                     break;
+                case "Go Fish":
+                    controller.setGameInfo("Go Fish", 
+                        getGameDescription("Go Fish"),
+                        "Gofish");
+                    break;
             }
             
             Stage stage = new Stage();
@@ -276,7 +283,7 @@ public class MainController {
             if (addButtonIndex >= 0) {
                 flowPane.getChildren().add(addButtonIndex, gameButton);
             } else {
-                // 如果找不到 addGameButton，就直接添加末尾
+                // 如果找不到 addGameButton，就直接添��末尾
                 flowPane.getChildren().add(gameButton);
             }
             
@@ -614,12 +621,47 @@ public class MainController {
                        "- Place bets before each game\n" +
                        "- Win multipliers based on pattern";
                        
+            case "Black Jack":
+                return "Classic Black Jack Card Game\n\n" +
+                       "Try to beat the dealer by getting closer to 21.\n\n" +
+                       "Features:\n" +
+                       "- Real card gameplay\n" +
+                       "- Betting system\n" +
+                       "- Score based on performance\n" +
+                       "- Automatic ace handling\n\n" +
+                       "Rules:\n" +
+                       "- Get closer to 21 than dealer\n" +
+                       "- Aces = 1 or 11\n" +
+                       "- Face cards = 10\n" +
+                       "- Don't go over 21\n\n" +
+                       "Controls:\n" +
+                       "- Hit to take another card\n" +
+                       "- Stay to keep current hand\n" +
+                       "- Place bets before each hand";
+
+            case "Go Fish":
+                return "Classic Go Fish Card Game\n\n" +
+                       "Match pairs of cards to earn points.\n\n" +
+                       "Features:\n" +
+                       "- 4x4 grid of cards\n" +
+                       "- Score based on matches\n" +
+                       "- 100 points per match\n" +
+                       "- Memory training\n\n" +
+                       "Rules:\n" +
+                       "- Click cards to reveal them\n" +
+                       "- Find matching pairs\n" +
+                       "- Cards flip back if no match\n" +
+                       "- Game ends when all pairs found\n\n" +
+                       "Controls:\n" +
+                       "- Click to flip cards\n" +
+                       "- New Game to restart";
+                       
             default:
                 return "Game description not available.";
         }
     }
     
-    // 在窗口关闭时停止更新
+    // 在窗口关闭时停止���新
     public void cleanup() {
         if (balanceUpdateTimeline != null) {
             balanceUpdateTimeline.stop();

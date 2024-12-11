@@ -41,6 +41,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
+
 public class BingoController{
 
 
@@ -1253,19 +1257,38 @@ public class BingoController{
     }
     @FXML 
     void callAction(ActionEvent event) {
-        // 原有的call逻辑
         callTextField.setText(bingo.call());
         markCards(bingo.getLastCall());
         cpuMarkCalls(bingo.getLastCall());
         updateCalledNumbers();
         
-        if(checkCPUBingo()) {
-            // CPU赢了,玩家输掉下注金额
+        boolean cpuBingo = checkCPUBingo();
+        boolean playerBingo = card.checkBingo(patternType);
+        
+        if (cpuBingo || playerBingo) {
             int betAmount = Integer.parseInt(betTextField.getText());
             int currentBalance = DatabaseService.getUserMoney(username);
-            DatabaseService.updateUserMoney(username, currentBalance - betAmount);
             
-            netProfit -= betAmount;
+            String message;
+            if (cpuBingo && playerBingo) {
+                // 平局 - 返还一半赌注
+                int returnAmount = betAmount / 2;
+                DatabaseService.updateUserMoney(username, currentBalance - betAmount + returnAmount);
+                netProfit = -betAmount + returnAmount;
+                message = "It's a tie!\nYou get half your bet back.";
+            } else if (cpuBingo) {
+                // CPU赢 - 输掉全部赌���
+                DatabaseService.updateUserMoney(username, currentBalance - betAmount);
+                netProfit = -betAmount;
+                message = "CPU got BINGO!\nYou lost your bet.";
+            } else {
+                // 玩家赢 - 获得3倍赌注
+                int winAmount = betAmount * 3;
+                DatabaseService.updateUserMoney(username, currentBalance + winAmount - betAmount);
+                netProfit = winAmount - betAmount;
+                message = "You got BINGO!\nYou won " + winAmount + " credits!";
+            }
+            
             winningsTextField.setText(Integer.toString(netProfit));
             
             if (netProfit != 0) {
@@ -1273,23 +1296,35 @@ public class BingoController{
             }
             
             updateBalance();
-            nextRoundAction();
+            
+            // 替换 JOptionPane 为 JavaFX Alert
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("BINGO!");
+            alert.setHeaderText(null);
+            alert.setContentText(message + "\nProceed to next round?");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                nextRoundAction();
+            } else {
+                // 如果选择不继续，关闭游戏
+                Platform.runLater(() -> {
+                    Stage stage = (Stage) callButton.getScene().getWindow();
+                    stage.close();
+                });
+            }
         }
     }
 
     @FXML
     void bingoButtonAction(ActionEvent event) {
         if(card.checkBingo(patternType)) {
-            // 玩家赢了,获得奖励
             int betAmount = Integer.parseInt(betTextField.getText());
             int winAmount = betAmount * 3 * roundIndex;
             int currentBalance = DatabaseService.getUserMoney(username);
             
-            // 先扣除下注金额
-            currentBalance -= betAmount;
-            // 再加上赢得金额
-            currentBalance += winAmount;
-            
+            // 更新余额和收益
+            currentBalance = currentBalance + winAmount - betAmount;
             DatabaseService.updateUserMoney(username, currentBalance);
             
             netProfit = winAmount - betAmount;
@@ -1300,7 +1335,24 @@ public class BingoController{
             }
             
             updateBalance();
-            nextRoundAction();
+            
+            // 显示获胜消息和确认对话框
+            String message = "You got BINGO!\nYou won " + winAmount + " credits!";
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("BINGO!");
+            alert.setHeaderText(null);
+            alert.setContentText(message + "\nProceed to next round?");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                nextRoundAction();
+            } else {
+                // 如果选择不继续，关闭游戏
+                Platform.runLater(() -> {
+                    Stage stage = (Stage) callButton.getScene().getWindow();
+                    stage.close();
+                });
+            }
         }
     }
 
@@ -1330,9 +1382,10 @@ public class BingoController{
         }
     }
 
+    // 修改 initialize 方法，添加游戏状态控制
+    private boolean gameInProgress = false;
 
-
-    @FXML // This method is called by the FXMLLoader when initialization is complete
+    @FXML
     void initialize() {
         try {
             roundIndex = 1;
@@ -1371,7 +1424,7 @@ public class BingoController{
             displayCard = new Circle[]{displayB1Circle, displayB2Circle, displayB3Circle, displayB4Circle, displayB5Circle, displayI1Circle, displayI2Circle, displayI3Circle, displayI4Circle, displayI5Circle, displayN1Circle, displayN2Circle, displayN4Circle, displayN5Circle, displayG1Circle, displayG2Circle, displayG3Circle, displayG4Circle, displayG5Circle, displayO1Circle, displayO2Circle, displayO3Circle, displayO4Circle, displayO5Circle};
             startDisplay();
             
-            // 设置初始下注金额和净收益
+            // ���置初始下注金额和净收益
             betTextField.setText("10");
             netProfit = 0;
             winningsTextField.setText("0");
@@ -1390,6 +1443,24 @@ public class BingoController{
                     });
                 }
             });
+            
+            // 添加游戏状态监听
+            callButton.setOnAction(e -> {
+                if (!gameInProgress) {
+                    gameInProgress = true;
+                    // 禁用下注相关控件
+                    betTextField.setEditable(false);
+                    plusButton.setDisable(true);
+                    minusButton.setDisable(true);
+                }
+                callAction(new ActionEvent());
+            });
+            
+            // 在每轮开始时重置游戏状态
+            gameInProgress = false;
+            betTextField.setEditable(true);
+            plusButton.setDisable(false);
+            minusButton.setDisable(false);
             
         } catch (Exception e) {
             e.printStackTrace();

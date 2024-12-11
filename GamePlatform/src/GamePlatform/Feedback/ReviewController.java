@@ -44,7 +44,8 @@ public class ReviewController {
             "Roulette",
             "Slot Machine",
             "Tic Tac Toe",
-            "Bingo"
+            "Bingo",
+            "Blackjack"
         ));
         
         setLanguage(LanguageUtil.isEnglish());
@@ -83,7 +84,8 @@ public class ReviewController {
                 "轮盘赌",
                 "老虎机",
                 "井字棋",
-                "宾果"
+                "宾果",
+                "21点"
             );
             gameComboBox.setItems(games);
         }
@@ -140,6 +142,7 @@ public class ReviewController {
             gameNameMap.put("老虎机", "Slot Machine");
             gameNameMap.put("井字棋", "Tic Tac Toe");
             gameNameMap.put("宾果", "Bingo");
+            gameNameMap.put("21点", "Blackjack");
             
             selectedGame = gameNameMap.get(selectedGame);
         }

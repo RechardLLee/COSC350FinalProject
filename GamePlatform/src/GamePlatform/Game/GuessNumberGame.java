@@ -47,7 +47,7 @@ public class GuessNumberGame extends BaseGame {
         
         // Set up window
         setTitle("Guess the Number Game - Player: " + currentPlayer);
-        setSize(400, 350);
+        setSize(400, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
         
@@ -113,7 +113,7 @@ public class GuessNumberGame extends BaseGame {
     
     private void updateInfoLabel() {
         Map<String, Integer> difficultyInfo = difficulties.get(currentDifficulty);
-        infoLabel.setText(String.format("Guess a number between 1 and %d. Attempts left: %d",
+        infoLabel.setText(String.format("<html>Guess a number between 1 and %d (inclusive).<br>Attempts left: %d</html>",
                                       difficultyInfo.get("range"), attemptsLeft));
     }
     
@@ -122,6 +122,16 @@ public class GuessNumberGame extends BaseGame {
         
         try {
             int guess = Integer.parseInt(inputField.getText());
+            Map<String, Integer> difficultyInfo = difficulties.get(currentDifficulty);
+            int maxRange = difficultyInfo.get("range");
+            
+            // 检查数字是否在有效范围内
+            if (guess < 1 || guess > maxRange) {
+                resultLabel.setText(String.format("Please enter a number between 1 and %d", maxRange));
+                inputField.setText("");
+                return;
+            }
+            
             guesses.add(guess);
             attemptsLeft--;
             
