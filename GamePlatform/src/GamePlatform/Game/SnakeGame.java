@@ -260,6 +260,10 @@ public class SnakeGame extends BaseGame {
         if (gameTimer != null) {
             gameTimer.setDelay(gameSpeed);
         }
+        
+        if (gameRunning) {
+            restartGame();
+        }
     }
     
     private void startGame() {
@@ -267,7 +271,7 @@ public class SnakeGame extends BaseGame {
             gameRunning = true;
             startButton.setEnabled(false);
             restartButton.setEnabled(true);
-            difficultyCombo.setEnabled(false);
+            difficultyCombo.setEnabled(true);
             generateFood();
             gameTimer.start();
         }
@@ -371,6 +375,8 @@ public class SnakeGame extends BaseGame {
         
         if (option == JOptionPane.YES_OPTION) {
             restartGame();
+        } else {
+            dispose();
         }
     }
     

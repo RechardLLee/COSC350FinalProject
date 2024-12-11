@@ -65,6 +65,7 @@ public class HanoiTowerGame extends BaseGame {
         diffCombo.setSelectedItem(currentDifficulty);
         diffCombo.addActionListener(e -> {
             currentDifficulty = (String)diffCombo.getSelectedItem();
+            numDisks = difficulties.get(currentDifficulty);
             resetGame();
         });
         
@@ -191,9 +192,9 @@ public class HanoiTowerGame extends BaseGame {
             }
             
             JOptionPane.showMessageDialog(this,
-                String.format("恭喜完成！\n移动次数: %d\n最少步数: %d\n得分: %d",
+                String.format("Congratulations!\nMoves: %d\nMinimum moves: %d\nScore: %d",
                     moves, minMoves, score),
-                "胜利",
+                "Victory",
                 JOptionPane.INFORMATION_MESSAGE);
             
             return true;
