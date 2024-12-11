@@ -22,9 +22,9 @@ public class DatabaseService {
     private static final String URL = "jdbc:sqlite:gameplatform.db";
     
     // developer username password security answer
-    private static final String DEV_USERNAME = "admin";
-    private static final String DEV_PASSWORD = "admin";
-    private static final String DEV_SECURITY_ANSWER = "admin";
+    private static final String[] DEV_USERNAME = new String[]{"weckmanscott", "eckertmorgan"};
+    private static final String[] DEV_PASSWORD = new String[]{"Isengard1", "Isengard2"};
+    private static final String[] DEV_SECURITY_ANSWER = new String[]{"question", "waffles"};
     
     private static final String USER_DATA_FILE = "user_data.txt";
     private static Map<String, Integer> userMoney = new HashMap<>();
@@ -161,10 +161,21 @@ public class DatabaseService {
         System.out.println("Username: " + username);
         System.out.println("Password: " + password);
         System.out.println("Security Answer: " + securityAnswer);
-        
-        boolean isValid = DEV_USERNAME.equals(username) && 
-                         DEV_PASSWORD.equals(password) && 
-                         DEV_SECURITY_ANSWER.equals(securityAnswer);
+
+        boolean isValid = false;
+        for(String user : DEV_USERNAME){
+            isValid = isValid || user.equals(username);
+        }
+        for(String pass : DEV_PASSWORD){
+            isValid = isValid || pass.equals(password);
+        }
+        for(String answer : DEV_SECURITY_ANSWER){
+            isValid = isValid || answer.equals(securityAnswer);
+        }
+        //DEV_USERNAME.equals(username)
+        // isValid =  isValid && 
+        //                  DEV_PASSWORD.equals(password) && 
+        //                  DEV_SECURITY_ANSWER.equals(securityAnswer);
                          
         System.out.println("Login result: " + isValid);
         return isValid;
