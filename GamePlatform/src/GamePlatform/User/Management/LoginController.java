@@ -38,7 +38,7 @@ public class LoginController {
     
     private void setLanguage(boolean english) {
         if (english) {
-            titleLabel.setText("Game Platform");
+            titleLabel.setText("Steinwand Gaming Emporium");
             usernameField.setPromptText("Username");
             passwordField.setPromptText("Password");
             loginButton.setText("Login");
@@ -78,7 +78,7 @@ public class LoginController {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/GamePlatform/Main/Interfaces/MainView.fxml"));
                 Parent root = loader.load();
                 Stage stage = new Stage();
-                stage.setTitle(LanguageUtil.isEnglish() ? "Game Platform" : "游戏平台");
+                stage.setTitle(LanguageUtil.isEnglish() ? "Steinwand Gaming Emporium" : "游戏平台");
                 stage.setScene(new Scene(root));
                 
                 // 只为主窗口设置尺寸

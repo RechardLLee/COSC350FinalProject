@@ -22,13 +22,15 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import javafx.application.Platform;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class MainController {
     
     @FXML private Label balanceLabel;
     @FXML private Label titleLabel;
     @FXML private Button languageButton;
-    @FXML private Button addGameButton;
+    //@FXML private Button addGameButton;
     @FXML private Button bugReportButton;
     @FXML private Button reviewButton;
     @FXML private Button developerButton;
@@ -50,16 +52,16 @@ public class MainController {
         gamePane.prefWrapLengthProperty().bind(gamePane.widthProperty());
         
         // 添加所有游戏
-        addGameButton("Snake", "SnakeGame");
-        addGameButton("Hanoi Tower", "HanoiTowerGame");
-        addGameButton("Guess Number", "GuessNumberGame");
-        addGameButton("Tic Tac Toe", "TicTacToe");
-        addGameButton("Slot Machine", "SlotMachine");
-        addGameButton("Roulette", "RouletteGame");
-        addGameButton("Memory Game", "MemoryGame");
-        addGameButton("Bingo", "BinGo");
-        addGameButton("Black Jack", "BlackJack");
-        addGameButton("Go Fish", "Gofish");
+        addGameButtonAction("Snake", "SnakeGame");
+        addGameButtonAction("Hanoi Tower", "HanoiTowerGame");
+        addGameButtonAction("Guess Number", "GuessNumberGame");
+        addGameButtonAction("Tic Tac Toe", "TicTacToe");
+        addGameButtonAction("Slot Machine", "SlotMachine");
+        addGameButtonAction("Roulette", "RouletteGame");
+        addGameButtonAction("Memory Game", "MemoryGame");
+        addGameButtonAction("Bingo", "BinGo");
+        addGameButtonAction("Black Jack", "BlackJack");
+        addGameButtonAction("Go Fish", "Gofish");
         
         // 设置定时更新余额
         balanceUpdateTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateBalance()));
@@ -71,14 +73,14 @@ public class MainController {
         if (english) {
             titleLabel.setText("My Games");
             languageButton.setText("中文");
-            addGameButton.setText("+\nAdd Game");
+            // addGameButton.setText("+\nAdd Game");
             bugReportButton.setText("Bug Report");
             reviewButton.setText("Review");
             developerButton.setText("Developer Login");
         } else {
             titleLabel.setText("我的游戏");
             languageButton.setText("English");
-            addGameButton.setText("+\n添加游戏");
+            // addGameButton.setText("+\n添加游戏");
             bugReportButton.setText("问题反馈");
             reviewButton.setText("评价");
             developerButton.setText("开发者登录");
@@ -231,29 +233,29 @@ public class MainController {
             LanguageUtil.isEnglish() ? "Developer Login" : "开发者登录");
     }
     
-    @FXML
-    private void handleAddGame() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(LanguageUtil.isEnglish() ? "Select Game Class File" : "选择游戏类文件");
-        fileChooser.getExtensionFilters().add(
-            new FileChooser.ExtensionFilter(
-                LanguageUtil.isEnglish() ? "Java Class Files" : "Java类文件", 
-                "*.class"
-            )
-        );
+    // @FXML
+    // private void handleAddGame() {
+    //     FileChooser fileChooser = new FileChooser();
+    //     fileChooser.setTitle(LanguageUtil.isEnglish() ? "Select Game Class File" : "选择游戏类文件");
+    //     fileChooser.getExtensionFilters().add(
+    //         new FileChooser.ExtensionFilter(
+    //             LanguageUtil.isEnglish() ? "Java Class Files" : "Java类文件", 
+    //             "*.class"
+    //         )
+    //     );
         
-        File selectedFile = fileChooser.showOpenDialog(addGameButton.getScene().getWindow());
-        if (selectedFile != null) {
-            String gameName = showGameNameDialog();
-            if (gameName != null && !gameName.trim().isEmpty()) {
-                // 获取类名(去掉.class后缀)
-                String className = selectedFile.getName().replace(".class", "");
-                // 保存完整的类名作为游戏路径
-                String classPath = "GamePlatform.Game." + className;
-                addCustomGame(gameName, classPath);
-            }
-        }
-    }
+    //     File selectedFile = fileChooser.showOpenDialog(addGameButton.getScene().getWindow());
+    //     if (selectedFile != null) {
+    //         String gameName = showGameNameDialog();
+    //         if (gameName != null && !gameName.trim().isEmpty()) {
+    //             // 获取类名(去掉.class后缀)
+    //             String className = selectedFile.getName().replace(".class", "");
+    //             // 保存完整的类名作为游戏路径
+    //             String classPath = "GamePlatform.Game." + className;
+    //             addCustomGame(gameName, classPath);
+    //         }
+    //     }
+    // }
     
     private String showGameNameDialog() {
         TextInputDialog dialog = new TextInputDialog();
@@ -265,45 +267,59 @@ public class MainController {
         return result.orElse(null);
     }
     
-    private void addCustomGame(String gameName, String exePath) {
-        try {
-            // 保存游戏信息
-            Map<String, String> customGames = loadCustomGamesMap();
-            customGames.put(gameName, exePath);
-            saveCustomGames(customGames);
+    // private void addCustomGame(String gameName, String exePath) {
+    //     try {
+    //         // 保存游戏信息
+    //         Map<String, String> customGames = loadCustomGamesMap();
+    //         customGames.put(gameName, exePath);
+    //         saveCustomGames(customGames);
             
-            // 创建新的游戏按钮
-            Button gameButton = createGameButton(gameName, exePath);
+    //         // 创建新的游戏按钮
+    //         String imagePath = "GamePlatform/Image/" + gameName.replace(" ", "").toLowerCase() + ".png";
+    //         Button gameButton = createGameButton(gameName, exePath, imagePath);
             
-            // 将按钮添加到 FlowPane
-            FlowPane flowPane = (FlowPane) addGameButton.getParent();
+    //         // 将按钮添加到 FlowPane
+    //         FlowPane flowPane = (FlowPane) addGameButton.getParent();
             
-            // 将新按钮添加到 addGameButton 之前
-            int addButtonIndex = flowPane.getChildren().indexOf(addGameButton);
-            if (addButtonIndex >= 0) {
-                flowPane.getChildren().add(addButtonIndex, gameButton);
-            } else {
-                // 如果找不到 addGameButton，就直接添��末尾
-                flowPane.getChildren().add(gameButton);
-            }
+    //         // 将新按钮添加到 addGameButton 之前
+    //         int addButtonIndex = flowPane.getChildren().indexOf(addGameButton);
+    //         if (addButtonIndex >= 0) {
+    //             flowPane.getChildren().add(addButtonIndex, gameButton);
+    //         } else {
+    //             // 如果找不到 addGameButton，就直接添��末尾
+    //             flowPane.getChildren().add(gameButton);
+    //         }
             
-        } catch (Exception e) {
-            showError(
-                LanguageUtil.isEnglish() ? "Error" : "错误",
-                LanguageUtil.isEnglish() ? "Failed to add game" : "添加游戏失败"
-            );
-            e.printStackTrace();
-        }
-    }
+    //     } catch (Exception e) {
+    //         showError(
+    //             LanguageUtil.isEnglish() ? "Error" : "错误",
+    //             LanguageUtil.isEnglish() ? "Failed to add game" : "添加游戏失败"
+    //         );
+    //         e.printStackTrace();
+    //     }
+    // }
     
-    private Button createGameButton(String gameName, String exePath) {
+    private Button createGameButton(String gameName, String exePath, String imagePath) {
         Button button = new Button(gameName);
         button.setMinWidth(180);
         button.setMinHeight(180);
         button.setMaxWidth(180);
         button.setMaxHeight(180);
-        button.setStyle("-fx-background-color: white; -fx-background-radius: 10; " +
-                       "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);");
+
+        try {
+            if (imagePath.toLowerCase().endsWith(".png")) {
+                ImageView imageView = new ImageView(new Image("file:" + imagePath));
+                imageView.setFitWidth(160);
+                imageView.setFitHeight(160);
+                imageView.setPreserveRatio(true);
+                button.setGraphic(imageView);
+            } else {
+                System.err.println("Unsupported image format. Please use a PNG image: " + imagePath);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load image: " + imagePath);
+            e.printStackTrace();
+        }
         
         button.setOnAction(event -> launchCustomGame(exePath));
         
@@ -365,23 +381,23 @@ public class MainController {
         prefs.put(CUSTOM_GAMES_KEY, sb.toString());
     }
     
-    private void loadCustomGames() {
-        Map<String, String> games = loadCustomGamesMap();
-        FlowPane flowPane = (FlowPane) addGameButton.getParent();
+    // private void loadCustomGames() {
+    //     Map<String, String> games = loadCustomGamesMap();
+    //     FlowPane flowPane = (FlowPane) addGameButton.getParent();
         
-        for (Map.Entry<String, String> entry : games.entrySet()) {
-            Button gameButton = createGameButton(entry.getKey(), entry.getValue());
+    //     for (Map.Entry<String, String> entry : games.entrySet()) {
+    //         Button gameButton = createGameButton(entry.getKey(), entry.getValue(), entry.getValue());
             
-            // 将新按钮添加到 addGameButton 之前
-            int addButtonIndex = flowPane.getChildren().indexOf(addGameButton);
-            if (addButtonIndex >= 0) {
-                flowPane.getChildren().add(addButtonIndex, gameButton);
-            } else {
-                // 如果找不到 addGameButton，就直接添加到末尾
-                flowPane.getChildren().add(gameButton);
-            }
-        }
-    }
+    //         // 将新按钮添加到 addGameButton 之前
+    //         int addButtonIndex = flowPane.getChildren().indexOf(addGameButton);
+    //         if (addButtonIndex >= 0) {
+    //             flowPane.getChildren().add(addButtonIndex, gameButton);
+    //         } else {
+    //             // 如果找不到 addGameButton，就直接添加到末尾
+    //             flowPane.getChildren().add(gameButton);
+    //         }
+    //     }
+    // }
     
     private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -428,31 +444,48 @@ public class MainController {
         });
     }
     
-    private void loadUserGames() {
-        String username = UserSession.getCurrentUser();
-        Map<String, String> userGames = DatabaseService.getUserGames(username);
+    // private void loadUserGames() {
+    //     String username = UserSession.getCurrentUser();
+    //     Map<String, String> userGames = DatabaseService.getUserGames(username);
         
-        // 清除现有游戏按钮保留添加按钮）
-        gamePane.getChildren().clear();
-        gamePane.getChildren().add(addGameButton);
+    //     // 清除现有游戏按钮保留添加按钮）
+    //     gamePane.getChildren().clear();
+    //     gamePane.getChildren().add(addGameButton);
         
-        // 添加用户拥有的游戏
-        for (Map.Entry<String, String> entry : userGames.entrySet()) {
-            Button gameButton = createGameButton(entry.getKey(), entry.getValue());
-            // 将新按钮添加到添加按钮之前
-            int addButtonIndex = gamePane.getChildren().indexOf(addGameButton);
-            gamePane.getChildren().add(addButtonIndex, gameButton);
-        }
-    }
+    //     // 添加用户拥有的游戏
+    //     for (Map.Entry<String, String> entry : userGames.entrySet()) {
+    //         Button gameButton = createGameButton(entry.getKey(), entry.getValue(), entry.getValue());
+    //         // 将新按钮添加到添加按钮之前
+    //         int addButtonIndex = gamePane.getChildren().indexOf(addGameButton);
+    //         gamePane.getChildren().add(addButtonIndex, gameButton);
+    //     }
+    // }
     
-    private void addGameButton(String gameName, String gameId) {
+    private void addGameButtonAction(String gameName, String gameId) {
+        String imagePath = "C:/Users/Ecker/COSC350/COSC350FinalProject/GamePlatform/src/GamePlatform/Image/" + gameName.replace(" ", "").toLowerCase() + ".png";
         Button gameButton = new Button(gameName);
-        gameButton.setMinWidth(180);
-        gameButton.setMinHeight(180);
-        gameButton.setMaxWidth(180);
-        gameButton.setMaxHeight(180);
-        gameButton.setStyle("-fx-background-color: white; -fx-background-radius: 10; " +
-                           "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);");
+        gameButton.setMinWidth(250);
+        gameButton.setMinHeight(250);
+        gameButton.setMaxWidth(250);
+        gameButton.setMaxHeight(250);
+
+        try {
+            File file = new File(imagePath);
+            if (file.exists()){
+                ImageView icon = new ImageView(new Image(file.toURI().toString()));;
+                icon.setFitWidth(230);
+                icon.setFitHeight(230);
+                icon.setPreserveRatio(true);
+
+                gameButton.setGraphic(icon);
+
+            } else {
+                System.err.println("Icon not found");
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load image: " + imagePath);
+            e.printStackTrace();
+        }
         
         gameButton.setOnAction(e -> showGameDetails(gameName, gameId));
         gamePane.getChildren().add(gameButton);
