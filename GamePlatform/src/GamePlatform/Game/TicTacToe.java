@@ -116,7 +116,6 @@ public class TicTacToe extends BaseGame {
             score = Math.max(score, 1000);  // 最低1000分
             if (score > 0) {
                 GameRecordManager.saveGameRecord(UserSession.getCurrentUser(), "Tic Tac Toe", score);
-                System.out.println(UserSession.getCurrentUser());
             }
             return;
         }
@@ -124,7 +123,7 @@ public class TicTacToe extends BaseGame {
         if (moves == GRID_SIZE * GRID_SIZE) {
             gameEnded = true;
             statusLabel.setText("Draw!");
-            saveScore(5000);  // 平局得5000分
+            GameRecordManager.saveGameRecord(UserSession.getCurrentUser(), "Tic Tac Toe", 5000);  // 平局得5000分
             return;
         }
         
