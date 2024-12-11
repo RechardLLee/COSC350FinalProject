@@ -41,7 +41,7 @@ mkdir "compile\GamePlatform\Game\GoFish\cards" 2>nul
 xcopy /s /y "src\GamePlatform\Game\GoFish\cards\*.png" "compile\GamePlatform\Game\GoFish\cards\"
 xcopy /s /y "src\GamePlatform\Game\GoFish\card_back.png" "compile\GamePlatform\Game\GoFish\"
 mkdir "compile\GamePlatform\Image" 2>nul
-xcopy /s /y "src\GamePlatform\Image\*"
+xcopy /s /y "src\GamePlatform\Image\*" "compile\GamePlatform\Image"
 
 :: Compile in correct order
 javac -encoding UTF-8 -d compile -sourcepath src ^
