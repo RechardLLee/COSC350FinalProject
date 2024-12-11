@@ -37,9 +37,11 @@ public class GoFishController {
 
    @FXML
    public void initialize() {
+      print("initialized");
       gameRunning = false;
       newDeck = new Deck();
       newDeck.shuffle();
+      print("shuffled");
 
       // Deal 14 cards alternately between player and bot
       for (int i = 0; i < 14; i++) {
@@ -50,7 +52,13 @@ public class GoFishController {
             botHand.add(drawn);
          }
       }
+      print("dealt");
       update();
+      print("update opened");
+   }
+
+   public void print(String str){
+      System.out.println(str);
    }
 
    private void checkMatch() {
@@ -91,6 +99,7 @@ public class GoFishController {
    }
 
    private void update() {
+      print("update running");
       playerHand.getChildren().clear();
       for (Card card : myHand) {
          try {
@@ -115,6 +124,7 @@ public class GoFishController {
             e.printStackTrace();
          }
       }
+      print("player hand reset");
 
       // Load the card backs for the bot's hand
       robotHand.getChildren().clear();
@@ -134,10 +144,14 @@ public class GoFishController {
             e.printStackTrace();
          }
       }
+      print("bot hand reset");
       
       if (isGameOver()) {
+         print("game is over");
          gameOver();
       }
+      print("game is not over");
+      print("update is done");
    }
 
    private void myTurn(Card selectedCard) {
@@ -147,7 +161,7 @@ public class GoFishController {
       }
 
       selectedCardLabel.setText("You selected: " + selectedCard);
-
+      print("you selected" + selectedCard);
       boolean botHasMatch = false;
       Card matchingCard = null;
 
@@ -160,6 +174,7 @@ public class GoFishController {
       }
 
       if (botHasMatch) {
+         print("you found a match");
          messageArea.setText("You found a match. Pick another card!");
          myMatches.add(selectedCard);
          myMatches.add(matchingCard);
@@ -168,8 +183,10 @@ public class GoFishController {
          botHand.remove(matchingCard);
          update();
       } else {
+         print("go fish");
          messageArea.setText("Go Fish!");
          if (newDeck.size() > 0) {
+            print("deck is not empty");
             myHand.add(newDeck.draw());
             checkMatch();
             update();
