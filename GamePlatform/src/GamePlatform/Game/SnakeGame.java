@@ -353,7 +353,7 @@ public class SnakeGame extends BaseGame {
         gameTimer.stop();
         
         if (score > 0) {
-            saveScore(score);
+            saveScore(0);
         }
         
         if (score > highScore) {
@@ -381,7 +381,8 @@ public class SnakeGame extends BaseGame {
     }
     
     private void updateScore() {
-        scoreLabel.setText(String.format("Score: %d High Score: %d", score, highScore));
+        scoreLabel.setText("Score: " + score);
+        highScoreLabel.setText("High Score: " + highScore);
     }
     
     private void createObstacles() {
